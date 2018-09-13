@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apps.BLL", "Apps.BLL\Apps.B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apps.Model", "Apps.Model\Apps.Model.csproj", "{75BCB93E-5262-4DB2-81BC-8434BAB5E7E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIS.Web", "MIS.Web4.0\MIS.Web.csproj", "{04E14025-F26A-440D-AE82-E7A80D1A99E2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIS.Web", "MIS.Web\MIS.Web.csproj", "{04E14025-F26A-440D-AE82-E7A80D1A99E2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
