@@ -1,0 +1,251 @@
+﻿@model Apps.Model.Employee
+@{
+    Layout = null;
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divDialog = controllerName + "_divDialog";
+    string divContent = controllerName + "_divContent";
+    string formEntity = controllerName + "_formEntity";
+    string tabEntityList = controllerName + "_tabEntityList";
+}
+<script>
+    function show() {
+        initDivDialog("编辑员工");
+        initForm();
+
+        $('#@(divDialog)').dialog('open');
+        $('#@(divDialog)').dialog('center');
+    }
+    $(function () {
+        show();
+    });
+
+    function destroyDialog() {
+        $('#@(divDialog)').dialog('destroy');
+        $('#@(divContent)').empty();
+    }
+
+    function initDivDialog(titleName) {
+        $('#@(divDialog)').dialog({
+            width: 800,
+            height: 500,
+            title: titleName,
+            modal: true,
+            closed: true,
+            collapsible: false,// 是否显示可折叠按钮
+            minimizable: false,// 是否显示最小化按钮
+            maximizable: false,// 是否显示最大化按钮
+            resizable: false,// 是否可以改变对话框窗口大小
+            onClose: destroyDialog,
+            // 对话框窗口底部按钮
+            buttons: [
+                {
+                    text: '保存',
+                    iconCls: 'icon-ok',
+                    handler: function () {
+                        $('#@(formEntity)').submit();
+                    }
+                },
+                {
+                    text: '取消',
+                    iconCls: 'icon-cancel',
+                    handler: destroyDialog
+                }
+            ]
+        });
+    }
+
+    function initForm() {
+        $('#@(formEntity)').form({
+            url: '/@(controllerName)/EditEntity',
+            method: 'post',
+            success: function (result) {
+                var obj = JSON.parse(result);
+                if (obj.status != 0) {
+                    alert(obj.content);
+                }
+                else {
+                    destroyDialog();
+                    $('#@(tabEntityList)').datagrid('reload');
+                }
+            },
+        });
+        $('#birthday').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+        $('#entryDate').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+        $('#formalDate').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+        $('#leaveDate').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+
+        $('#departmentId').combobox({
+            width: '100%',
+            editable: false,
+            url: '/Department/GetAllEntities',
+            mode: 'remote',
+            valueField: 'id',
+            textField: 'name',
+        });
+        @{
+            if (Model.department != null)
+            {
+                <text>
+        $('#departmentId').combobox('setValue', '@(Model.departmentId)')
+                </text>
+            }
+        }
+
+        $('#sex').combobox({
+            width: '100%',
+            editable: false,
+            valueField: 'sex',
+            textField: 'text',
+            data: [
+                { sex: '男', text: '男' },
+                { sex: '女', text: '女' }
+            ]
+        });
+        $('#status').combobox({
+            width: '100%',
+            editable: false,
+            valueField: 'sex',
+            textField: 'text',
+            data: [
+                { sex: '试用期', text: '试用期' },
+                { sex: '在职', text: '在职' },
+                { sex: '离职', text: '离职' },
+            ]
+        });
+
+    }
+
+</script>
+
+<div id="@(divDialog)" class="easyui-dialog">
+    <form id="@(formEntity)" action="" method="post">
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.id)
+        <table style="margin:auto;width:90%">
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.name, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.number, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.number, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.departmentId, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    <input class="parm_control" type="text" id="departmentId" name="departmentId" />
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.sex, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    @*<input class="parm_control" type="text" id="sex" name="sex" value="" />*@
+                    @Html.EditorFor(model => model.sex, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.idCard, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.idCard, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.phone, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.phone, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.birthday, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.birthday, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.bankCard, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.bankCard, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.status, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.status, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.entryDate, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.formalDate, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.formalDate, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.leaveDate, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.leaveDate, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.emergencyContact, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.emergencyContact, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.emergencyPhone, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.emergencyPhone, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+

@@ -1,0 +1,350 @@
+﻿@{
+    ViewBag.Title = "工资单录入";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divContent = controllerName + "_divContent";
+    string tabEntityList = controllerName + "_tabEntityList";
+
+}
+
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+        @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+            <form id="searchForm">
+                <table>
+                    <tr>
+                        <th>部门：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="departmentId" name="departmentId" />
+                        </td>
+                        <th>员工姓名：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="employeeName" name="employeeName" />
+                        </td>
+                        <td>
+                            <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
+                        </td>
+
+                    </tr>
+                    <tr>
+                        <th>考核月：</th>
+                        <!--由于datebox框架上面的数据必须是时间格式的，所以我们用editable="false"来禁止用户手动输入，以免报错-->
+                        <td>
+                            <input class="parm_control" editable="false" name="month" id="month" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <table class="tab_center" id="@(tabEntityList)"></table>
+    </div>
+</div>
+
+<div id="menu" class="easyui-menu" style="width: 50px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+    <div data-options="iconCls:'icon-save'" onclick="onSaveSingle()">保存</div>
+    <div data-options="iconCls:'icon-cancel'" onclick="clearRow()">清空</div>
+</div>
+
+<script>
+    $(function () {
+        initDatagrid();
+    })
+
+
+    function initDatagrid() {
+        $('#departmentId').combobox({
+            width: '100%',
+            editable: false,
+            url: '/Department/GetAllEntities',
+            mode: 'remote',
+            valueField: 'id',
+            textField: 'name',
+        });
+
+        $('#month').datebox({
+            width: '100%',
+            formatter: databoxFormatMonth,
+            parser: databoxParser
+        });
+        $('#month').datebox('setValue', new Date);
+
+
+        $('#@(tabEntityList)').datagrid({
+            method: 'POST',
+            url: '/@(controllerName)/GetAssessmentByPager',
+            pagination: true,
+            singleSelect: true,
+            rownumbers: true,
+            loadMsg: '正在加载中，请稍等... ',
+            nowrap: false,//允许换行
+            fitColumns: true,//宽度自适应
+            onBeforeLoad: onBeforeLoad,
+            onClickRow: onClickRow,
+            onDblClickRow: onDblClickRow,
+            onRowContextMenu: showMenu,
+            onAfterEdit: refreshSalary,
+
+            toolbar: [
+                { text: '保存当前员工', iconCls: 'icon-save', handler: onSaveSingle },
+                { text: '全部保存', iconCls: 'icon-save', handler: onSaveAll },
+            ],
+            frozenColumns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'assessmentInfoId', title: 'assessmentId', width: 80, hidden: true },
+                { field: 'employeeId', title: 'employeeId', width: 80, hidden: true },
+                { field: 'employeeNumber', title: '工号', width: 80 },
+                { field: 'employeeName', title: '姓名', width: 80 },
+                { field: 'departmentName', title: '部门', width: 80 },
+
+            ]],
+            columns: [[
+                { field: 'postSalary', title: '岗位工资', width: 80, },
+                { field: 'shouldWorkTime', title: '应出勤', width: 80, },
+                { field: 'actualWorkTime', title: '实出勤', width: 80, },
+                { field: 'isFullAttendance', title: '是否全勤', width: 80, },
+                { field: 'fullAttendanceRewards', title: '全勤奖', width: 80, styler: positiveStyler, },
+                { field: 'performanceRewardsBase', title: '绩效基数', width: 80, },
+                { field: 'performanceScore', title: '绩效得分', width: 80, },
+                { field: 'performanceRewards', title: '绩效奖金', width: 80, styler: positiveStyler, },
+                { field: 'benefitRewardsBase', title: '效益基数', width: 80, },
+                { field: 'benefitScore', title: '效益得分', width: 80, },
+                { field: 'benefitRewards', title: '效益奖金', width: 80, styler: positiveStyler, },
+                { field: 'seniorityRewardsBae', title: '工龄奖基数', width: 80, },
+                { field: 'seniorityRewards', title: '工龄奖', width: 80, styler: positiveStyler, },
+                { field: 'normalOvertimeRewards', title: '工作日加班补贴', width: 100, styler: positiveStyler, },
+                { field: 'holidayOvertimeRewards', title: '节假日加班补贴', width: 100, styler: positiveStyler, },
+                {
+                    field: 'subsidy', title: '其他补贴', width: 80, styler: positiveStyler,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'reissue', title: '补发', width: 80, styler: positiveStyler,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'socialSecurity', title: '社保', width: 80, styler: negativeStyler,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'publicFund', title: '公积金', width: 80, styler: negativeStyler,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'tax', title: '个人所得税', width: 80, styler: negativeStyler,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                { field: 'shouldTotal', title: '应发工资', width: 80, styler: positiveStyler, },
+                { field: 'actualTotal', title: '实发工资', width: 80, styler: positiveStyler, },
+
+            ]],
+        });
+        var p = $('#@(tabEntityList)').datagrid('getPager');
+        $(p).pagination({
+            pageSize: 10,
+            pageList: [10, 20, 50, 100],
+            beforePageText: '第',
+            afterPageText: '页 共{pages}页',
+            displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
+        });
+
+    }
+
+    function showMenu(e, rowIndex, rowData) { //右键时触发事件
+        //三个参数：e里面的内容很多，真心不明白，rowIndex就是当前点击时所在行的索引，rowData当前行的数据
+        e.preventDefault(); //阻止浏览器捕获右键事件
+
+        $(this).datagrid("selectRow", rowIndex); //根据索引选中该行
+
+        $('#menu').menu('show', {
+            //显示右键菜单
+            left: e.pageX,//在鼠标点击处显示菜单
+            top: e.pageY
+        });
+    }
+
+    function positiveStyler()
+    {
+        return 'background-color:yellow;';
+    }
+    function negativeStyler() {
+        return 'background-color:lightpink;';
+    }
+
+    function refreshSalary(rowIndex, rowData, changes) {
+        if (changes.length == 0) {
+            return
+        }
+
+        
+
+        alert(changes.subsidy);
+        alert(rowData.subsidy);
+
+        var c = parseFloat(changes.subsidy) + parseFloat(changes.reissue)
+
+        //前后变化的值
+
+        rowData.subsidy = 400
+    }
+
+    function getParamsJson() {
+        var filterList = new Array;
+        if ($('#departmentId').val().trim() != '') {
+            var p = {
+                "key": "departmentId",
+                "action": "==",
+                "value": $('#departmentId').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#employeeName').val().trim() != '') {
+            var p = {
+                "key": "employeeName",
+                "action": "==",
+                "value": $('#employeeName').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#month').val().trim() != '') {
+            var p = {
+                "key": "month",
+                "action": "==",
+                "value": $('#month').val().trim()
+            };
+            filterList.push(p)
+        }
+
+        return JSON.stringify(filterList);
+    }
+
+
+    function onBeforeLoad(param) {
+
+        param.extendParams = getParamsJson();
+
+        return true;
+    }
+
+    function filter() {
+        var queryParams = $('#@(tabEntityList)').datagrid('options').queryParams;
+
+        queryParams.extendParams = getParamsJson();
+
+        $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
+        $('#@(tabEntityList)').datagrid('load');
+    }
+
+    function onSaveSingle() {
+        if ($('#month').val() == '') {
+            showAlert('请选择考核月');
+            return;
+        }
+
+        if (!endEditing()){
+            retrun;
+        }
+        var rows = $('#@(tabEntityList)').datagrid('getSelected');
+        if (rows.length == 0) {
+            showAlert('无数据');
+            return;
+        }
+
+        var data = JSON.stringify(rows);
+        var param = {
+            "month" : $('#month').val(),
+            "salaryRecord" : data
+        }
+
+        $.post('/@(controllerName)/SaveSingle', param, function (result) {
+            if (result.status != 0) {
+                showAlert(result.content)
+            }
+            else {
+                showPrompt("保存成功")
+            }
+
+        }, "JSON").error(function (result) {
+        });
+    }
+    function onSaveAll() {
+        if ($('#month').val() == '') {
+            showAlert('请选择考核月');
+            return;
+        }
+        if (!endEditing()) {
+            retrun;
+        }
+        var rows = $('#@(tabEntityList)').datagrid('getRows');
+        if (rows.length == 0) {
+            showAlert('无修改数据');
+            return;
+        }
+
+        var data = JSON.stringify(rows);
+        var param = {
+            "month": $('#month').val(),
+            "salaryRecord": data
+        }
+
+        $.post('/@(controllerName)/SaveBatch', param, function (result) {
+            if (result.status != 0) {
+                showAlert(result.content)
+            }
+            else {
+                showPrompt("保存成功")
+            }
+
+        }, "JSON").error(function (result) {
+        });
+    }
+
+    function clearRow() {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            alert("未选择")
+            return;
+        }
+
+    }
+
+    var editIndex = undefined;//定义全局变量：当前编辑的行
+    function onClickRow(index) {
+        if (editIndex != index) {
+            if (endEditing()) {
+                //$('#@(tabEntityList)').datagrid('selectRow', index).datagrid('beginEdit', index);
+                //editIndex = index;
+                $('#@(tabEntityList)').datagrid('selectRow', editIndex);
+            } else {
+
+            }
+        }
+    }
+
+    function onDblClickRow(index) {
+        if (editIndex != index) {
+            if (endEditing()) {
+                $('#@(tabEntityList)').datagrid('selectRow', index).datagrid('beginEdit', index);
+                editIndex = index;
+            } else {
+                $('#@(tabEntityList)').datagrid('selectRow', editIndex);
+            }
+        }
+    }
+    function endEditing() {
+        if (editIndex == undefined) {
+            return true
+        }
+        if ($('#@(tabEntityList)').datagrid('validateRow', editIndex)) {
+            $('#@(tabEntityList)').datagrid('endEdit', editIndex);
+            editIndex = undefined;
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+</script>

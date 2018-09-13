@@ -1,0 +1,150 @@
+﻿@{
+    ViewBag.Title = "部门管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divContent = controllerName + "_divContent";
+    string tabEntityList = controllerName + "_tabEntityList";
+
+}
+
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+    @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <table class="tab_center" id="@(tabEntityList)"></table>
+    </div>
+</div>
+<div id="@(divContent)"></div>
+
+<div id="menu" class="easyui-menu" style="width: 50px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+    <div data-options="iconCls:'icon-add'" onclick="onAddEntity()">增加</div>
+    <div data-options="iconCls:'icon-edit'" onclick="onEditEntity()">修改</div>
+    <div data-options="iconCls:'icon-remove'" onclick="onRemoveEntity()">删除</div>
+</div>
+
+<script>
+    $(function () {
+        initDatagrid();
+    })
+
+    function initDatagrid() {
+        $('#@(tabEntityList)').treegrid({
+            method: 'POST',
+            url: '/@(controllerName)/GetEntities',
+            pagination: true,
+            singleSelect: true,
+            rownumbers: true,
+            loadMsg: '正在加载中，请稍等... ',
+            nowrap: false,//允许换行
+            fitColumns: true,//宽度自适应
+            onContextMenu: showMenu,
+            toolbar: [
+                { text: '增加', iconCls: 'icon-add', handler: onAddEntity },
+                { text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+                { text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+            ],
+            idField: 'id',
+            treeField: 'name',
+            columns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'name', title: '部门名称', width: 80 },
+                { field: 'code', title: '部门编码', width: 80 },
+            ]],
+
+        });
+        var p = $('#@(tabEntityList)').datagrid('getPager');
+        $(p).pagination({
+            pageSize: 10,
+            pageList: [10, 20, 50, 100],
+            beforePageText: '第',
+            afterPageText: '页 共{pages}页',
+            displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
+        });
+    }
+
+    function showMenu(e, row) { //右键时触发事件
+        //三个参数：e里面的内容很多，真心不明白，rowIndex就是当前点击时所在行的索引，rowData当前行的数据
+        e.preventDefault(); //阻止浏览器捕获右键事件
+
+        $(this).treegrid("select", row.id); //根据索引选中该行
+
+        $('#menu').menu('show', {
+            //显示右键菜单
+            left: e.pageX,//在鼠标点击处显示菜单
+            top: e.pageY
+        });
+    }
+
+
+
+    function formatDepartment(department) {
+        if (department != null) {
+            return department["name"];
+        }
+        else {
+            return "";
+        }
+    }
+
+    function onAddEntity() {
+        $.ajax({
+            url: '/@(controllerName)/Create',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+    function onEditEntity() {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            alert("未选择")
+            return;
+        }
+
+        $('#@(divContent)').empty();
+
+        $.ajax({
+            url: '/@(controllerName)/Edit',
+            type: 'GET',
+            data: 'id='+row.id,
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+    function onRemoveEntity(id) {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            alert("未选择")
+            return;
+        }
+        if (!confirm("确定删除吗")){
+            return;
+        }
+
+        $.ajax({
+            url: '/@(controllerName)/Delete',
+            type: 'GET',
+            data: 'id=' + row.id,
+            async: false,
+            success: function (result) {
+                //var obj = JSON.parse(result);
+                if (result.status != 0) {
+                    alert(result.content);
+                }
+                else {
+                    alert(result.content);
+                    $('#@(tabEntityList)').datagrid('reload');
+                }
+            }
+        });
+    }
+</script>
+
+
+

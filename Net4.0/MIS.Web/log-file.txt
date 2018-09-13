@@ -1,0 +1,4 @@
+[Header] 2018-07-11 18:46:36,036 [9] INFO  App.Logging [(null)]  - log test GetAllEntities
+[Header] 2018-07-11 19:02:26,618 [9] INFO  App.Logging [(null)]  - log test GetAllEntities
+2018-07-11 19:02:40,122 [11] INFO  App.Logging [(null)]  - log test GetAllEntities
+[Header] 2018-07-11 19:05:06,610 [11] INFO  App.Logging [(null)]  - enter GetEntities
