@@ -1,0 +1,168 @@
+﻿@{
+    ViewBag.Title = "员工管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divContent = controllerName + "_divContent";
+    string tabEntityList = controllerName + "_tabEntityList";
+}
+
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+        @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <table class="tab_center" id="@(tabEntityList)"></table>
+    </div>
+</div>
+<div id="@(divContent)"></div>
+
+<div id="menu" class="easyui-menu" style="width: 50px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+    <div data-options="iconCls:'icon-add'" onclick="onAddEntity()">增加</div>
+    <div data-options="iconCls:'icon-edit'" onclick="onEditEntity()">修改</div>
+    <div data-options="iconCls:'icon-remove'" onclick="onRemoveEntity()">删除</div>
+    <div data-options="iconCls:'icon-money'" onclick="onShowSalary()">薪资设定</div>
+</div>
+
+<script>
+    $(function () {
+        initDatagrid();
+    })
+
+    function initDatagrid() {
+        $('#@(tabEntityList)').datagrid({
+            method: 'POST',
+            url: '/@(controllerName)/GetEntities',
+            pagination: true,
+            singleSelect: true,
+            rownumbers: true,
+            loadMsg: '正在加载中，请稍等... ',
+            nowrap: false,//允许换行
+            fitColumns: true,//宽度自适应
+            onRowContextMenu: showMenu,
+            columns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'number', title: '工号', width: 80 },
+                { field: 'name', title: '姓名', width: 80 },
+                { field: 'departmentName', title: '所在部门', width: 100, },
+                { field: 'sex', title: '性别', width: 50 },
+                { field: 'idCard', title: '身份证', width: 160 },
+                { field: 'phone', title: '联系电话', width: 100 },
+                { field: 'birthday', title: '出生日期', width: 100, formatter: formatDate },
+                { field: 'status', title: '在职状态', width: 100 },
+                { field: 'bankCard', title: '工资卡', width: 160 },
+                { field: 'emergencyContact', title: '紧急联系人', width: 80 },
+                { field: 'emergencyPhone', title: '紧急联系人电话', width: 100 },
+                { field: 'entryDate', title: '入职日期', width: 100, formatter: formatDate },
+                { field: 'formalDate', title: '转正日期', width: 100, formatter: formatDate },
+                { field: 'leaveDate', title: '离职日期', width: 100, formatter: formatDate },
+            ]],
+            toolbar: [
+                { text: '增加', iconCls: 'icon-add', handler: onAddEntity },
+                { text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+                { text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+                { text: '薪资设定', iconCls: 'icon-money', handler: onShowSalary },
+
+            ]
+        });
+        var p = $('#@(tabEntityList)').datagrid('getPager');
+        $(p).pagination({
+            pageSize: 10,
+            pageList: [10, 20, 50, 100],
+            beforePageText: '第',
+            afterPageText: '页 共{pages}页',
+            displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
+        });
+    }
+
+    function showMenu(e, rowIndex, rowData) { //右键时触发事件
+        //三个参数：e里面的内容很多，真心不明白，rowIndex就是当前点击时所在行的索引，rowData当前行的数据
+        e.preventDefault(); //阻止浏览器捕获右键事件
+
+        $(this).datagrid("selectRow", rowIndex); //根据索引选中该行
+
+        $('#menu').menu('show', {
+            //显示右键菜单
+            left: e.pageX,//在鼠标点击处显示菜单
+            top: e.pageY
+        });
+    }
+
+    function formatDepartment(department) {
+        return department["name"];
+    }
+
+    function onAddEntity() {
+        $.ajax({
+            url: '/@(controllerName)/Create',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+    function onEditEntity() {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            alert("未选择")
+            return;
+        }
+
+        $.ajax({
+            url: '/@(controllerName)/Edit',
+            type: 'GET',
+            data: 'id='+row.id,
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+    function onRemoveEntity(id) {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            alert("未选择");
+            return;
+        }
+        if (!confirm("确定删除吗")){
+            return;
+        }
+
+        $.ajax({
+            url: '/@(controllerName)/Delete',
+            type: 'GET',
+            data: 'id=' + row.id,
+            async: false,
+            success: function (result) {
+                if (result.status != 0) {
+                    alert(result.content);
+                }
+                else {
+                    $('#@(tabEntityList)').datagrid('reload');
+                }
+            }
+        });
+    }
+
+    function onShowSalary() {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            alert("未选择")
+            return;
+        }
+
+        $.ajax({
+            url: '/@(controllerName)/ShowSalary',
+            type: 'GET',
+            data: 'id=' + row.id,
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+
+</script>
+
+

@@ -1,0 +1,247 @@
+﻿@model Apps.Model.SalaryInfo
+@{
+    Layout = null;
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divDialog = controllerName + "_divDialog";
+    string divContent = controllerName + "_divContent";
+    string formEntity = controllerName + "_formEntity";
+    string tabEntityList = controllerName + "_tabEntityList";
+}
+
+<script>
+    var postTotal = 0;   //用来记录选择的岗位所包含的工资及奖金总和
+    var performanceTotal = 0;   //用来记录选择的绩效所包含的奖金总和
+    var benefitTotal = 0;   //用来记录选择的效益所包含的奖金总和
+
+
+    function show() {
+        initDivDialog("修改个人薪资");
+        initForm();
+
+        $('#@(divDialog)').dialog('open');
+        $('#@(divDialog)').dialog('center');
+    }
+    $(function () {
+        show();
+    });
+
+    function destroyDialog() {
+        $('#@(divDialog)').dialog('destroy');
+        $('#@(divContent)').empty();
+    }
+
+    function initDivDialog(titleName) {
+        $('#@(divDialog)').dialog({
+            width: 450,
+            height: 500,
+            title: titleName,
+            modal: true,
+            closed: true,
+            collapsible: false,// 是否显示可折叠按钮
+            minimizable: false,// 是否显示最小化按钮
+            maximizable: false,// 是否显示最大化按钮
+            resizable: false,// 是否可以改变对话框窗口大小
+            onClose: destroyDialog,
+            // 对话框窗口底部按钮
+            buttons: [
+                {
+                    text: '保存',
+                    iconCls: 'icon-ok',
+                    handler: function () {
+                        $('#@(formEntity)').submit();
+                    }
+                },
+                {
+                    text: '取消',
+                    iconCls: 'icon-cancel',
+                    handler: function () {
+                        destroyDialog();
+                    }
+                }
+            ]
+        });
+    }
+
+    function initForm() {
+        $('#@(formEntity)').form({
+            url: '/@(controllerName)/EditSalary',
+            method: 'post',
+            success: function (result) {
+                var obj = JSON.parse(result);
+                if (obj.status != 0) {
+                    alert(obj.content);
+                }
+                else {
+                    destroyDialog();
+                    $('#@(tabEntityList)').datagrid('reload');
+                }
+            },
+        });
+        //$('#postId').combobox({
+        //    width: '100%',
+        //    editable: false,
+        //    url: '/Post/GetAllEntities',
+        //    mode: 'remote',
+        //    valueField: 'id',
+        //    textField: 'name',
+        //});
+        $('#postId').combogrid({
+            width: '100%',
+            panelWidth: 370,
+            panelHeight: 'auto',
+            editable: false,
+            idField: 'id',
+            textField: 'name',
+            url: '/Post/GetAllEntities',
+            columns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'name', title: '岗位名称', width: 120 },
+                { field: 'code', title: '岗位代码', width: 80 },
+                { field: 'postSalary', title: '岗位工资', width: 80 },
+                { field: 'fullAttendanceRewards', title: '全勤奖', width: 80 },
+            ]],
+            onSelect: function (index, record) {
+                postTotal = record.postSalary + record.fullAttendanceRewards;
+                updateTotal();
+            }
+        });
+
+        $('#performanceId').combogrid({
+            width: '100%',
+            panelWidth: 200,
+            panelHeight: 'auto',
+            editable: false,
+            idField: 'id',
+            textField: 'code',
+            url: '/Performance/GetAllEntities',
+            columns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'code', title: '绩效代码', width: 80 },
+                { field: 'performanceRewards', title: '绩效奖金', width: 80 },
+            ]],
+            onSelect: function (index, record) {
+                performanceTotal = record.performanceRewards;
+                updateTotal();
+            }
+        });
+
+        $('#benefitId').combogrid({
+            width: '100%',
+            panelWidth: 200,
+            panelHeight: 'auto',
+            editable: false,
+            idField: 'id',
+            textField: 'code',
+            url: '/Benefit/GetAllEntities',
+            columns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'code', title: '绩效代码', width: 80 },
+                { field: 'benefitRewards', title: '效益奖金', width: 80 },
+            ]],
+            onSelect: function (index, record) {
+                benefitTotal = record.benefitRewards;
+                updateTotal();
+            }
+        });
+
+        @{
+            var total = 0.0;
+            if (Model.postInfo != null)
+            {
+                <text>
+        postTotal = @(Model.postInfo.postSalary + Model.postInfo.fullAttendanceRewards)
+        $('#postId').combogrid('setValue', '@(Model.postId)')
+                </text>
+            }
+            if (Model.performanceInfo != null)
+            {
+                <text>
+        performanceTotal = @(Model.performanceInfo.performanceRewards)
+        $('#performanceId').combogrid('setValue', '@(Model.performanceId)')
+                </text>
+            }
+            if (Model.benefitInfo != null)
+            {
+                <text>
+        benefitTotal = @(Model.benefitInfo.benefitRewards)
+        $('#benefitId').combogrid('setValue', '@(Model.benefitId)')
+                </text>
+            }
+
+            
+        }
+
+        updateTotal();
+    }
+
+    function updateTotal() {
+        var total = postTotal + performanceTotal + benefitTotal;
+        $('#total').val(total);
+    }
+
+</script>
+
+<div id="@(divDialog)" class="easyui-dialog">
+    <form id="@(formEntity)" action="" method="post">
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.id)
+        @Html.HiddenFor(model => model.employeeId)
+
+
+        <table style="margin:auto;width:90%">
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.employee.number, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    @Html.EditorFor(model => model.employee.number, new { htmlAttributes = new { @class = "parm_control", @disabled="disabled" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.employee.name, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    @Html.EditorFor(model => model.employee.name, new { htmlAttributes = new { @class = "parm_control", @disabled = "disabled" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.postId, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    <select class="parm_control" id="postId" name="postId" ></select>
+                    @*<input class="parm_control" type="text" id="postId" name="postId" />*@
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.performanceId, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" type="text" id="performanceId" name="performanceId" />
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.benefitId, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" type="text" id="benefitId" name="benefitId" />
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    <label class = "lab">标准合计</label>
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" disabled="disabled" type="text" id="total" value="@(total)" />
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+
+
+
