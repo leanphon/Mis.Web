@@ -25,12 +25,26 @@
 </div>
 
 <script>
-    $(function () {
+	$(function () {
         initDatagrid();
+
+		//初始加载，表格宽度自适应
+		$(document).ready(function(){
+			fitCoulms();
+		});
+	　　//浏览器窗口大小变化后，表格宽度自适应
+		$(window).resize(function(){
+			fitCoulms();
+		});
     })
+
+	function fitCoulms(){
+		$('#@(tabEntityList)').datagrid('resize');
+	}
 
     function initDatagrid() {
         $('#@(tabEntityList)').treegrid({
+            width: '100%',
             method: 'POST',
             url: '/@(controllerName)/GetEntities',
             pagination: true,
