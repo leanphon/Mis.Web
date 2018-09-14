@@ -582,6 +582,8 @@
     <Content Include="App_Data\sqliteMis.db" />
     <None Include="Properties\PublishProfiles\MisConfig.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\grid_common.js" />
+    <Content Include="Scripts\grid_entity_define.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
     <Content Include="Scripts\jquery-1.10.2.min.js" />
     <Content Include="Scripts\jquery.easyui.min.js" />
