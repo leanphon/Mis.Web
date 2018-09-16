@@ -1,35 +1,110 @@
+function PostGrid(gridId, toolbarFun) {
+    this.id = gridId;
 
-function EmployeeGrid(toolbarFun){
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'name', title: '层级名称', width: 150 },
+                { field: 'code', title: '层级代码', width: 150 },
+                { field: 'postSalary', title: '岗位工资', width: 150 },
+                { field: 'fullAttendanceRewards', title: '全勤奖', width: 150 },
+                { field: 'seniorityRewardsBase', title: '工龄奖基数', width: 150 },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
+function PerformanceGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'code', title: '绩效代码', width: 150 },
+                { field: 'performanceRewards', title: '绩效奖金', width: 150 },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
+function BenefitGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'code', title: '效益代码', width: 150 },
+                { field: 'benefitRewards', title: '效益奖金', width: 150 },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
+function DepartmentGrid(gridId, toolbarFun) {
+    this.id = gridId;
+    this.idField = 'id';
+    this.treeField = 'name';
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'name', title: '部门名称', width: 250 },
+                { field: 'code', title: '部门编码', width: 150 },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
+
+function EmployeeGrid(gridId, toolbarFun){
+    this.id = gridId;
 
 	this.forzenCols = [[
-                { field: 'id', title: 'id', hidden: true },
-                { field: 'number', title: '工号', width: 80 },
-                { field: 'name', title: '姓名', width: 80 },
-                { field: 'departmentName', title: '所在部门', width: 100, },
+                { field: 'id', hidden: true },
+                { field: 'number', title: '工号', width: 150 },
+                { field: 'name', title: '姓名', width: 150 },
+                { field: 'departmentName', title: '所在部门', width: 150, },
             ]];
 
 	this.normalCols = [[
-                { field: 'id', title: 'id', width: 80, hidden: true },
-                { field: 'number', title: '工号', width: 80 },
-                { field: 'name', title: '姓名', width: 80 },
-                { field: 'departmentName', title: '所在部门', width: 100, },
-                { field: 'sex', title: '性别', width: 50 },
-                { field: 'idCard', title: '身份证', width: 160 },
-                { field: 'phone', title: '联系电话', width: 100 },
-                { field: 'birthday', title: '出生日期', width: 100, formatter: formatDate },
-                { field: 'status', title: '在职状态', width: 100 },
-                { field: 'bankCard', title: '工资卡', width: 160 },
-                { field: 'emergencyContact', title: '紧急联系人', width: 80 },
-                { field: 'emergencyPhone', title: '紧急联系人电话', width: 100 },
-                { field: 'entryDate', title: '入职日期', width: 100, formatter: formatDate },
-                { field: 'formalDate', title: '转正日期', width: 100, formatter: formatDate },
-                { field: 'leaveDate', title: '离职日期', width: 100, formatter: formatDate },
-				{ field: 'bankCard', title: '工资卡', width: 160 },
-                { field: 'emergencyContact', title: '紧急联系人', width: 80 },
-                { field: 'emergencyPhone', title: '紧急联系人电话', width: 100 },
-                { field: 'entryDate', title: '入职日期', width: 100, formatter: formatDate },
-                { field: 'formalDate', title: '转正日期', width: 100, formatter: formatDate },
-                { field: 'leaveDate', title: '离职日期', width: 100, formatter: formatDate },
+                { field: 'sex', title: '性别', width: 100 },
+                { field: 'idCard', title: '身份证', width: 200 },
+                { field: 'phone', title: '联系电话', width: 150 },
+                { field: 'email', title: '工作邮箱', width: 200 },
+                { field: 'birthday', title: '出生日期', width: 150, formatter: formatDate },
+                { field: 'status', title: '在职状态', width: 150 },
+                { field: 'shouldTotal', title: '标准应发月薪', width: 150 },
+                { field: 'bankCard', title: '工资卡', width: 200 },
+                { field: 'emergencyContact', title: '紧急联系人', width: 150 },
+                { field: 'emergencyPhone', title: '紧急联系人电话', width: 150 },
+                { field: 'entryDate', title: '入职日期', width: 200, formatter: formatDate },
+                { field: 'formalDate', title: '转正日期', width: 200, formatter: formatDate },
+                { field: 'leaveDate', title: '离职日期', width: 200, formatter: formatDate },
+                { field: 'address', title: '居住地', width: 250 },
             ]];
 
 
@@ -38,113 +113,257 @@ function EmployeeGrid(toolbarFun){
 			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
 			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
 			{ text: '薪资设定', iconCls: 'icon-money', handler: toolbarFun[3] },
-
+            { text: '导入员工数据', iconCls: 'icon-upload', handler: toolbarFun[4] },
+			{ text: '导出所有', iconCls: 'icon-export', handler: toolbarFun[5] },
 		];
 }
 
 
-function SalaryInputGrid(toolbarFun){
 
-	this.forzenCols = [[
+function AssessmentInputGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+                { field: 'id', hidden: true },
+                { field: 'employeeId', hidden: true },
+                { field: 'employeeNumber', title: '工号', width: 150 },
+                { field: 'employeeName', title: '姓名', width: 150 },
+                { field: 'departmentName', title: '部门', width: 150 },
+    ]];
+
+    this.normalCols = [[
+                {
+                    field: 'shouldWorkTime', title: '应出勤', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'actualWorkTime', title: '实出勤', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'normalOvertime', title: '平日加班', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'holidayOvertime', title: '法定节假日加班', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'lateTime', title: '迟到', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'earlyTime', title: '早退', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'absenteeismTime', title: '旷工', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'personalLeaveTime', title: '事假', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'sickLeaveTime', title: '病假', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'annualVacationTime', title: '使用年假', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'performanceScore', title: '绩效得分', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'benefitScore', title: '效益得分', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+    ]];
+
+    this.toolbar = [
+			{ text: '保存当前', iconCls: 'icon-save', handler: toolbarFun[0] },
+            { text: '保存全部', iconCls: 'icon-save', handler: toolbarFun[1] },
+
+    ];
+}
+
+function AssessmentRecordGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+                { field: 'id', hidden: true },
+                { field: 'employeeId', hidden: true },
+                { field: 'employeeNumber', title: '工号', width: 150 },
+                { field: 'employeeName', title: '姓名', width: 150 },
+                { field: 'departmentName', title: '部门', width: 150 },
+                { field: 'month', title: '月份', width: 150, },
+
+    ]];
+
+    this.normalCols = [[
+                {
+                    field: 'shouldWorkTime', title: '应出勤', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'actualWorkTime', title: '实出勤', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'normalOvertime', title: '平日加班', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'holidayOvertime', title: '法定节假日加班', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'lateTime', title: '迟到', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'earlyTime', title: '早退', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'absenteeismTime', title: '旷工', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'personalLeaveTime', title: '事假', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'sickLeaveTime', title: '病假', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'annualVacationTime', title: '使用年假', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'performanceScore', title: '绩效得分', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                {
+                    field: 'benefitScore', title: '效益得分', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
+                },
+                { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDate },
+    ]];
+
+    this.toolbar = [
+			{ text: '保存当前', iconCls: 'icon-save', handler: toolbarFun[0] },
+            { text: '保存全部', iconCls: 'icon-save', handler: toolbarFun[1] },
+
+    ];
+}
+
+function SalaryInputGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
                 { field: 'id', hidden: true },
                 { field: 'assessmentInfoId', hidden: true },
-                { field: 'employeeId',  hidden: true },
-                { field: 'employeeNumber', title: '工号', width: 90 },
-                { field: 'employeeName', title: '姓名', width: 80 },
-                { field: 'departmentName', title: '部门', width: 80 },
-            ]];
+                { field: 'employeeId', hidden: true },
+                { field: 'employeeNumber', title: '工号', width: 150 },
+                { field: 'employeeName', title: '姓名', width: 150 },
+                { field: 'departmentName', title: '部门', width: 150 },
+    ]];
 
-	this.normalCols = [[
-                { field: 'postSalary', title: '岗位工资', width: 80, },
-                { field: 'shouldWorkTime', title: '应出勤', width: 80, },
-                { field: 'actualWorkTime', title: '实出勤', width: 80, },
-                { field: 'isFullAttendance', title: '是否全勤', width: 80, },
-                { field: 'fullAttendanceRewards', title: '全勤奖', width: 80, styler: positiveStyler, },
-                { field: 'performanceRewardsBase', title: '绩效基数', width: 80, },
-                { field: 'performanceScore', title: '绩效得分', width: 80, },
-                { field: 'performanceRewards', title: '绩效奖金', width: 80, styler: positiveStyler, },
-                { field: 'benefitRewardsBase', title: '效益基数', width: 80, },
-                { field: 'benefitScore', title: '效益得分', width: 80, },
-                { field: 'benefitRewards', title: '效益奖金', width: 80, styler: positiveStyler, },
-                { field: 'seniorityRewardsBae', title: '工龄奖基数', width: 80, },
-                { field: 'seniorityRewards', title: '工龄奖', width: 80, styler: positiveStyler, },
-                { field: 'normalOvertimeRewards', title: '工作日加班补贴', width: 100, styler: positiveStyler, },
-                { field: 'holidayOvertimeRewards', title: '节假日加班补贴', width: 100, styler: positiveStyler, },
+    this.normalCols = [[
+                { field: 'postSalary', title: '岗位工资', width: 150, },
+                { field: 'shouldWorkTime', title: '应出勤', width: 150, },
+                { field: 'actualWorkTime', title: '实出勤', width: 150, },
+                { field: 'isFullAttendance', title: '是否全勤', width: 150, },
+                { field: 'fullAttendanceRewards', title: '全勤奖', width: 150, styler: positiveStyler, },
+                { field: 'performanceRewardsBase', title: '绩效基数', width: 150, },
+                { field: 'performanceScore', title: '绩效得分', width: 150, },
+                { field: 'performanceRewards', title: '绩效奖金', width: 150, styler: positiveStyler, },
+                { field: 'benefitRewardsBase', title: '效益基数', width: 150, },
+                { field: 'benefitScore', title: '效益得分', width: 150, },
+                { field: 'benefitRewards', title: '效益奖金', width: 150, styler: positiveStyler, },
+                { field: 'seniorityRewardsBae', title: '工龄奖基数', width: 150, },
+                { field: 'seniorityRewards', title: '工龄奖', width: 150, styler: positiveStyler, },
+                { field: 'normalOvertimeRewards', title: '工作日加班补贴', width: 150, styler: positiveStyler, },
+                { field: 'holidayOvertimeRewards', title: '节假日加班补贴', width: 150, styler: positiveStyler, },
                 {
-                    field: 'subsidy', title: '其他补贴', width: 80, styler: positiveStyler,
+                    field: 'subsidy', title: '其他补贴', width: 150, styler: positiveStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
                 {
-                    field: 'reissue', title: '补发', width: 80, styler: positiveStyler,
+                    field: 'reissue', title: '补发', width: 150, styler: positiveStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
                 {
-                    field: 'socialSecurity', title: '社保', width: 80, styler: negativeStyler,
+                    field: 'socialSecurity', title: '社保', width: 150, styler: negativeStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
                 {
-                    field: 'publicFund', title: '公积金', width: 80, styler: negativeStyler,
+                    field: 'publicFund', title: '公积金', width: 150, styler: negativeStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
                 {
-                    field: 'tax', title: '个人所得税', width: 80, styler: negativeStyler,
+                    field: 'tax', title: '个人所得税', width: 150, styler: negativeStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
-                { field: 'shouldTotal', title: '应发工资', width: 80, styler: positiveStyler, },
-                { field: 'actualTotal', title: '实发工资', width: 80, styler: positiveStyler, }, 
+                { field: 'shouldTotal', title: '应发工资', width: 150, styler: positiveStyler, },
+                { field: 'actualTotal', title: '实发工资', width: 150, styler: positiveStyler, },
 
-            ]];
+    ]];
 
 
-	this.toolbar = [
+    this.toolbar = [
 			{ text: '保存当前员工', iconCls: 'icon-save', handler: toolbarFun[0] },
             { text: '全部保存', iconCls: 'icon-save', handler: toolbarFun[1] },
 
-		];
+    ];
 }
 
-
-function SalaryRecordGrid(toolbarFun){
+function SalaryRecordGrid(gridId, toolbarFun) {
+    this.id = gridId;
 
 	this.forzenCols = [[
                 { field: 'id', hidden: true },
                 { field: 'assessmentInfoId', hidden: true },
                 { field: 'employeeId',  hidden: true },
-                { field: 'employeeNumber', title: '工号', width: 90 },
-                { field: 'employeeName', title: '姓名', width: 80 },
-                { field: 'departmentName', title: '部门', width: 80 },
+                { field: 'employeeNumber', title: '工号', width: 150 },
+                { field: 'employeeName', title: '姓名', width: 150 },
+                { field: 'departmentName', title: '部门', width: 150 },
+                { field: 'month', title: '月份', width: 150, },
 
             ]];
 
 	this.normalCols = [[
-                { field: 'month', title: '月份', width: 80, },
-                { field: 'postSalary', title: '岗位工资', width: 80, },
-                { field: 'fullAttendanceRewards', title: '全勤奖', width: 80, styler: positiveStyler, },
-                { field: 'performanceRewards', title: '绩效奖金', width: 80, styler: positiveStyler, },
-                { field: 'benefitRewards', title: '效益奖金', width: 80, styler: positiveStyler, },
-                { field: 'seniorityRewards', title: '工龄奖', width: 80, styler: positiveStyler, },
+                { field: 'postSalary', title: '岗位工资', width: 150, },
+                { field: 'fullAttendanceRewards', title: '全勤奖', width: 150, styler: positiveStyler, },
+                { field: 'performanceRewards', title: '绩效奖金', width: 150, styler: positiveStyler, },
+                { field: 'benefitRewards', title: '效益奖金', width: 150, styler: positiveStyler, },
+                { field: 'seniorityRewards', title: '工龄奖', width: 150, styler: positiveStyler, },
                 { field: 'normalOvertimeRewards', title: '工作日加班补贴', width: 100, styler: positiveStyler, },
                 { field: 'holidayOvertimeRewards', title: '节假日加班补贴', width: 100, styler: positiveStyler, },
-                { field: 'subsidy', title: '其他补贴', width: 80, styler: positiveStyler, },
+                { field: 'subsidy', title: '其他补贴', width: 150, styler: positiveStyler, },
                 {
-                    field: 'reissue', title: '补发', width: 80, styler: positiveStyler,
+                    field: 'reissue', title: '补发', width: 150, styler: positiveStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
                 {
-                    field: 'socialSecurity', title: '社保', width: 80, styler: negativeStyler,
+                    field: 'socialSecurity', title: '社保', width: 150, styler: negativeStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
                 {
-                    field: 'publicFund', title: '公积金', width: 80, styler: negativeStyler,
+                    field: 'publicFund', title: '公积金', width: 150, styler: negativeStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
                 {
-                    field: 'tax', title: '个人所得税', width: 80, styler: negativeStyler,
+                    field: 'tax', title: '个人所得税', width: 150, styler: negativeStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
-                { field: 'shouldTotal', title: '应发工资', width: 80, styler: positiveStyler, },
-                { field: 'actualTotal', title: '实发工资', width: 80, styler: positiveStyler, },
-                { field: 'inputDate', title: '录入时间', width: 100, formatter: formatDate },
+                { field: 'shouldTotal', title: '应发工资', width: 150, styler: positiveStyler, },
+                { field: 'actualTotal', title: '实发工资', width: 150, styler: positiveStyler, },
+                { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDate },
 
             ]];
 

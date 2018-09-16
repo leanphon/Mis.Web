@@ -26,71 +26,26 @@
 
 <script>
 	$(function () {
-        initDatagrid();
+        initPage();
 
 		//初始加载，表格宽度自适应
 		$(document).ready(function(){
-			fitCoulms();
+		    onTreegridAdjust();
 		});
 	　　//浏览器窗口大小变化后，表格宽度自适应
 		$(window).resize(function(){
-			fitCoulms();
+		    onTreegridAdjust();
 		});
-    })
+	})
 
-	function fitCoulms(){
-		$('#@(tabEntityList)').datagrid('resize');
-	}
+	function initPage() {
+	    var url = '/@(controllerName)/GetEntities';
+	    var callbackFuns = [{ "name": "onContextMenu", "fun": onTreegridonContextMenu }];
+	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
+	    var gridObj = new DepartmentGrid('@(tabEntityList)', toolbarFun);
 
-    function initDatagrid() {
-        $('#@(tabEntityList)').treegrid({
-            width: '100%',
-            method: 'POST',
-            url: '/@(controllerName)/GetEntities',
-            pagination: true,
-            singleSelect: true,
-            rownumbers: true,
-            loadMsg: '正在加载中，请稍等... ',
-            nowrap: false,//允许换行
-            fitColumns: true,//宽度自适应
-            onContextMenu: showMenu,
-            toolbar: [
-                { text: '增加', iconCls: 'icon-add', handler: onAddEntity },
-                { text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
-                { text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
-            ],
-            idField: 'id',
-            treeField: 'name',
-            columns: [[
-                { field: 'id', title: 'id', width: 80, hidden: true },
-                { field: 'name', title: '部门名称', width: 80 },
-                { field: 'code', title: '部门编码', width: 80 },
-            ]],
-
-        });
-        var p = $('#@(tabEntityList)').datagrid('getPager');
-        $(p).pagination({
-            pageSize: 10,
-            pageList: [10, 20, 50, 100],
-            beforePageText: '第',
-            afterPageText: '页 共{pages}页',
-            displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
-        });
+	    initTreegrid(gridObj, url, callbackFuns);
     }
-
-    function showMenu(e, row) { //右键时触发事件
-        //三个参数：e里面的内容很多，真心不明白，rowIndex就是当前点击时所在行的索引，rowData当前行的数据
-        e.preventDefault(); //阻止浏览器捕获右键事件
-
-        $(this).treegrid("select", row.id); //根据索引选中该行
-
-        $('#menu').menu('show', {
-            //显示右键菜单
-            left: e.pageX,//在鼠标点击处显示菜单
-            top: e.pageY
-        });
-    }
-
 
 
     function formatDepartment(department) {

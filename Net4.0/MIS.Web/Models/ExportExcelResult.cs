@@ -36,7 +36,6 @@ namespace MIS.Web.Models
                     DateTime.Now.ToString("yyyyMMddHHmmss"),
                     ".xlsx");
             }
-
             this.ExportExcelEventHandler(context);
         }
 
