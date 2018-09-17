@@ -11,6 +11,31 @@
 <div class="easyui-layout" fit="true" border="false">
     <div>
         @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+            <form id="searchForm">
+                <table>
+                    <tr>
+                        <th>部门：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="departmentId" name="departmentId" />
+                        </td>
+                        <th>员工姓名：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="employeeName" name="employeeName" />
+                        </td>
+                        <th>员工状态：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="status" name="status" />
+                        </td>
+                        <th></th>
+                        <td>
+                            <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
+                        </td>
+
+                    </tr>
+                </table>
+            </form>
+        </div>
         <table class="tab_center" id="@(tabEntityList)"></table>
     </div>
 </div>
@@ -24,86 +49,123 @@
     <div data-options="iconCls:'icon-money'" onclick="onShowSalary()">薪资设定</div>
 </div>
 
+
+<div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+</div>
+
 <script>
 	$(function () {
-        initDatagrid();
+	    initPage();
 
 		//初始加载，表格宽度自适应
 		$(document).ready(function(){
-			fitCoulms();
+			onDatagridAdjust();
 		});
 	　　//浏览器窗口大小变化后，表格宽度自适应
 		$(window).resize(function(){
-			fitCoulms();
+			onDatagridAdjust();
 		});
     })
 
-	function fitCoulms(){
-		$('#@(tabEntityList)').datagrid('resize');
+	function initPage() {
+	    $('#departmentId').combobox({
+	        width: '100%',
+	        //editable: false,
+	        url: '/Department/GetAllEntities',
+	        mode: 'remote',
+	        valueField: 'id',
+	        textField: 'name',
+	    });
+
+	    $('#status').combobox({
+	        width: '100%',
+	        multiple: 'true',
+	        editable: false,
+	        valueField: 'sex',
+	        textField: 'text',
+	        data: [
+                { sex: '试用期', text: '试用期' },
+                { sex: '在职', text: '在职' },
+                { sex: '离职', text: '离职' },
+	        ]
+	    });
+	    var data = '试用期,在职';
+	    $('#status').combobox('setValues', data.split(','))
+
+
+	    var url = '/@(controllerName)/GetEntities';
+	    var callbackFuns = [
+            { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
+	    ];
+	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity, onShowSalary, onImportExcel, onExportAll];
+	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbarFun);
+
+	    initDatagrid(gridObj, url, callbackFuns);
 	}
 
-    function initDatagrid() {
-        $('#@(tabEntityList)').datagrid({
-            width: '100%',
-            method: 'POST',
-            url: '/@(controllerName)/GetEntities',
-            pagination: true,
-            singleSelect: true,
-            rownumbers: true,
-            loadMsg: '正在加载中，请稍等... ',
-            nowrap: false,//允许换行
-            fitColumns: true,//宽度自适应
-            onRowContextMenu: showMenu,
-            columns: [[
-                { field: 'id', title: 'id', width: 80, hidden: true },
-                { field: 'number', title: '工号', width: 80 },
-                { field: 'name', title: '姓名', width: 80 },
-                { field: 'departmentName', title: '所在部门', width: 100, },
-                { field: 'sex', title: '性别', width: 50 },
-                { field: 'idCard', title: '身份证', width: 160 },
-                { field: 'phone', title: '联系电话', width: 100 },
-                { field: 'birthday', title: '出生日期', width: 100, formatter: formatDate },
-                { field: 'status', title: '在职状态', width: 100 },
-                { field: 'bankCard', title: '工资卡', width: 160 },
-                { field: 'emergencyContact', title: '紧急联系人', width: 80 },
-                { field: 'emergencyPhone', title: '紧急联系人电话', width: 100 },
-                { field: 'entryDate', title: '入职日期', width: 100, formatter: formatDate },
-                { field: 'formalDate', title: '转正日期', width: 100, formatter: formatDate },
-                { field: 'leaveDate', title: '离职日期', width: 100, formatter: formatDate },
-            ]],
-            toolbar: [
-                { text: '增加', iconCls: 'icon-add', handler: onAddEntity },
-                { text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
-                { text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
-                { text: '薪资设定', iconCls: 'icon-money', handler: onShowSalary },
 
-            ]
-        });
-        var p = $('#@(tabEntityList)').datagrid('getPager');
-        $(p).pagination({
-            pageSize: 10,
-            pageList: [10, 20, 50, 100],
-            beforePageText: '第',
-            afterPageText: '页 共{pages}页',
-            displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
-        });
+    function getParamsJson() {
+        var filterList = new Array;
+        if ($('#departmentId').val().trim() != '') {
+            var p = {
+                "key": "departmentId",
+                "action": "==",
+                "value": $('#departmentId').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#employeeName').val().trim() != '') {
+            var p = {
+                "key": "employeeName",
+                "action": "==",
+                "value": $('#employeeName').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#status').val().trim() != '') {
+            var p = {
+                "key": "status",
+                "action": "==",
+                "value": $('#status').val().trim()
+            };
+            filterList.push(p)
+        }
+
+        return JSON.stringify(filterList);
     }
 
-    function showMenu(e, rowIndex, rowData) { //右键时触发事件
-        //三个参数：e里面的内容很多，真心不明白，rowIndex就是当前点击时所在行的索引，rowData当前行的数据
-        e.preventDefault(); //阻止浏览器捕获右键事件
 
-        $(this).datagrid("selectRow", rowIndex); //根据索引选中该行
+    function onBeforeLoad(param) {
 
-        $('#menu').menu('show', {
-            //显示右键菜单
-            left: e.pageX,//在鼠标点击处显示菜单
-            top: e.pageY
-        });
+        param.extendParams = getParamsJson();
+
+        return true;
     }
 
-    function formatDepartment(department) {
-        return department["name"];
+    function filter() {
+        var queryParams = $('#@(tabEntityList)').datagrid('options').queryParams;
+
+        queryParams.extendParams = getParamsJson();
+
+        $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
+        $('#@(tabEntityList)').datagrid('load');
+    }
+
+    function onExportAll() {
+
+        window.location.href = '/@(controllerName)/ExportAll?extendParams=' + getParamsJson();
+
+    }
+    function onImportExcel() {
+        $.ajax({
+            url: '/@(controllerName)/ShowImport',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
     }
 
     function onAddEntity() {

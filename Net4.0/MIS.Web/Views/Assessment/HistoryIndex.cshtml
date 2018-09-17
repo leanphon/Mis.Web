@@ -30,7 +30,7 @@
 
                     </tr>
                     <tr>
-                        <th>考核月：</th>
+                        <th>月份：</th>
                         <!--由于datebox框架上面的数据必须是时间格式的，所以我们用editable="false"来禁止用户手动输入，以免报错-->
                         <td>
                             <input class="parm_control" name="month" id="month" />
@@ -49,29 +49,29 @@
     <div data-options="iconCls:'icon-cancel'" onclick="clearRow()">清空</div>
 </div>
 
+<div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+</div>
+
 <script>
 	$(function () {
-        initDatagrid();
+	    initPage();
 
 		//初始加载，表格宽度自适应
 		$(document).ready(function(){
-			fitCoulms();
+			onDatagridAdjust();
 		});
 	　　//浏览器窗口大小变化后，表格宽度自适应
 		$(window).resize(function(){
-			fitCoulms();
+			onDatagridAdjust();
 		});
     })
 
-	function fitCoulms(){
-		$('#@(tabEntityList)').datagrid('resize');
-	}
+	function initPage() {
 
-
-    function initDatagrid() {
-        $('#departmentId').combobox({
+	    $('#departmentId').combobox({
             width: '100%',
-            editable: false,
+            //editable: false,
             url: '/Department/GetAllEntities',
             mode: 'remote',
             valueField: 'id',
@@ -85,108 +85,16 @@
         });
         $('#month').datebox('setValue', new Date);
 
+        var url = '/@(controllerName)/GetEntities';
+	    var callbackFuns = [
+            { "name": "onBeforeLoad", "fun": onBeforeLoad },
+            { "name": "onClickRow", "fun": onClickRow },
+            { "name": "onDblClickRow", "fun": onDblClickRow, },
+            { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
+	    ]; var toolbarFun = [onEditEntity, onLock, onUnlock, onExportAll];
+        var gridObj = new AssessmentRecordGrid('@(tabEntityList)', toolbarFun);
+        initDatagrid(gridObj, url, callbackFuns);
 
-        $('#@(tabEntityList)').datagrid({
-            width: '100%',
-            method: 'POST',
-            url: '/@(controllerName)/GetEntities',
-            pagination: true,
-            singleSelect: true,
-            rownumbers: true,
-            loadMsg: '正在加载中，请稍等... ',
-            nowrap: false,//允许换行
-            fitColumns: true,//宽度自适应
-            onBeforeLoad: onBeforeLoad,
-            onClickRow: onClickRow,
-            onDblClickRow: onDblClickRow,
-            onRowContextMenu: showMenu,
-
-            toolbar: [
-                { text: '修改', iconCls: 'icon-save', handler: onEditEntity },
-                { text: '锁定', iconCls: 'icon-lock', handler: onLock },
-                { text: '解锁', iconCls: 'icon-unlock', handler: onUnlock },
-                { text: '导出所有', iconCls: 'icon-export', handler: onExportAll },
-            ],
-            columns: [[
-                { field: 'id', title: 'id', width: 80, hidden: true },
-                { field: 'employeeId', title: 'employeeId', width: 80, hidden: true },
-                { field: 'month', title: '考核月', width: 80, },
-                { field: 'employeeNumber', title: '工号', width: 80 },
-                { field: 'employeeName', title: '姓名', width: 80 },
-                { field: 'departmentName', title: '部门', width: 80 },
-                {
-                    field: 'shouldWorkTime', title: '应出勤', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
-                },
-                {
-                    field: 'actualWorkTime', title: '实出勤', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
-                },
-                {
-                    field: 'normalOvertime', title: '平日加班', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'holidayOvertime', title: '法定节假日加班', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'lateTime', title: '迟到', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'earlyTime', title: '早退', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'absenteeismTime', title: '旷工', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'personalLeaveTime', title: '事假', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'sickLeaveTime', title: '病假', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'annualVacationTime', title: '使用年假', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'performanceScore', title: '绩效得分', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'benefitScore', title: '效益得分', width: 80,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                { field: 'inputDate', title: '录入时间', width: 80, formatter: formatDate },
-            ]],
-        });
-        var p = $('#@(tabEntityList)').datagrid('getPager');
-        $(p).pagination({
-            pageSize: 10,
-            pageList: [10, 20, 50, 100],
-            beforePageText: '第',
-            afterPageText: '页 共{pages}页',
-            displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
-        });
-
-    }
-
-    function showMenu(e, rowIndex, rowData) { //右键时触发事件
-        //三个参数：e里面的内容很多，真心不明白，rowIndex就是当前点击时所在行的索引，rowData当前行的数据
-        e.preventDefault(); //阻止浏览器捕获右键事件
-
-        $(this).datagrid("selectRow", rowIndex); //根据索引选中该行
-
-        $('#menu').menu('show', {
-            //显示右键菜单
-            left: e.pageX,//在鼠标点击处显示菜单
-            top: e.pageY
-        });
     }
 
     function getParamsJson() {
@@ -238,7 +146,7 @@
 
     function onSaveSingle() {
         if ($('#month').val() == '') {
-            showAlert('请选择考核月');
+            showAlert('请选月份');
             return;
         }
 

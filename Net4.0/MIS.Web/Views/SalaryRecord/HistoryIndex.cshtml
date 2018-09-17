@@ -29,7 +29,7 @@
 
                     </tr>
                     <tr>
-                        <th>考核月：</th>
+                        <th>月份：</th>
                         <!--由于datebox框架上面的数据必须是时间格式的，所以我们用editable="false"来禁止用户手动输入，以免报错-->
                         <td>
                             <input class="parm_control"  name="month" id="month" />
@@ -58,29 +58,19 @@
 
 		//初始加载，表格宽度自适应
 	    $(document).ready(function () {
-		    fitCoulms('@(tabEntityList)');
+		    onDatagridAdjust('@(tabEntityList)');
 		});
 	　　//浏览器窗口大小变化后，表格宽度自适应
 	    $(window).resize(function () {
-		    fitCoulms('@(tabEntityList)');
+		    onDatagridAdjust('@(tabEntityList)');
 		});
     })
 
-    
+
     function initPage() {
-        var toolbarFun = [onEditEntity, onLock, onUnlock, onExportAll];
-        var gridObj = new SalaryRecordGrid(toolbarFun);
-
-        initGrid('@(tabEntityList)', gridObj, '/@(controllerName)/GetEntities');
-
-        $('#@(tabEntityList)').datagrid('options').onBeforeLoad = onBeforeLoad;
-        $('#@(tabEntityList)').datagrid('options').onClickRow = onClickRow;
-        $('#@(tabEntityList)').datagrid('options').onDblClickRow = onDblClickRow;
-        $('#@(tabEntityList)').datagrid('options').onRowContextMenu = showMenu;
-
         $('#departmentId').combobox({
             width: '100%',
-            editable: false,
+            //editable: false,
             url: '/Department/GetAllEntities',
             mode: 'remote',
             valueField: 'id',
@@ -94,20 +84,20 @@
         });
         $('#month').datebox('setValue', new Date);
 
+        var url = '/@(controllerName)/GetEntities';
+        var callbackFuns = [
+            { "name": "onBeforeLoad", "fun": onBeforeLoad },
+            { "name": "onClickRow", "fun": onClickRow },
+            { "name": "onDblClickRow", "fun": onDblClickRow },
+            { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu },
+        ];
+        var toolbarFun = [onEditEntity, onLock, onUnlock, onExportAll];
+        var gridObj = new SalaryRecordGrid('@(tabEntityList)', toolbarFun);
+
+        initDatagrid(gridObj, url, callbackFuns);
+
     }
 
-    function showMenu(e, rowIndex, rowData) { //右键时触发事件
-        //三个参数：e里面的内容很多，真心不明白，rowIndex就是当前点击时所在行的索引，rowData当前行的数据
-        e.preventDefault(); //阻止浏览器捕获右键事件
-
-        $(this).datagrid("selectRow", rowIndex); //根据索引选中该行
-
-        $('#menu').menu('show', {
-            //显示右键菜单
-            left: e.pageX,//在鼠标点击处显示菜单
-            top: e.pageY
-        });
-    }
 
     function positiveStyler()
     {
@@ -149,7 +139,6 @@
 
 
     function onBeforeLoad(param) {
-
         param.extendParams = getParamsJson();
 
         return true;
@@ -232,51 +221,6 @@
 
         window.location.href = '/@(controllerName)/ExportAll?extendParams=' + getParamsJson();
 
-    }
-
-    function clearRow() {
-        var row = $('#@(tabEntityList)').datagrid('getSelected');
-        if (null == row) {
-            alert("未选择")
-            return;
-        }
-
-    }
-
-    var editIndex = undefined;//定义全局变量：当前编辑的行
-    function onClickRow(index) {
-        if (editIndex != index) {
-            if (endEditing()) {
-                //$('#@(tabEntityList)').datagrid('selectRow', index).datagrid('beginEdit', index);
-                //editIndex = index;
-                $('#@(tabEntityList)').datagrid('selectRow', editIndex);
-            } else {
-
-            }
-        }
-    }
-
-    function onDblClickRow(index) {
-        if (editIndex != index) {
-            if (endEditing()) {
-                $('#@(tabEntityList)').datagrid('selectRow', index).datagrid('beginEdit', index);
-                editIndex = index;
-            } else {
-                $('#@(tabEntityList)').datagrid('selectRow', editIndex);
-            }
-        }
-    }
-    function endEditing() {
-        if (editIndex == undefined) {
-            return true
-        }
-        if ($('#@(tabEntityList)').datagrid('validateRow', editIndex)) {
-            $('#@(tabEntityList)').datagrid('endEdit', editIndex);
-            editIndex = undefined;
-            return true;
-        } else {
-            return false;
-        }
     }
 
     function onEditEntity() {
