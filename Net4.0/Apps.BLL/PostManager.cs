@@ -27,17 +27,6 @@ namespace Apps.BLL
                         };
                     }
 
-                    match = from m in db.postInfoList
-                                where m.code.Equals(model.code)
-                                select m;
-                    if (match.Count() > 0)
-                    {
-                        return new OperateResult
-                        {
-                            content = "该岗位代码已经存在",
-                        };
-                    }
-
                     db.postInfoList.Add(model);
                     db.SaveChanges();
 
@@ -113,16 +102,6 @@ namespace Apps.BLL
                         };
                     }
 
-                    elements = from e in db.postInfoList
-                               where e.id != model.id && e.code == model.code
-                               select e;
-                    if (elements.Count() > 0)
-                    {
-                        return new OperateResult
-                        {
-                            content = "该岗位代码已经存在",
-                        };
-                    }
 
                     db.Entry(model).State = EntityState.Modified;
 
@@ -190,14 +169,7 @@ namespace Apps.BLL
                 try
                 {
                     var elements = (from e in db.postInfoList
-                                    select new
-                                    {
-                                        e.id,
-                                        e.name,
-                                        e.code,
-                                        e.postSalary,
-                                        e.fullAttendanceRewards
-                                    }
+                                    select e
                                   ).ToList();
 
                     return new OperateResult

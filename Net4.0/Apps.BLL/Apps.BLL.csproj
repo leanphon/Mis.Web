@@ -64,6 +64,7 @@
     <Compile Include="BenefitManager.cs" />
     <Compile Include="DepartmentManager.cs" />
     <Compile Include="EmployeeManager.cs" />
+    <Compile Include="LevelManager.cs" />
     <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="PerformanceManager.cs" />
     <Compile Include="PostManager.cs" />

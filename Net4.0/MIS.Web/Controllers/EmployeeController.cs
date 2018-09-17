@@ -203,98 +203,98 @@ namespace MIS.Web.Controllers
 
         }
 
-        public ActionResult ExportAll()
-        {
-            QueryParam queryParam = new QueryParam();
+        //public ActionResult ExportAll()
+        //{
+        //    QueryParam queryParam = new QueryParam();
 
-            var extendParams = Request.Params["extendParams"];
-            if (extendParams != null)
-            {
-                JavaScriptSerializer js = new JavaScriptSerializer();
-                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
-                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+        //    var extendParams = Request.Params["extendParams"];
+        //    if (extendParams != null)
+        //    {
+        //        JavaScriptSerializer js = new JavaScriptSerializer();
+        //        List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+        //        Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
 
-                queryParam.filters = filterSet;
-            }
-
-
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.ExportAll(queryParam);
-
-            if (or.status == OperateStatus.Success
-                && or.data != null)
-            {
-                string exportFileName = string.Concat("导出", DateTime.Now.ToString("yyyyMMddHHmmss"), ".xlsx");
-
-                return new ExportExcelResult
-                {
-                    SheetName = "员工列表",
-                    FileName = exportFileName,
-                    ExportData = (DataTable)or.data
-                };
-
-            }
-
-            return Json(or, JsonRequestBehavior.AllowGet);
-
-        }
-
-        public ActionResult ShowImport()
-        {
-            return View();
-        }
-
-        public ActionResult ImportExcel()
-        {
-            if (Request.Files.Count == 0)
-            {
-                return Json(
-                    new OperateResult
-                    {
-                        content = "请上传数据文件",
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
-
-            }
-            HttpPostedFileBase file = Request.Files["fileName"];
-
-            switch (Path.GetExtension(file.FileName))
-            {
-                case ".xlsx":
-                case ".xls":
-                    break;
-                default:
-                    return Json(
-                        new OperateResult
-                        {
-                            content = "上传的文件不是Excel文件",
-                        },
-                        JsonRequestBehavior.AllowGet
-                    );
-            }
-
-            string target = Server.MapPath("/") + ("/Upload/");//取得目标文件夹的路径
-            int pos = file.FileName.LastIndexOf('\\');
-            string filename;
-            if (pos >=0)
-            {
-                filename = file.FileName.Substring(pos+1);
-            }
-            else
-            {
-                filename = file.FileName;
-            }
-
-            string path = target + filename;//获取存储的目标地址
-            file.SaveAs(path);
-
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.ImportExcel(path);
+        //        queryParam.filters = filterSet;
+        //    }
 
 
-            return Json(or, JsonRequestBehavior.AllowGet);
-        }
+        //    EmployeeManager manager = new EmployeeManager();
+        //    OperateResult or = manager.ExportAll(queryParam);
+
+        //    if (or.status == OperateStatus.Success
+        //        && or.data != null)
+        //    {
+        //        string exportFileName = string.Concat("导出", DateTime.Now.ToString("yyyyMMddHHmmss"), ".xlsx");
+
+        //        return new ExportExcelResult
+        //        {
+        //            SheetName = "员工列表",
+        //            FileName = exportFileName,
+        //            ExportData = (DataTable)or.data
+        //        };
+
+        //    }
+
+        //    return Json(or, JsonRequestBehavior.AllowGet);
+
+        //}
+
+        //public ActionResult ShowImport()
+        //{
+        //    return View();
+        //}
+
+        //public ActionResult ImportExcel()
+        //{
+        //    if (Request.Files.Count == 0)
+        //    {
+        //        return Json(
+        //            new OperateResult
+        //            {
+        //                content = "请上传数据文件",
+        //            },
+        //            JsonRequestBehavior.AllowGet
+        //        );
+
+        //    }
+        //    HttpPostedFileBase file = Request.Files["fileName"];
+
+        //    switch (Path.GetExtension(file.FileName))
+        //    {
+        //        case ".xlsx":
+        //        case ".xls":
+        //            break;
+        //        default:
+        //            return Json(
+        //                new OperateResult
+        //                {
+        //                    content = "上传的文件不是Excel文件",
+        //                },
+        //                JsonRequestBehavior.AllowGet
+        //            );
+        //    }
+
+        //    string target = Server.MapPath("/") + ("/Upload/");//取得目标文件夹的路径
+        //    int pos = file.FileName.LastIndexOf('\\');
+        //    string filename;
+        //    if (pos >=0)
+        //    {
+        //        filename = file.FileName.Substring(pos+1);
+        //    }
+        //    else
+        //    {
+        //        filename = file.FileName;
+        //    }
+
+        //    string path = target + filename;//获取存储的目标地址
+        //    file.SaveAs(path);
+
+        //    EmployeeManager manager = new EmployeeManager();
+        //    OperateResult or = manager.ImportExcel(path);
+
+
+        //    return Json(or, JsonRequestBehavior.AllowGet);
+        //}
 
     }
 }
