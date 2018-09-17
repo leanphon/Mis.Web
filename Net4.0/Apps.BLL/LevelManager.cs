@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace Apps.BLL
 {
-    public class PostManager
+    public class LevelManager
     {
-        public OperateResult Add(PostInfo model)
+        public OperateResult Add(LevelInfo model)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var match = from m in db.postInfoList
+                    var match = from m in db.levelInfoList
                                 where m.name.Equals(model.name)
                                 select m;
                     if (match.Count() > 0)
@@ -27,7 +27,7 @@ namespace Apps.BLL
                         };
                     }
 
-                    db.postInfoList.Add(model);
+                    db.levelInfoList.Add(model);
                     db.SaveChanges();
 
                     return new OperateResult
@@ -51,7 +51,7 @@ namespace Apps.BLL
             {
                 try
                 {
-                    var element = db.postInfoList.Find(id);
+                    var element = db.levelInfoList.Find(id);
 
                     if (element == null)
                     {
@@ -61,7 +61,7 @@ namespace Apps.BLL
                         };
                     }
 
-                    db.postInfoList.Remove(element);
+                    db.levelInfoList.Remove(element);
 
                     db.Entry(element).State = EntityState.Deleted;
                     db.SaveChanges();
@@ -85,13 +85,13 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult Update(PostInfo model)
+        public OperateResult Update(LevelInfo model)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var elements = from e in db.postInfoList
+                    var elements = from e in db.levelInfoList
                                     where e.id != model.id && e.name == model.name
                                     select e;
                     if (elements.Count() >= 1)
@@ -130,7 +130,7 @@ namespace Apps.BLL
             {
                 try
                 {
-                    var element = (from m in db.postInfoList
+                    var element = (from m in db.levelInfoList
                                    where id == m.id
                                    select m
                                 ).FirstOrDefault();
@@ -168,7 +168,7 @@ namespace Apps.BLL
             {
                 try
                 {
-                    var elements = (from e in db.postInfoList
+                    var elements = (from e in db.levelInfoList
                                     select e
                                   ).ToList();
 
@@ -197,7 +197,7 @@ namespace Apps.BLL
             {
                 try
                 {
-                    var elements = from e in db.postInfoList
+                    var elements = from e in db.levelInfoList
                                    select e;
 
                     int total = elements.Count();
