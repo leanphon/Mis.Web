@@ -20,6 +20,7 @@ namespace Apps.BLL
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<PostInfo>().ToTable("PostInfos");
+            modelBuilder.Entity<LevelInfo>().ToTable("LevelInfos");
             modelBuilder.Entity<PerformanceInfo>().ToTable("PerformanceInfos");
             modelBuilder.Entity<BenefitInfo>().ToTable("BenefitInfos");
             modelBuilder.Entity<SalaryInfo>().ToTable("SalaryInfos");
@@ -54,6 +55,7 @@ namespace Apps.BLL
 
 
         public DbSet<PostInfo> postInfoList { get; set; }
+        public DbSet<LevelInfo> levelInfoList { get; set; }
         public DbSet<PerformanceInfo> performanceInfoList { get; set; }
         public DbSet<BenefitInfo> benefitInfoList { get; set; }
         public DbSet<SalaryInfo> salaryInfoList { get; set; }

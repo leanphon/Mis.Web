@@ -65,6 +65,7 @@
     <Compile Include="OperateResult.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="OrderItem.cs" />
+    <Compile Include="PostInfo.cs" />
     <Compile Include="Privilege\Right.cs" />
     <Compile Include="Privilege\Role.cs" />
     <Compile Include="Privilege\User.cs" />

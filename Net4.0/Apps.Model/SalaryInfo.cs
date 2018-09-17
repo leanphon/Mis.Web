@@ -11,18 +11,18 @@ namespace Apps.Model
     /// <summary>
     /// 岗位信息
     /// </summary>
-    public class PostInfo
+    public class LevelInfo
     {
         [Key]
         public long id { get; set; }
         //岗位名称
-        [Display(Name = "岗位名称")]
+        [Display(Name = "层级名称")]
         [Required(ErrorMessage = "{0}必须输入")]
         [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
         public string name { get; set; }
 
         // 级别
-        [Display(Name = "级别代码")]
+        [Display(Name = "层级代码")]
         [Required(ErrorMessage = "{0}必须输入")]
         [StringLength(10, ErrorMessage = "{0}长度不得超过10")]
         public string code { get; set; }
@@ -101,7 +101,7 @@ namespace Apps.Model
         [Display(Name = "岗位")]
         public long postId { get; set; }
         [ForeignKey("postId")]
-        public virtual PostInfo postInfo { get; set; }
+        public virtual LevelInfo postInfo { get; set; }
 
         [Display(Name = "绩效奖")]
         public long performanceId { get; set; }
