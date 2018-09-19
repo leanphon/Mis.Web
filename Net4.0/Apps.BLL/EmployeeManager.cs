@@ -423,6 +423,95 @@ namespace Apps.BLL
             }
         }
 
+        public OperateResult AnalyseByAge(QueryParam param = null)
+        {
+
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var now = DateTime.Now;
+                    var elements = from e in db.employeeList.AsEnumerable()
+                                   select new
+                                   {
+                                       e.id,
+                                       years = Utility.Utility.CalYears(e.birthday, now),
+                                       e.departmentId,
+                                   };
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                    }
+                    #endregion
+
+                    var results = elements.GroupBy(e => e.years)
+                        .Select(e => new { years = e.Key, count = e.Count() }).ToList();
+
+                    var categorys = new List<object>();
+                    var datas = new List<object>();
+
+                    foreach (var e in results)
+                    {
+                        categorys.Add(e.years);
+                        datas.Add(e.count);
+                    }
+
+                    var data = new
+                    {
+                        title = "年龄",
+                        categorys,
+                        datas,
+                    };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = data,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+        }
+
         /// <summary>
         /// 返回值中的data是DataTable
         /// </summary>
