@@ -686,11 +686,7 @@ namespace Apps.BLL
                 int days = DateTime.DaysInMonth(dtMonth.Year, dtMonth.Month);
                 dtMonth = dtMonth.AddDays(days - 1);
 
-                int seniority = dtMonth.Year - entryDate.Year;
-                if (dtMonth.Month < entryDate.Month || (dtMonth.Month == entryDate.Month && dtMonth.Day < entryDate.Day))
-                {
-                    seniority--;
-                }
+                int seniority = Utility.Utility.CalYears(entryDate, dtMonth);
 
                 return Math.Round(seniority * rewardsBase, 2);
             }
