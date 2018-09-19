@@ -14,6 +14,9 @@ using System.Text;
 
 namespace Apps.Model.Uitility
 {
+    /// <summary>
+    /// 从枚举列表转换为DataTable，转换后的表中列名为model的diaplay属性的name值
+    /// </summary>
     public class DataTableHelper
     {
         public static DataTable ToDataTable<T>(IEnumerable<T> collection)
@@ -40,34 +43,34 @@ namespace Apps.Model.Uitility
             return dt;
         }
 
-        private static DataColumn[] GetColumnsByType<T>()
+        public static DataColumn[] GetColumnsByType<T>()
         {
             //4.0或以上版本
             try
             {
                 var props = typeof(T).GetProperties();
 
-                var cols = props.Select(p => new DataColumn(GetColumnDisplay(p), p.PropertyType)).ToArray();
+                var cols = props.Select(p => new DataColumn(GetColumnDisplay(p), GetColumnType(p))).ToArray();
 
                 return cols;
             }
             catch (Exception ex)
             {
-                throw new InvalidCastException();
+                throw ex;
             }
 
         }
 
 
 #if NET_4_0
-        private static string GetColumnDisplay(PropertyInfo p)
+        public static string GetColumnDisplay(PropertyInfo p)
         {
             //4.0或以上版本
             try
             {
                 var arrs = p.GetCustomAttributes(false);
                 var arr = arrs.FirstOrDefault() as DisplayAttribute;
-                if (arr == null)
+                if (arr != null)
                 {
                     return arr.Name;
                 }
@@ -81,7 +84,7 @@ namespace Apps.Model.Uitility
 
         }
 #else
-        private static string GetColumnDisplay(PropertyInfo p)
+        public static string GetColumnDisplay(PropertyInfo p)
         {
             //4.0或以上版本
             try
@@ -97,5 +100,18 @@ namespace Apps.Model.Uitility
 
         }
 #endif
+
+        private static Type GetColumnType(PropertyInfo p)
+        {
+            Type colType = p.PropertyType;
+            if ((colType.IsGenericType) && (colType.GetGenericTypeDefinition() == typeof(Nullable<>)))
+            {
+                colType = colType.GetGenericArguments()[0];
+            }
+
+            return colType;
+        }
+
+
     }
 }
