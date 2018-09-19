@@ -597,6 +597,7 @@
     <Content Include="App_Data\sqliteMis.db" />
     <None Include="Properties\PublishProfiles\MisConfig.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="Scripts\echart-entity-define.js" />
     <Content Include="Scripts\echarts-common.js" />
     <Content Include="Scripts\grid-common.js" />
     <Content Include="Scripts\grid-entity-define.js" />
@@ -710,6 +711,7 @@
     <Content Include="Views\Analyse\Edit.cshtml" />
     <Content Include="Views\Analyse\EmployeeAge.cshtml" />
     <Content Include="Views\Analyse\Index.cshtml" />
+    <Content Include="Views\Analyse\EmployeeGender.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
