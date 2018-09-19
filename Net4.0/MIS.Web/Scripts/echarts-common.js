@@ -1,27 +1,15 @@
-﻿
-
-function showReport(viewEntity) {
+﻿function showReport(viewEntity) {
     var myChart = echarts.init(viewEntity.viewObj);
-    
-    var seriesData = viewEntity.option.series;
+
+    var seriesData = viewEntity.series;
     var series = new Array();
-    for (var i=0; i < seriesData.length; i++)
-    {
+    for (var i = 0; i < seriesData.length; i++) {
         var e = {
-            name: viewEntity.option.series[i].name,
-            type: 'line',
-            data: viewEntity.option.series[i].data,
-            markPoint: {
-                data: [
-                    { type: 'max', name: '最大值' },
-                    { type: 'min', name: '最小值' }
-                ]
-            },
-            markLine: {
-                data: [
-                    { type: 'average', name: '平均值' }
-                ]
-            }
+            name: seriesData[i].name,
+            type: viewEntity.legendType,
+            data: seriesData[i].data,
+            markPoint: viewEntity.markPoint,
+            markLine: viewEntity.markLine
         }
 
         series.push(e);
@@ -35,13 +23,13 @@ function showReport(viewEntity) {
             trigger: 'axis'
         },
         legend: {
-            data: viewEntity.option.legend
+            data: viewEntity.legend
         },
         toolbox: {
             show: true,
             feature: {
                 mark: { show: false },
-                dataView: { show: false, readOnly: false },
+                dataView: { show: true, readOnly: false },
                 magicType: { show: true, type: ['line', 'bar'] },
                 restore: { show: true },
                 saveAsImage: { show: true }
@@ -51,21 +39,26 @@ function showReport(viewEntity) {
         xAxis: [
             {
                 type: 'category',
-                boundaryGap: false,
-                data: viewEntity.option.category
+                data: viewEntity.category,
+                axisLabel: {
+                    formatter: '{value} ' + viewEntity.xAxisPostfix
+                }
             }
         ],
         yAxis: [
             {
                 type: 'value',
                 axisLabel: {
-                    formatter: '{value} ' + viewEntity.yAxisDesc
+                    formatter: '{value} ' + viewEntity.yAxisPostfix
                 }
             }
         ],
-        series: series,
+        series: series
     };
 
     // 为echarts对象加载数据
     myChart.setOption(option);
 }
+
+
+

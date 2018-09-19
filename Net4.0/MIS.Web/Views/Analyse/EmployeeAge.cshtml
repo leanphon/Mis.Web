@@ -1,11 +1,10 @@
 ﻿@{
-    ViewBag.Title = "考核历史记录";
+    ViewBag.Title = "员工年龄分析";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string divContent = controllerName + "_divContent";
     string reportView = controllerName + "_reportView";
-
 }
 
 
@@ -27,11 +26,12 @@
                 </table>
             </form>
         </div>
-        <div class="reportView" style="border:1px solid;height:400px; width:100%" id="@(reportView)"></div>
+        <div class="reportView" style="border:1px solid;height:500px; width:100%" id="@(reportView)"></div>
     </div>
 </div>
 
 <script src="~/Scripts/echarts-all.js"></script>
+<script src="~/Scripts/echarts-entity-define.js"></script>
 <script src="~/Scripts/echarts-common.js"></script>
 <script>
 	$(function () {
@@ -45,7 +45,38 @@
 	        $('@(reportView)').resize();
 	    });
 
-    })
+	})
+
+    function loadReport(param) {
+        var url = '/@(controllerName)/LoadEmployeeAge';
+        if (param)
+        {
+            url = url + "?extendParams=" + param;
+        }
+        $.ajax({
+            url: url,
+            type: 'GET',
+            async: false,
+            success: function (result) {
+                if (result.status == 0)
+                {
+                    var viewEntity = new EmployeeAgeReport(
+                        '@(reportView)',
+                        result.data.title,
+                        result.data.category,
+                        result.data.legend,
+                        result.data.series
+                        );
+
+                    showReport(viewEntity);
+                }
+                else
+                {
+                    showAlert(result.content);
+                }
+            }
+        });
+    }
 
 
 	function initPage() {
@@ -58,99 +89,30 @@
 	        textField: 'name',
 	    });
 
-
-
-	    var seriesObj = [
-        {
-            name: '最高气温',
-            data: [11, 11, 15, 13, 12, 13, 10],
-        },
-        {
-            name: '最低气温',
-            data: [1, -2, 2, 5, 3, 2, 0],
-        },
-	    ];
-	    var optionData = {
-	        category: ['周一', '周二', '周三', '周四', '周五', '周六', '周日'],
-	        legend: ['最高气温', '最低气温'],
-	        series: seriesObj,
-	    };
-	    var viewEntity = {
-	        viewObj: document.getElementById('@(reportView)'),
-	        title: '气温',
-	        yAxisDesc: '°C',
-	        option: optionData,
-
-	    };
-	    showReport(viewEntity);
+	    loadReport();
 	}
 
-    //function showReport(viewEntity)
-	//{
-    //    // document.getElementById()
-    //    console.log(viewEntity)
-    //    var myChart = echarts.init(viewEntity.viewObj);
+	function getParamsJson() {
+	    var filterList = new Array;
+	    if ($('#departmentId').val().trim() != '') {
+	        var p = {
+	            "key": "departmentId",
+	            "action": "==",
+	            "value": $('#departmentId').val().trim()
+	        };
+	        filterList.push(p)
+	    }
 
-	//    var option= {
-	//        title: {
-	//            text: viewEntity.title,
-	//        },
-	//        tooltip: {
-	//            trigger: 'axis'
-	//        },
-	//        legend: {
-	//            data: viewEntity.option.legend
-	//        },
-	//        toolbox: {
-	//            show: true,
-	//            feature: {
-	//                mark: { show: false },
-	//                dataView: { show: false, readOnly: false },
-	//                magicType: { show: true, type: ['line', 'bar'] },
-	//                restore: { show: true },
-	//                saveAsImage: { show: true }
-	//            }
-	//        },
-	//        calculable: true,
-	//        xAxis: [
-    //            {
-    //                type: 'category',
-    //                boundaryGap: false,
-    //                data: viewEntity.option.category
-    //            }
-	//        ],
-	//        yAxis: [
-    //            {
-    //                type: 'value',
-    //                axisLabel: {
-    //                    formatter: '{value} ' + viewEntity.yAxisDesc
-    //                }
-    //            }
-	//        ],
-	//        series: [
-    //            {
-    //                name: viewEntity.option.series[0].name,
-    //                type: 'line',
-    //                data: viewEntity.option.series[0].data,
-    //                markPoint: {
-    //                    data: [
-    //                        { type: 'max', name: '最大值' },
-    //                        { type: 'min', name: '最小值' }
-    //                    ]
-    //                },
-    //                markLine: {
-    //                    data: [
-    //                        { type: 'average', name: '平均值' }
-    //                    ]
-    //                }
-    //            },
+	    return JSON.stringify(filterList);
+	}
 
-	//        ]
-	//    };
 
-	//    // 为echarts对象加载数据
-	//    myChart.setOption(option);
-	//}
+	function filter() {
+
+	    var extendParams = getParamsJson();
+	    loadReport(extendParams);
+
+	}
 
 </script>
 
