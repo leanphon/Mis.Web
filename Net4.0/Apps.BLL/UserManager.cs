@@ -1,4 +1,5 @@
-﻿using Apps.Model;
+﻿using Apps.BLL.Utility;
+using Apps.Model;
 using Apps.Model.Privilege;
 using System;
 using System.Data;
@@ -269,7 +270,7 @@ namespace Apps.BLL
 
         public OperateResult Login(User model)
         {
-            using (SystemDB db = new SystemDB())
+            using (SystemDB db = new SystemDB(SessionHelper.GetDbName()))
             {
                 try
                 {

@@ -376,3 +376,46 @@ function SalaryRecordGrid(gridId, toolbarFun) {
 		];
 }
 
+
+function ModuleGrid(gridId, toolbarFun) {
+    this.id = gridId;
+    this.idField = 'id';
+    this.treeField = 'name';
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'name', title: '模块名称', width: 250 },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
+
+function CompanyRegisterGrid(gridId, toolbarFun) {
+    this.id = gridId;
+    this.idField = 'id';
+    this.treeField = 'name';
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'name', title: '公司名称', width: 250 },
+                { field: 'code', title: '简称', width: 250 },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
