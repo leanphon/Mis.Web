@@ -24,8 +24,33 @@ namespace MIS.Web.Controllers
             return View();
         }
 
-        public ActionResult Login()
+        /// <summary>
+        /// 从请求中得到公司名称，然后查询公司信息，加载到登录页面
+        /// </summary>
+        /// <param name="company"></param>
+        /// <returns></returns>
+        public ActionResult Login(string company)
         {
+            if(company == null)
+            {
+                return Content("未输入公司名字");
+            }
+            if (company == "Root")
+            {
+                Session["CompanyName"] = "Default";
+            }
+            else
+            {
+                CompanyManager manager = new CompanyManager();
+                OperateResult or = manager.GetRegisterByCode(company);
+                if (or.status != OperateStatus.Success)
+                {
+                    return Content("不存在的公司");
+                }
+
+                Session["CompanyName"] = company;
+            }
+
             return View();
         }
 

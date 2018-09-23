@@ -13,6 +13,7 @@
 <div id="@(divDialog)" class="easyui-dialog">
     <form id="@(formEntity)" action="" method="post">
         @Html.AntiForgeryToken()
+        <input type="hidden" name="company" value="@(ViewBag.company)" />
 
         <table style="margin:auto;width:90%">
             <tr>

@@ -10,10 +10,13 @@ namespace Apps.BLL
     public partial class SystemDB : DbContext
     {
         public SystemDB()
-            : base("name=SystemDB")
+            : base("name=Default")
         {
         }
-
+        public SystemDB(string conStr)
+            : base(conStr)
+        {
+        }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -40,14 +43,14 @@ namespace Apps.BLL
         public DbSet<PaymentProject> paymentProjects { get; set; }
 
 
-
         public DbSet<Module> moduleList { get; set; }
         public DbSet<FunctionRight> rightList { get; set; }
         public DbSet<Role> roleList { get; set; }
         public DbSet<RoleRights> roleRightsList { get; set; }
         public DbSet<User> userList { get; set; }
+        public DbSet<CompanyRegister> companyRegisterList { get; set; }
 
-
+        public DbSet<Company> companyList { get; set; }
         public DbSet<Employee> employeeList { get; set; }
         public DbSet<Department> departmentList { get; set; }
         public DbSet<Category> categoryList { get; set; }

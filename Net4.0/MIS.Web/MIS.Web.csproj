@@ -651,12 +651,14 @@
     <Compile Include="Controllers\AnalyseController.cs" />
     <Compile Include="Controllers\AssessmentController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\CompanyRegisterController.cs" />
     <Compile Include="Controllers\BenefitController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LevelController.cs" />
     <Compile Include="Controllers\LoginAuthorizeAttribute.cs" />
+    <Compile Include="Controllers\ModuleController.cs" />
     <Compile Include="Controllers\PerformanceController.cs" />
     <Compile Include="Controllers\PostController.cs" />
     <Compile Include="Controllers\SalaryRecordController.cs" />
@@ -712,6 +714,12 @@
     <Content Include="Views\Analyse\EmployeeAge.cshtml" />
     <Content Include="Views\Analyse\Index.cshtml" />
     <Content Include="Views\Analyse\EmployeeGender.cshtml" />
+    <Content Include="Views\Module\Create.cshtml" />
+    <Content Include="Views\Module\Edit.cshtml" />
+    <Content Include="Views\Module\Index.cshtml" />
+    <Content Include="Views\CompanyRegister\Create.cshtml" />
+    <Content Include="Views\CompanyRegister\Edit.cshtml" />
+    <Content Include="Views\CompanyRegister\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

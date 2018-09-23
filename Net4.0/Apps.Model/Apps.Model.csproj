@@ -51,6 +51,8 @@
     <Compile Include="AssessmentInfo.cs" />
     <Compile Include="Attendance.cs" />
     <Compile Include="Category.cs" />
+    <Compile Include="Company.cs" />
+    <Compile Include="CompanyRegister.cs" />
     <Compile Include="Customer.cs" />
     <Compile Include="Department.cs" />
     <Compile Include="Employee.cs" />
@@ -59,9 +61,9 @@
     <Compile Include="Finance\PurchaseItem.cs" />
     <Compile Include="Finance\PurchaseRecord.cs" />
     <Compile Include="Finance\Supplier.cs" />
-    <Compile Include="FunctionRight.cs" />
+    <Compile Include="Privilege\FunctionRight.cs" />
     <Compile Include="MD5Encode.cs" />
-    <Compile Include="Module.cs" />
+    <Compile Include="Privilege\Module.cs" />
     <Compile Include="OperateResult.cs" />
     <Compile Include="Order.cs" />
     <Compile Include="OrderItem.cs" />

@@ -69,6 +69,7 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>E:\SDK\C# Extend packages\System.Data.SQLite.Linq.1.0.108.0\lib\net40\System.Data.SQLite.Linq.dll</HintPath>
     </Reference>
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -78,16 +79,19 @@
   <ItemGroup>
     <Compile Include="AssessmentManager.cs" />
     <Compile Include="BenefitManager.cs" />
+    <Compile Include="CompanyManager.cs" />
     <Compile Include="DepartmentManager.cs" />
     <Compile Include="EmployeeManager.cs" />
     <Compile Include="LevelManager.cs" />
     <Compile Include="Migrations\Configuration.cs" />
+    <Compile Include="ModuleManager.cs" />
     <Compile Include="PerformanceManager.cs" />
     <Compile Include="PostManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SalaryRecordManager.cs" />
     <Compile Include="SystemDB.cs" />
     <Compile Include="UserManager.cs" />
+    <Compile Include="Utility\SessionHelper.cs" />
     <Compile Include="Utility\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
