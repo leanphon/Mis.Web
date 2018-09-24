@@ -184,7 +184,7 @@ function initTreegrid(gridEntity, url, callbackFuns) {
         method: 'POST',
         url: url,
         //data: data,
-        pagination: true,
+        pagination: gridEntity.pager,
         singleSelect: true,
         rownumbers: true,
         loadMsg: '正在加载中，请稍等... ',
@@ -192,7 +192,6 @@ function initTreegrid(gridEntity, url, callbackFuns) {
         //fitColumns: true,//宽度自适应
         idField: gridEntity.idField,
         treeField: gridEntity.treeField,
-
         frozenColumns: gridEntity.forzenCols,
         columns: gridEntity.normalCols,
         toolbar: gridEntity.toolbar,
@@ -205,15 +204,19 @@ function initTreegrid(gridEntity, url, callbackFuns) {
             });
         }
     });
+    if (gridEntity.pager)
+    {
+        console.log(gridEntity)
 
-    var p = gridObj.treegrid('getPager');
-    $(p).pagination({
-        pageSize: 10,
-        pageList: [10, 20, 50, 100],
-        beforePageText: '第',
-        afterPageText: '页 共{pages}页',
-        displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
-    });
+        var p = gridObj.treegrid('getPager');
+        $(p).pagination({
+            pageSize: 10,
+            pageList: [10, 20, 50, 100],
+            beforePageText: '第',
+            afterPageText: '页 共{pages}页',
+            displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
+        });
+    }
 
     var contextMenu = $('#' + gridEntity.id + 'ContextMenu');
     createTreegridHeaderMenu(gridEntity.id, contextMenu);

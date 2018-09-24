@@ -33,7 +33,7 @@ namespace MIS.Web.Controllers
         {
 
             LevelManager manager = new LevelManager();
-            OperateResult or = manager.GetPage(new QueryParam { pager = pager });
+            OperateResult or = manager.GetByPager(new QueryParam { pager = pager });
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

@@ -6,14 +6,16 @@ namespace Apps.BLL
     using Apps.Model.Finance;
     using Apps.Model;
     using Model.Privilege;
+    using Utility;
 
-    public partial class SystemDB : DbContext
+    public class DbContextRoot : DbContext
     {
-        public SystemDB()
+        public DbContextRoot() 
             : base("name=Default")
         {
         }
-        public SystemDB(string conStr)
+
+        public DbContextRoot(string conStr)
             : base(conStr)
         {
         }
@@ -31,10 +33,17 @@ namespace Apps.BLL
             modelBuilder.Entity<AssessmentInfo>().ToTable("AssessmentInfos");
             modelBuilder.Entity<User>().ToTable("Users");
 
-
+            modelBuilder.Entity<Role>()
+            .HasMany(t => t.rightList)
+            .WithMany(t => t.roleList)
+            .Map(m =>
+            {
+                m.MapLeftKey("roleId");
+                m.MapRightKey("rightId");
+                m.ToTable("RoleRights");
+            });
 
         }
-
 
 
         public DbSet<PurchaseRecord> purchaseRecords { get; set; }
@@ -46,8 +55,11 @@ namespace Apps.BLL
         public DbSet<Module> moduleList { get; set; }
         public DbSet<FunctionRight> rightList { get; set; }
         public DbSet<Role> roleList { get; set; }
-        public DbSet<RoleRights> roleRightsList { get; set; }
+        //public DbSet<RoleRights> roleRightsList { get; set; }
         public DbSet<User> userList { get; set; }
+        public DbSet<RootUser> rootUserList { get; set; }
+
+
         public DbSet<CompanyRegister> companyRegisterList { get; set; }
 
         public DbSet<Company> companyList { get; set; }
@@ -71,4 +83,15 @@ namespace Apps.BLL
         public DbSet<Customer> customerList { get; set; }
         public DbSet<Baby> babyList { get; set; }
     }
+
+    public class SystemDB : DbContextRoot
+    {
+        public SystemDB()
+            : base("name=Default")
+        //: base(SessionHelper.GetDbName())
+        {
+        }
+        
+    }
+
 }

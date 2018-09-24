@@ -49,7 +49,7 @@ namespace MIS.Web.Controllers
             }
 
             EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.GetPage(queryParam);
+            OperateResult or = manager.GetByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

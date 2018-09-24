@@ -39,23 +39,14 @@
 	})
 
 	function initPage() {
-	    var url = '/@(controllerName)/GetEntities';
+	    var url = '/@(controllerName)/GetAllEntities';
 	    var callbackFuns = [{ "name": "onContextMenu", "fun": onTreegridonContextMenu }];
 	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
-	    var gridObj = new ModuleGrid('@(tabEntityList)', toolbarFun);
+	    var gridObj = new ModuleTreeGrid('@(tabEntityList)', toolbarFun);
 
 	    initTreegrid(gridObj, url, callbackFuns);
     }
 
-
-    function formatDepartment(department) {
-        if (department != null) {
-            return department["name"];
-        }
-        else {
-            return "";
-        }
-    }
 
     function onAddEntity() {
         $.ajax({
@@ -70,7 +61,7 @@
     function onEditEntity() {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
-            alert("未选择")
+            showAlert("未选择")
             return;
         }
 
@@ -89,7 +80,7 @@
     function onRemoveEntity(id) {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
-            alert("未选择")
+            showAlert("未选择")
             return;
         }
         if (!confirm("确定删除吗")){
@@ -104,10 +95,10 @@
             success: function (result) {
                 //var obj = JSON.parse(result);
                 if (result.status != 0) {
-                    alert(result.content);
+                    showAlert(result.content);
                 }
                 else {
-                    alert(result.content);
+                    showAlert(result.content);
                     $('#@(tabEntityList)').datagrid('reload');
                 }
             }

@@ -191,7 +191,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetPage(QueryParam param = null)
+        public OperateResult GetByPager(QueryParam param = null)
         {
             using (SystemDB db = new SystemDB())
             {

@@ -209,7 +209,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetPage(QueryParam param = null)
+        public OperateResult GetByPager(QueryParam param = null)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -270,13 +270,13 @@ namespace Apps.BLL
 
         public OperateResult Login(User model)
         {
-            using (SystemDB db = new SystemDB(SessionHelper.GetDbName()))
+            using (SystemDB db = new SystemDB())
             {
                 try
                 {
                     var passwd = MD5Encode.Encode16(model.passwd);
 
-                    var element = (from e in db.userList
+                    var element = (from e in db.userList.Include("role")
                                    where e.passwd == passwd && e.name == model.name
                                    select e
                                     ).FirstOrDefault();
@@ -305,6 +305,61 @@ namespace Apps.BLL
                     };
                 }
             }
+
+        }
+
+        public OperateResult RootLogin(User model)
+        {
+            if (model.name == "root" && model.passwd == "root")
+            {
+                return new OperateResult
+                {
+                    status = OperateStatus.Success,
+                    content = "登录成功",
+                    data = new RootUser { name = "root", passwd = "" }
+                };
+            }
+
+            return new OperateResult
+            {
+                content = "用户名或密码不正确"
+            };
+
+            //using (SystemDB db = new SystemDB())
+            //{
+            //    try
+            //    {
+            //        var passwd = MD5Encode.Encode16(model.passwd);
+
+            //        var element = (from e in db.rootUserList
+            //                       where e.passwd == passwd && e.name == model.name
+            //                       select e
+            //                        ).FirstOrDefault();
+            //        if (element != null)
+            //        {
+            //            return new OperateResult
+            //            {
+            //                status = OperateStatus.Success,
+            //                content = "登录成功",
+            //                data = element
+            //            };
+            //        }
+
+
+            //        return new OperateResult
+            //        {
+            //            content = "用户名或密码不正确"
+            //        };
+
+            //    }
+            //    catch (Exception ex)
+            //    {
+            //        return new OperateResult
+            //        {
+            //            content = ex.Message,
+            //        };
+            //    }
+            //}
 
         }
     }

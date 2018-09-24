@@ -42,7 +42,7 @@ namespace Apps.Model
         [Display(Name = "角色")]
         //[Required(ErrorMessage = "{0}必须填写！")]
         public int roleId { get; set; }
-        public virtual Role role { get; set; }
+        //public virtual Role role { get; set; }
 
 
         public static string FormateState(AccountState state)

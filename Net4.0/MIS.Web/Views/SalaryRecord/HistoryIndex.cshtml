@@ -226,7 +226,7 @@
     function onEditEntity() {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
-            alert("未选择")
+            showAlert("未选择")
             return;
         }
 

@@ -14,7 +14,7 @@ namespace Apps.Model.Privilege
         public string name { get; set; }
 
         [Display(Name = "父模块")]
-        public long parentId { get; set; }
+        public long? parentId { get; set; }
 
         [ForeignKey("parentId")]
         public virtual Module parent { get; set; }
@@ -23,7 +23,7 @@ namespace Apps.Model.Privilege
         [Range(minimum:0, maximum:65536,ErrorMessage = "{0}须在指定数值范围内！")]
         public int showIndex { get; set; }
 
-        [Display(Name = "是否只属于是root账号")]
+        [Display(Name = "root权限")]
         public int onlyRoot { get; set; }
 
 
