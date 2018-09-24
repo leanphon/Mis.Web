@@ -78,8 +78,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssessmentManager.cs" />
+    <Compile Include="RoleManager.cs" />
     <Compile Include="BenefitManager.cs" />
     <Compile Include="CompanyManager.cs" />
+    <Compile Include="FunctionRightManager.cs" />
+    <Compile Include="CompanyRegisterManager.cs" />
     <Compile Include="DepartmentManager.cs" />
     <Compile Include="EmployeeManager.cs" />
     <Compile Include="LevelManager.cs" />

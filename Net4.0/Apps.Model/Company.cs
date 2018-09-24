@@ -13,15 +13,30 @@ namespace Apps.Model
     {
         [Key]
         public long id { get; set; }
-        //部门名称
-        [Display(Name = "部门名称")]
+
+        [Display(Name = "公司名称")]
+        [Required(ErrorMessage = "{0}必须填写")]
+        [StringLength(30, ErrorMessage = "{0}的长度在{1}个字符之内")]
+        public string name { get; set; }
+
+
+        [Display(Name = "公司简称")]
         [Required(ErrorMessage = "{0}必须填写")]
         [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
-        public string name { get; set; }
-        // 部门编码
-        [Display(Name = "部门编码")]
-        [Required(ErrorMessage = "{0}必须填写")]
-        [StringLength(10, ErrorMessage = "{0}的长度在{1}个字符之内")]
         public string code { get; set; }
+
+        [Display(Name = "logo图片")]
+        [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
+        public string logo { get; set; }
+
+        [Display(Name = "登录时背景图片")]
+        [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
+        public string loginImg { get; set; }
+
+        [Display(Name = "主页面背景图片")]
+        [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
+        public string mainImg { get; set; }
+
+
     }
 }

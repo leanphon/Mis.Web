@@ -14,7 +14,7 @@ namespace Apps.BLL.Utility
             HttpSessionState session = HttpContext.Current.Session;
             string db = session["CompanyName"] as string;
 
-            return db ?? "";
+            return db ?? "null";
         }
     }
 }

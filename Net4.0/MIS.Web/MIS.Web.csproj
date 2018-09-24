@@ -143,6 +143,7 @@
     <Content Include="Content\form.css" />
     <Content Include="Content\icon.css" />
     <Content Include="Content\Images\bg.jpg" />
+    <Content Include="Content\Site.css" />
     <Content Include="Content\table.css" />
     <Content Include="Content\themes\angular.css" />
     <Content Include="Content\themes\black\accordion.css" />
@@ -597,8 +598,9 @@
     <Content Include="App_Data\sqliteMis.db" />
     <None Include="Properties\PublishProfiles\MisConfig.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="Scripts\echart-entity-define.js" />
+    <Content Include="Scripts\echarts-all.js" />
     <Content Include="Scripts\echarts-common.js" />
+    <Content Include="Scripts\echarts-entity-define.js" />
     <Content Include="Scripts\grid-common.js" />
     <Content Include="Scripts\grid-entity-define.js" />
     <Content Include="Scripts\jquery-1.10.2.js" />
@@ -651,13 +653,16 @@
     <Compile Include="Controllers\AnalyseController.cs" />
     <Compile Include="Controllers\AssessmentController.cs" />
     <Compile Include="Controllers\BaseController.cs" />
+    <Compile Include="Controllers\CompanyController.cs" />
     <Compile Include="Controllers\CompanyRegisterController.cs" />
     <Compile Include="Controllers\BenefitController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
+    <Compile Include="Controllers\RoleController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\LevelController.cs" />
     <Compile Include="Controllers\LoginAuthorizeAttribute.cs" />
+    <Compile Include="Controllers\FunctionRightController.cs" />
     <Compile Include="Controllers\ModuleController.cs" />
     <Compile Include="Controllers\PerformanceController.cs" />
     <Compile Include="Controllers\PostController.cs" />
@@ -720,6 +725,16 @@
     <Content Include="Views\CompanyRegister\Create.cshtml" />
     <Content Include="Views\CompanyRegister\Edit.cshtml" />
     <Content Include="Views\CompanyRegister\Index.cshtml" />
+    <Content Include="Views\Company\Create.cshtml" />
+    <Content Include="Views\Company\Edit.cshtml" />
+    <Content Include="Views\Company\Index.cshtml" />
+    <Content Include="Views\FunctionRight\Create.cshtml" />
+    <Content Include="Views\FunctionRight\Edit.cshtml" />
+    <Content Include="Views\FunctionRight\Index.cshtml" />
+    <Content Include="Views\Role\Create.cshtml" />
+    <Content Include="Views\Role\Edit.cshtml" />
+    <Content Include="Views\Role\Index.cshtml" />
+    <Content Include="Views\Role\ShowAssign.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

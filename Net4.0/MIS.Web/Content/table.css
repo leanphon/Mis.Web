@@ -49,3 +49,7 @@ select.td_select{
     width:200px;
     height:30px;
 }
+
+.spanInputDanger{
+    color:red
+}

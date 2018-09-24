@@ -15,8 +15,8 @@ namespace MIS.Web
 
             routes.MapRoute(
                 "Login",
-                "{company}/Login",
-                new { controller = "Home", action = "Login" }
+                "Home/LoginRoot/{company}",
+                new { controller = "Home", action = "Login", company = "Root"}
             );
 
             routes.MapRoute(

@@ -194,6 +194,7 @@ namespace Apps.BLL
                                       e.id,
                                       e.name,
                                       e.code,
+                                      _parentId = e.parentId,
                                       parentName = e.parent.name
                                   }
                                   ).ToList();
@@ -217,7 +218,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetPage(QueryParam param=null)
+        public OperateResult GetByPager(QueryParam param=null)
         {
             using (SystemDB db = new SystemDB())
             {

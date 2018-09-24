@@ -9,13 +9,14 @@ namespace Apps.BLL
 {
     public class CompanyManager
     {
-        public OperateResult AddRegister(CompanyRegister model)
+
+        public OperateResult Add(Company model)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var match = from m in db.companyRegisterList
+                    var match = from m in db.companyList
                                 where m.name.Equals(model.name) || m.code.Equals(model.code)
                                 select m;
                     if (match.Count() > 0)
@@ -26,7 +27,7 @@ namespace Apps.BLL
                         };
                     }
 
-                    db.companyRegisterList.Add(model);
+                    db.companyList.Add(model);
                     db.SaveChanges();
 
                     return new OperateResult
@@ -44,24 +45,24 @@ namespace Apps.BLL
             }
 
         }
-        public OperateResult RemoveRegister(long id)
+        public OperateResult Remove(long id)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var element = db.companyRegisterList.Find(id);
-                    var elements = db.companyRegisterList.ToList();
+                    var element = db.companyList.Find(id);
+                    var elements = db.companyList.ToList();
 
                     if (element == null)
                     {
                         return new OperateResult
                         {
-                            content = "不存在该部门",
+                            content = "不存在该公司",
                         };
                     }
 
-                    db.companyRegisterList.Remove(element);
+                    db.companyList.Remove(element);
 
                     db.Entry(element).State = EntityState.Deleted;
                     db.SaveChanges();
@@ -85,13 +86,13 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult UpdateRegister(CompanyRegister model)
+        public OperateResult Update(Company model)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var elements = (from e in db.companyRegisterList
+                    var elements = (from e in db.companyList
                                     where e.id != model.id && e.name == model.name
                                     select e
                                     ).ToList();
@@ -99,7 +100,7 @@ namespace Apps.BLL
                     {
                         return new OperateResult
                         {
-                            content = "已经存在同名的部门",
+                            content = "已经存在同名的公司",
                         };
                     }
 
@@ -125,13 +126,13 @@ namespace Apps.BLL
             }
 
         }
-        public OperateResult GetRegisterByCode(string code)
+        public OperateResult GetByCode(string code)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var element = (from m in db.companyRegisterList
+                    var element = (from m in db.companyList
                                    where code == m.code
                                    select m
                                 ).FirstOrDefault();
@@ -162,13 +163,13 @@ namespace Apps.BLL
             }
 
         }
-        public OperateResult GetRegisterById(long id)
+        public OperateResult GetById(long id)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var element = (from m in db.companyRegisterList.Include("parent")
+                    var element = (from m in db.companyList
                                    where id == m.id
                                    select m
                                 ).FirstOrDefault();
@@ -200,25 +201,19 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetRegisterAll(QueryParam param = null)
+        public OperateResult GetAll(QueryParam param = null)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var elements = (from e in db.companyRegisterList
-                                    select new
-                                    {
-                                        e.id,
-                                        e.name,
-                                        e.code,
-                                    }
-                                  ).ToList();
+                    var elements = from e in db.companyList
+                                    select e;
 
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
-                        data = elements,
+                        data = elements.ToList(),
                     };
 
                 }
@@ -233,19 +228,15 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetRegisterByPager(QueryParam param = null)
+        public OperateResult GetByPager(QueryParam param = null)
         {
             using (SystemDB db = new SystemDB())
             {
                 try
                 {
-                    var elements = from e in db.companyRegisterList
-                                   select new
-                                   {
-                                       e.id,
-                                       e.name,
-                                       e.code,
-                                   };
+                    var elements = from e in db.companyList
+                                   select e
+                                   ;
 
                     int total = elements.Count();
                     int pages = 0;

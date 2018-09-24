@@ -17,7 +17,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            CompanyManager manager = new CompanyManager();
+            CompanyRegisterManager manager = new CompanyRegisterManager();
             OperateResult or = manager.GetRegisterAll();
 
             if (or.status == OperateStatus.Success
@@ -32,7 +32,7 @@ namespace MIS.Web.Controllers
         public ActionResult GetEntities(Pager pager)
         {
 
-            CompanyManager manager = new CompanyManager();
+            CompanyRegisterManager manager = new CompanyRegisterManager();
             OperateResult or = manager.GetRegisterByPager(new QueryParam { pager = pager });
 
             if (or.status == OperateStatus.Success
@@ -48,7 +48,52 @@ namespace MIS.Web.Controllers
         {
             return View();
         }
-        public ActionResult CreateEntity(CompanyRegister model)
+        /// <summary>
+        /// 1、先在default数据库内注册公司
+        /// 2、新建数据库（即拷贝一份空数据库，以公司简称为文件名）
+        /// 3、在新建数据库内插入公司记录
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        //public ActionResult CreateEntity(CompanyRegister model)
+        //{
+        //    if (!ModelState.IsValid)
+        //    {
+        //        return Json(
+        //            new OperateResult
+        //            {
+        //                content = Model.Utility.GetModelStateErrors(ModelState),
+        //            },
+        //            JsonRequestBehavior.AllowGet
+        //        );
+        //    }
+
+        //    CompanyRegisterManager manager = new CompanyRegisterManager();
+
+        //    OperateResult or = manager.AddRegister(model);
+        //    if (or.status == OperateStatus.Success)
+        //    {
+        //        //从空数据库复制一份
+        //        string dbSrc = Server.MapPath("/") + "App_Data/sqliteDefault.db";
+        //        string dbDst = Server.MapPath("/") + "App_Data/sqlite" + model.code + ".db";
+
+        //        System.IO.File.Copy(dbSrc, dbDst);
+
+        //        Company c = new Company
+        //        {
+        //            name = model.name,
+        //            code = model.code
+        //        };
+
+        //        CompanyManager m = new CompanyManager();
+        //        or = m.Add(c);
+        //    }
+
+        //    return Json(or, JsonRequestBehavior.AllowGet);
+
+        //}
+
+        public ActionResult CreateEntity(Company model)
         {
             if (!ModelState.IsValid)
             {
@@ -63,15 +108,7 @@ namespace MIS.Web.Controllers
 
             CompanyManager manager = new CompanyManager();
 
-            OperateResult or = manager.AddRegister(model);
-            if (or.status == OperateStatus.Success)
-            {
-                //从空数据库复制一份
-                string dbSrc = Server.MapPath("/") + "App_Data/sqliteEmpty.db";
-                string dbDst = Server.MapPath("/") + "App_Data/sqlite" + model.code + ".db";
-
-                System.IO.File.Copy(dbSrc, dbDst);
-            }
+            OperateResult or = manager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -90,14 +127,14 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            CompanyManager manager = new CompanyManager();
+            CompanyRegisterManager manager = new CompanyRegisterManager();
 
             OperateResult or = manager.GetRegisterById(id.Value);
 
             return View(or.data);
 
         }
-        public ActionResult EditEntity(CompanyRegister model)
+        public ActionResult EditEntity(Company model)
         {
             if (!ModelState.IsValid)
             {
@@ -112,7 +149,7 @@ namespace MIS.Web.Controllers
 
             CompanyManager manager = new CompanyManager();
 
-            OperateResult or = manager.UpdateRegister(model);
+            OperateResult or = manager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -131,7 +168,7 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            CompanyManager manager = new CompanyManager();
+            CompanyRegisterManager manager = new CompanyRegisterManager();
 
             OperateResult or = manager.RemoveRegister(id.Value);
 

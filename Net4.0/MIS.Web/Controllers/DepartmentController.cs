@@ -36,7 +36,7 @@ namespace MIS.Web.Controllers
         {
 
             DepartmentManager manager = new DepartmentManager();
-            OperateResult or = manager.GetPage(new QueryParam {pager=pager });
+            OperateResult or = manager.GetByPager(new QueryParam {pager=pager });
             
             if (or.status == OperateStatus.Success
                 && or.data != null)

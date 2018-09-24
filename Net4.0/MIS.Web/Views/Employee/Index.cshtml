@@ -181,7 +181,7 @@
     function onEditEntity() {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
-            alert("未选择")
+            showAlert("未选择")
             return;
         }
 
@@ -198,7 +198,7 @@
     function onRemoveEntity(id) {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
-            alert("未选择");
+            showAlert("未选择");
             return;
         }
         if (!confirm("确定删除吗")){
@@ -212,7 +212,7 @@
             async: false,
             success: function (result) {
                 if (result.status != 0) {
-                    alert(result.content);
+                    showAlert(result.content);
                 }
                 else {
                     $('#@(tabEntityList)').datagrid('reload');
@@ -224,7 +224,7 @@
     function onShowSalary() {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
-            alert("未选择")
+            showAlert("未选择")
             return;
         }
 

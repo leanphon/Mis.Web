@@ -51,7 +51,7 @@ namespace MIS.Web.Controllers
             }
 
             SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.GetPage(queryParam);
+            OperateResult or = manager.GetByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

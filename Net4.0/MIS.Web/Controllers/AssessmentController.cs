@@ -55,7 +55,7 @@ namespace MIS.Web.Controllers
             }
 
             AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.GetPage(queryParam);
+            OperateResult or = manager.GetByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

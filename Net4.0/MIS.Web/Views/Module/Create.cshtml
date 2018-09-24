@@ -65,7 +65,7 @@
             success: function (result) {
                 var obj = JSON.parse(result);
                 if (obj.status != 0) {
-                    alert(obj.content);
+                    showAlert(obj.content);
                 }
                 else {
                     destroyDialog();
@@ -81,6 +81,16 @@
             mode: 'remote',
             valueField: 'id',
             textField: 'name',
+        });
+        $('#onlyRoot').combobox({
+            width: '100%',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '0', text: '否' },
+                { value: '1', text: '是' },
+            ]
         });
     }
 </script>
@@ -100,7 +110,7 @@
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.showIndex, new { @class = "lab" })
+                    @Html.LabelFor(model => model.parentId, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
                     <input class="parm_control" type="text" id="parentId" name="parentId" />
@@ -112,6 +122,14 @@
                 </td>
                 <td class="cols_2_right">
                     @Html.EditorFor(model => model.showIndex, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.onlyRoot, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" type="text" id="onlyRoot" name="onlyRoot" />
                 </td>
             </tr>
         </table>

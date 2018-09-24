@@ -62,7 +62,7 @@
             success: function (result) {
                 var obj = JSON.parse(result);
                 if (obj.status != 0) {
-                    alert(obj.content);
+                    showAlert(obj.content);
                 }
                 else {
                     destroyDialog();

@@ -14,8 +14,6 @@ namespace MIS.Web.Controllers
         [LoginAuthorize]
         public ActionResult Index()
         {
-            ViewBag.companyName = "广西南宁穆图装饰工程有限公司";
-
             if (!IsLogin())
             {
                 return RedirectToAction("Login", "Home");
@@ -31,25 +29,26 @@ namespace MIS.Web.Controllers
         /// <returns></returns>
         public ActionResult Login(string company)
         {
-            if(company == null)
-            {
-                return Content("未输入公司名字");
-            }
-            if (company == "Root")
-            {
-                Session["CompanyName"] = "Default";
-            }
-            else
-            {
-                CompanyManager manager = new CompanyManager();
-                OperateResult or = manager.GetRegisterByCode(company);
-                if (or.status != OperateStatus.Success)
-                {
-                    return Content("不存在的公司");
-                }
+            //if (company == "Root")
+            //{
+            //    //Session["CompanyName"] = "Default";
+            //    Session["CompanyName"] = "Default";
+            //}
+            //else
+            //{
+            //    CompanyManager manager = new CompanyManager();
+            //    OperateResult or = manager.GetByCode(company);
+            //    if (or.status != OperateStatus.Success)
+            //    {
+            //        return Content("不存在的公司");
+            //    }
 
-                Session["CompanyName"] = company;
-            }
+            //    Company m = or.data as Company;
+
+            //    ViewBag.companyName = m.name;
+
+            //    Session["company"] = m;
+            //}
 
             return View();
         }
@@ -66,8 +65,15 @@ namespace MIS.Web.Controllers
             }
 
             UserManager manager = new UserManager();
-
-            OperateResult or = manager.Login(model);
+            OperateResult or;
+            if (model.name == "root")
+            {
+                or = manager.RootLogin(model);
+            }
+            else
+            {
+                or = manager.Login(model);
+            }
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

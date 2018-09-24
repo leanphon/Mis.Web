@@ -1,3 +1,130 @@
+
+
+function ModuleTreeGrid(gridId, toolbarFun) {
+    this.id = gridId;
+    this.idField = 'id';
+    this.treeField = 'name';
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'name', title: '模块名称', width: 250 },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
+
+function FunctionRightGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'moduleName', title: '模块名', width: 250 },
+                { field: 'name', title: '功能名', width: 250 },
+                { field: 'url', title: 'url路径', width: 250 },
+                { field: 'icon', title: '图标', width: 250 },
+                { field: 'authorize', title: '是否授权', width: 250 },
+    ]];
+
+    this.toolbar = [
+            { text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
+function RoleGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'name', title: '角色名', width: 250 },
+                { field: 'description', title: '描述', width: 250 },
+    ]];
+
+    this.toolbar = [
+            { text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+            { text: '权限分配', iconCls: 'icon-edit', handler: toolbarFun[3] },
+    ];
+}
+
+function RoleAssignRightTreeGrid(gridId, toolbarFun) {
+    this.id = gridId;
+    this.idField = 'id';
+    this.treeField = 'name';
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                //{ field: 'id', hidden: true },
+                { field: 'id', title: 'id', checkbox: true, align: 'center', width: 60 },
+                { field: 'name', title: '功能名', width: 250 },
+    ]];
+
+    this.toolbar = [
+			//{ text: '保存', iconCls: 'icon-save', handler: toolbarFun[0] },
+    ];
+}
+
+
+
+function CompanyRegisterGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'name', title: '公司名称', width: 250 },
+                { field: 'code', title: '公司简称', width: 250 },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+    ];
+}
+
+function CompanyGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'logo', title: 'logo图片', width: 250 },
+                { field: 'name', title: '公司名称', width: 250 },
+                { field: 'code', title: '公司简称', width: 250 },
+                { field: 'loginImg', title: '登录背景图片', width: 250 },
+                { field: 'mainImg', title: '主页面背景图片', width: 250 },
+    ]];
+
+    this.toolbar = [
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+    ];
+}
+
+
+
 function PostGrid(gridId, toolbarFun) {
     this.id = gridId;
 
@@ -58,7 +185,7 @@ function BenefitGrid(gridId, toolbarFun) {
     ];
 }
 
-function DepartmentGrid(gridId, toolbarFun) {
+function DepartmentTreeGrid(gridId, toolbarFun) {
     this.id = gridId;
     this.idField = 'id';
     this.treeField = 'name';
@@ -376,46 +503,4 @@ function SalaryRecordGrid(gridId, toolbarFun) {
 		];
 }
 
-
-function ModuleGrid(gridId, toolbarFun) {
-    this.id = gridId;
-    this.idField = 'id';
-    this.treeField = 'name';
-
-    this.forzenCols = [[
-    ]];
-
-    this.normalCols = [[
-                { field: 'id', hidden: true },
-                { field: 'name', title: '模块名称', width: 250 },
-    ]];
-
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
-}
-
-
-function CompanyRegisterGrid(gridId, toolbarFun) {
-    this.id = gridId;
-    this.idField = 'id';
-    this.treeField = 'name';
-
-    this.forzenCols = [[
-    ]];
-
-    this.normalCols = [[
-                { field: 'id', hidden: true },
-                { field: 'name', title: '公司名称', width: 250 },
-                { field: 'code', title: '简称', width: 250 },
-    ]];
-
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
-}
 

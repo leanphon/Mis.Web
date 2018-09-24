@@ -37,7 +37,7 @@ namespace MIS.Web.Controllers
         public ActionResult GetEntities(Pager pager)
         {
             ModuleManager manager = new ModuleManager();
-            OperateResult or = manager.GetPage(new QueryParam { pager = pager });
+            OperateResult or = manager.GetByPager(new QueryParam { pager = pager });
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

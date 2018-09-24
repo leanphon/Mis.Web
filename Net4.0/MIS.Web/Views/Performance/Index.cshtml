@@ -65,7 +65,7 @@
     function onEditEntity() {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
-            alert("未选择")
+            showAlert("未选择")
             return;
         }
 
@@ -84,7 +84,7 @@
     function onRemoveEntity(id) {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
-            alert("未选择")
+            showAlert("未选择")
             return;
         }
         if (!confirm("确定删除吗")){
@@ -99,10 +99,10 @@
             success: function (result) {
                 //var obj = JSON.parse(result);
                 if (result.status != 0) {
-                    alert(result.content);
+                    showAlert(result.content);
                 }
                 else {
-                    alert(result.content);
+                    showAlert(result.content);
                     $('#@(tabEntityList)').datagrid('reload');
                 }
             }
