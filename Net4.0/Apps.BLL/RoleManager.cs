@@ -276,7 +276,7 @@ namespace Apps.BLL
                                        name = e.name,
                                        _parentId = e.parentId,
                                        rightId = (long)-1,
-                                       check = false,
+                                       @checked = false,
                                    }).ToList();
 
                     var max = (from e in db.moduleList
@@ -293,7 +293,7 @@ namespace Apps.BLL
                                       name = e.name,
                                       _parentId = (long ?)e.moduleId,
                                       rightId = e.id,
-                                      check = check,
+                                      @checked = check,
                                   }).ToList();
 
                     var elements = modules.Concat(rights);
@@ -330,51 +330,36 @@ namespace Apps.BLL
             {
                 try
                 {
-                    var role = (from e in db.roleList
+                    var role = (from e in db.roleList.Include("rightList")
                                 where e.id == roleId
                                 select e).FirstOrDefault();
                     if (role != null)
                     {
                         foreach( var rid in idList)
                         {
-                            var right = (from e in db.rightList
-                                        where e.id == rid
+                            var model = db.rightList.Find(rid);
+
+                            var query = (from e in role.rightList
+                                         where e.id == rid
                                         select e).FirstOrDefault();
-                            var m = role.rightList.Find(r => r.id.Equals(right.id));
-                            if (right != null && role.rightList.Find(right))
+
+                            if (model != null && query == null)
                             {
-                                role.rightList.Add(right);
+                                role.rightList.Add(model);
                             }
                         }
                     }
 
+                    db.Entry(role).State = EntityState.Modified;
 
-                    var rights = (from e in db.rightList.Include("module").AsEnumerable()
-                                  where e.module.onlyRoot != 1
-                                  let check = AssignCheck(id, e.id)
-                                  let rid = ++max
-                                  select new
-                                  {
-                                      id = rid,
-                                      name = e.name,
-                                      _parentId = (long?)e.moduleId,
-                                      rightId = e.id,
-                                      check = check,
-                                  }).ToList();
-
-                    var elements = modules.Concat(rights);
-
-                    var data = new
-                    {
-                        pages = 1,
-                        total = elements.Count(),
-                        rows = elements
-                    };
+                    //db.Configuration.ValidateOnSaveEnabled = false;
+                    db.SaveChanges();
+                    //db.Configuration.ValidateOnSaveEnabled = true;
 
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
-                        data = data,
+                        content = "更新成功"
                     };
 
                 }

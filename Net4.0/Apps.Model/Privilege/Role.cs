@@ -29,11 +29,9 @@ namespace Apps.Model.Privilege
         public string name { get; set; }
 
         [Display(Name = "描述")]
-        [Required(ErrorMessage = "{0}必须输入")]
         public string description { get; set; }
 
         [Display(Name = "权限")]
-        [Required(ErrorMessage = "{0}必须输入")]
         [JsonIgnore]
         public List<FunctionRight> rightList { get; set; }
 

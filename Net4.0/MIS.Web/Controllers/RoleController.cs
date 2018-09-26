@@ -170,7 +170,7 @@ namespace MIS.Web.Controllers
 
         }
 
-        public ActionResult AssignRight()
+        public ActionResult AssignRight(long roleId)
         {
             string data = Request.Params["extendData"];
             if (data == null)
@@ -200,7 +200,7 @@ namespace MIS.Web.Controllers
 
             RoleManager manager = new RoleManager();
 
-            OperateResult or = manager.Remove(0);
+            OperateResult or = manager.AssignRight(roleId, lstData);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
