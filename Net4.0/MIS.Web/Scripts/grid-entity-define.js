@@ -67,13 +67,15 @@ function RoleAssignRightTreeGrid(gridId, toolbarFun) {
     this.id = gridId;
     this.idField = 'id';
     this.treeField = 'name';
+    this.singleSelect = false;
 
     this.forzenCols = [[
     ]];
 
     this.normalCols = [[
-                //{ field: 'id', hidden: true },
-                { field: 'id', title: 'id', checkbox: true, align: 'center', width: 60 },
+                { field: 'id', hidden: true },
+                { field: 'check', title: '', checkbox: true, align: 'center', width: 60 },
+                { field: 'rightId', hidden: true},
                 { field: 'name', title: '功能名', width: 250 },
     ]];
 

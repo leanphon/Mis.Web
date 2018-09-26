@@ -45,7 +45,7 @@
                     text: '保存',
                     iconCls: 'icon-ok',
                     handler: function () {
-                        $('#@(formEntity)').submit();
+                        saveAssin();
                     }
                 },
                 {
@@ -84,6 +84,36 @@
         var gridObj = new RoleAssignRightTreeGrid('@(tabEntityList)', toolbarFun);
 
         initTreegrid(gridObj, url, callbackFuns);
+    }
+
+    function saveAssin()
+    {
+        var rightArray = new Array();
+        var rows = $('#@(tabEntityList)').treegrid('getChecked');
+        for (var i=0; i<rows.length; i++)
+        {
+            rightArray.push(rows[i].rightId);
+        }
+
+        console.log(rows);
+
+        var data = JSON.stringify(rightArray);
+        var param = {
+            "roleId" : @(ViewBag.id),
+            "extendData": data
+        }
+
+        $.post('/@(controllerName)/AssignRight', param, function (result) {
+            if (result.status != 0) {
+                showAlert(result.content)
+            }
+            else {
+                showPrompt("保存成功")
+                destroyDialog();
+            }
+
+        }, "JSON").error(function (result) {
+        });
     }
 
 </script>
