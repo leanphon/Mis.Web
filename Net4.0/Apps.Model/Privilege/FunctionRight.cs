@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -27,11 +28,13 @@ namespace Apps.Model.Privilege
         [Required(ErrorMessage = "{0}必须填写！")]
         public long moduleId { get; set; }
         [ForeignKey("moduleId")]
+        [JsonIgnore]
         public virtual Module module { get; set; }
 
         [Display(Name = "授权")]
         public string authorize { get; set; }
 
+        [JsonIgnore]
         public ICollection<Role> roleList { get; set; }
     }
 }

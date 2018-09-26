@@ -253,36 +253,51 @@ namespace Apps.BLL
             {
                 try
                 {
-                    Func<long, long, bool> AssignCheck = null;
-                    AssignCheck = (roleId, rightId) =>
+                    // 根据给定的roleId和rightId，判断它是否已经被授权
+                    Func<long, long, bool> AssignCheck = (roleId, rightId) =>
                     {
-                        // 查找属于给定部门的员工
-                        var role = (from e in db.roleList.Include("rightList")
+                        
+                        var roleRight = (from e in db.roleList.Include("rightList")
                                      where e.id == roleId
-                                     select e
+                                     select e.rightList
                                      ).FirstOrDefault();
-                        var query = from e in role.rightList
+                        var query = from e in roleRight
                                     where e.id == rightId
                                     select e;
 
                         return query.Count() > 0;
                     };
 
-                    var elements = from e in db.rightList.AsEnumerable()
-                                   let check= AssignCheck(id, e.id)
+                    Func<long, IEnumerable<object>> GetRights = (moduleId) =>
+                    {
+                        var rights = from e in db.rightList.AsEnumerable()
+                                     where e.moduleId == moduleId
+                                     let check = AssignCheck(id, e.id)
+                                     select new
+                                     {
+                                         e.id,
+                                         e.name,
+                                         _parentId = e.moduleId,
+                                         check = check
+                                     };
+
+                        return rights.ToList();
+                    };
+
+
+                    var elements = (from e in db.moduleList.AsEnumerable()
                                    select new
                                    {
                                        e.id,
                                        e.name,
-                                       _parentId = e.moduleId,
-                                       check = check
-                                   };
-
+                                       _parentId = e.parentId,
+                                       right = GetRights(e.id)
+                                   }).ToList();
 
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
-                        data = elements.ToList(),
+                        data = elements,
                     };
 
                 }
