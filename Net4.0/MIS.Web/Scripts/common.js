@@ -37,6 +37,17 @@ function formatDate(value, format) {
 
     return dt.format(format); //扩展的Date的format方法(上述插件实现)
 }
+function formatDateTime(value) {
+    if (value == null || value == '') {
+        return '';
+    }
+    var dateStr = value.replace(/\/Date\(/gi, '');
+    dateStr = dateStr.replace(/\)\//gi, '');
+
+    var dt = new Date(parseInt(dateStr, 10));
+
+    return dt.format("yyyy-MM-dd hh:mm:ss"); //扩展的Date的format方法(上述插件实现)
+}
 
 function formatDate(value) {
     if (value == null || value == '') {
@@ -91,4 +102,18 @@ function showPrompt(msg) {
 }
 function showAlert(msg) {
     $.messager.alert({ "title": "操作提示", "msg": msg, "icon": "warning" })
+}
+function showConfirm(msg) {
+    var re = false;
+    $.messager.confirm({
+        "title": "操作提示", "msg": msg,"fn":
+        function (result) {
+            if (result) {
+                re = result;
+            }
+        }
+    });
+    //console.log(re)
+
+    return re;
 }
