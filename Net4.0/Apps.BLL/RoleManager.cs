@@ -171,7 +171,7 @@ namespace Apps.BLL
                 try
                 {
                     var elements = from e in db.roleList
-                                    select e ;
+                                   select e;
 
                     return new OperateResult
                     {
@@ -256,10 +256,10 @@ namespace Apps.BLL
                     // 根据给定的roleId和rightId，判断它是否已经被授权
                     Func<long, long, bool> AssignCheck = (roleId, rightId) =>
                     {
-                        
+
                         var roleRight = (from e in db.roleList.Include("rightList")
-                                     where e.id == roleId
-                                     select e.rightList
+                                         where e.id == roleId
+                                         select e.rightList
                                      ).FirstOrDefault();
                         var query = from e in roleRight
                                     where e.id == rightId
@@ -268,36 +268,47 @@ namespace Apps.BLL
                         return query.Count() > 0;
                     };
 
-                    Func<long, IEnumerable<object>> GetRights = (moduleId) =>
-                    {
-                        var rights = from e in db.rightList.AsEnumerable()
-                                     where e.moduleId == moduleId
-                                     let check = AssignCheck(id, e.id)
-                                     select new
-                                     {
-                                         e.id,
-                                         e.name,
-                                         _parentId = e.moduleId,
-                                         check = check
-                                     };
-
-                        return rights.ToList();
-                    };
-
-
-                    var elements = (from e in db.moduleList.AsEnumerable()
+                    var modules = (from e in db.moduleList
+                                   where e.onlyRoot!=1
                                    select new
                                    {
-                                       e.id,
-                                       e.name,
+                                       id = e.id,
+                                       name = e.name,
                                        _parentId = e.parentId,
-                                       right = GetRights(e.id)
+                                       rightId = (long)-1,
+                                       @checked = false,
                                    }).ToList();
+
+                    var max = (from e in db.moduleList
+                                   //where e.onlyRoot != 1
+                                   select e.id).Max();
+
+                    var rights = (from e in db.rightList.Include("module").AsEnumerable()
+                                  where e.module.onlyRoot != 1
+                                  let check = AssignCheck(id, e.id)
+                                  let rid = ++max
+                                  select new
+                                  {
+                                      id = rid,
+                                      name = e.name,
+                                      _parentId = (long ?)e.moduleId,
+                                      rightId = e.id,
+                                      @checked = check,
+                                  }).ToList();
+
+                    var elements = modules.Concat(rights);
+
+                    var data = new
+                    {
+                        pages = 1,
+                        total = elements.Count(),
+                        rows = elements
+                    };
 
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
-                        data = elements,
+                        data = data,
                     };
 
                 }
@@ -313,6 +324,54 @@ namespace Apps.BLL
         }
 
 
+        public OperateResult AssignRight(long roleId, List<long> idList)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var role = (from e in db.roleList.Include("rightList")
+                                where e.id == roleId
+                                select e).FirstOrDefault();
+                    if (role != null)
+                    {
+                        foreach( var rid in idList)
+                        {
+                            var model = db.rightList.Find(rid);
 
+                            var query = (from e in role.rightList
+                                         where e.id == rid
+                                        select e).FirstOrDefault();
+
+                            if (model != null && query == null)
+                            {
+                                role.rightList.Add(model);
+                            }
+                        }
+                    }
+
+                    db.Entry(role).State = EntityState.Modified;
+
+                    //db.Configuration.ValidateOnSaveEnabled = false;
+                    db.SaveChanges();
+                    //db.Configuration.ValidateOnSaveEnabled = true;
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+        }
     }
 }

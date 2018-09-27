@@ -159,26 +159,48 @@ namespace MIS.Web.Controllers
 
             OperateResult or = manager.GetRightById(id);
 
+            if (or.status == OperateStatus.Success
+                && or.data != null)
+            {
+                return Json(or.data, JsonRequestBehavior.AllowGet);
+            }
+
+
             return Json(or, JsonRequestBehavior.AllowGet);
 
         }
 
-        public ActionResult AssginRight(int? id)
+        public ActionResult AssignRight(long roleId)
         {
-            if (id == null)
+            string data = Request.Params["extendData"];
+            if (data == null)
             {
                 return Json(
                     new OperateResult
                     {
-                        content = "访问错误",
+                        content = "无考核数据",
                     },
                     JsonRequestBehavior.AllowGet
                 );
-
             }
+
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            List<long> lstData = js.Deserialize<List<long>>(data);
+
+            if (lstData.Count == 0)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无考核数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
             RoleManager manager = new RoleManager();
 
-            OperateResult or = manager.Remove(id.Value);
+            OperateResult or = manager.AssignRight(roleId, lstData);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

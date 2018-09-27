@@ -39,7 +39,7 @@
 	})
 
 	function initPage() {
-	    var url = '/@(controllerName)/GetAllEntities';
+	    var url = '/@(controllerName)/GetEntities';
 	    var callbackFuns = [{ "name": "onContextMenu", "fun": onTreegridonContextMenu }];
 	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
 	    var gridObj = new ModuleTreeGrid('@(tabEntityList)', toolbarFun);

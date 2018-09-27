@@ -185,7 +185,7 @@ function initTreegrid(gridEntity, url, callbackFuns) {
         url: url,
         //data: data,
         pagination: gridEntity.pager,
-        singleSelect: true,
+        singleSelect: gridEntity.singleSelect,
         rownumbers: true,
         loadMsg: '正在加载中，请稍等... ',
         nowrap: false,//允许换行

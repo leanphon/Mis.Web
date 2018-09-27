@@ -234,6 +234,10 @@ namespace Apps.BLL
                                        //parentName = e.parent.name
                                    };
 
+                    //不做分页
+                    int total = elements.Count();
+
+                    /*
                     int total = elements.Count();
                     int pages = 0;
                     Pager pager = param.pager;
@@ -254,10 +258,11 @@ namespace Apps.BLL
                             elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
                         }
                     }
+                    */
 
                     var data = new
                     {
-                        pages,
+                        pages = 1,
                         total,
                         rows = elements.ToList()
                     };

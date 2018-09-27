@@ -232,10 +232,10 @@ namespace Apps.BLL
                                        e.id,
                                        e.name,
                                        _parentId = e.parentId
-                                       //parentName = e.parent.name
                                    };
 
                     int total = elements.Count();
+                    /*
                     int pages = 0;
                     Pager pager = param.pager;
                     if (pager == null || pager.rows == 0)
@@ -255,10 +255,10 @@ namespace Apps.BLL
                             elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
                         }
                     }
-
+                    */
                     var data = new
                     {
-                        pages,
+                        pages = 1,
                         total,
                         rows = elements.ToList()
                     };
