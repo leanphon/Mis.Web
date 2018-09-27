@@ -104,19 +104,25 @@ namespace Apps.BLL
             {
                 try
                 {
-                    var elements = (from e in db.userList
+                    var element = (from e in db.userList
                                     where e.id != model.id && e.name == model.name
                                     select e
-                                    ).ToList();
-                    if (elements.Count() >= 1)
+                                    ).FirstOrDefault();
+                    if (element != null)
                     {
                         return new OperateResult
                         {
-                            content = "已经存在同名的部门",
+                            content = "已经存在同名",
                         };
                     }
+                    element = (from e in db.userList
+                               where e.id == model.id 
+                               select e
+                               ).AsNoTracking().FirstOrDefault();
 
+                    model.passwd = element.passwd;
 
+                    db.Configuration.ValidateOnSaveEnabled = false;
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
@@ -215,11 +221,14 @@ namespace Apps.BLL
             {
                 try
                 {
-                    var elements = from e in db.userList
+                    var elements = from e in db.userList.Include("role")
                                    select new
                                    {
                                        e.id,
                                        e.name,
+                                       roleName = e.role.name,
+                                       e.status,
+                                       e.lastLogin
                                    };
 
                     int total = elements.Count();
@@ -282,6 +291,25 @@ namespace Apps.BLL
                                     ).FirstOrDefault();
                     if (element != null)
                     {
+                        if (element.status == "锁定")
+                        {
+                            return new OperateResult
+                            {
+                                content = "用户被锁定",
+                            };
+                        }
+
+                        //更新最后一次登录
+                        element.lastLogin = DateTime.Now;
+
+                        if (element.status == "未激活")
+                        {
+                            element.status = "激活";
+                        }
+
+                        db.Entry(element).State = System.Data.Entity.EntityState.Modified;
+                        db.SaveChanges();
+
                         return new OperateResult
                         {
                             status = OperateStatus.Success,
@@ -362,5 +390,95 @@ namespace Apps.BLL
             //}
 
         }
+
+
+        public OperateResult ResetPasswd(long id, string pwd)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var element = (from m in db.userList
+                                   where id == m.id
+                                   select m
+                                ).FirstOrDefault();
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    element.passwd = MD5Encode.Encode16(pwd);
+
+                    db.Entry(element).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+
+        }
+
+        public OperateResult Lock(long id)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var element = (from m in db.userList
+                                   where id == m.id
+                                   select m
+                                ).FirstOrDefault();
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    element.status = "锁定";
+
+                    db.Entry(element).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+
+        }
+
     }
 }

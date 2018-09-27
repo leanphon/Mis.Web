@@ -9,6 +9,12 @@ using System.Threading.Tasks;
 
 namespace Apps.Model.Privilege
 {
+    public enum UserStatus{
+        Inactive,
+        Active,
+        Lock
+    }
+
     public class RootUser
     {
         [Key]
@@ -46,5 +52,12 @@ namespace Apps.Model.Privilege
         [ForeignKey("roleId")]
         [JsonIgnore]
         public virtual Role role { get; set; }
+
+        [Display(Name = "状态")]
+        public string status { get; set; }
+
+        [Display(Name = "最后一次登录")]
+        public DateTime? lastLogin { get; set; }
+
     }
 }

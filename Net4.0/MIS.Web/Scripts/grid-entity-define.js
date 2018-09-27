@@ -84,6 +84,28 @@ function RoleAssignRightTreeGrid(gridId, toolbarFun) {
     ];
 }
 
+function UserGrid(gridId, toolbarFun) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'name', title: '用户名', width: 250 },
+                { field: 'roleName', title: '角色', width: 250 },
+                { field: 'status', title: '状态', width: 250 },
+                { field: 'lastLogin', title: '最后一次登录', width: 250, formatter: formatDateTime },
+    ]];
+
+    this.toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
+			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
+			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
+            { text: '重置密码', iconCls: 'icon-edit', handler: toolbarFun[3] },
+            { text: '锁定', iconCls: 'icon-edit', handler: toolbarFun[4] },
+    ];
+}
 
 
 function CompanyRegisterGrid(gridId, toolbarFun) {
