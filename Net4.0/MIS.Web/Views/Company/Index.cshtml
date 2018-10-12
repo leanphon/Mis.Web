@@ -49,8 +49,11 @@
 	    var callbackFuns = [
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
-	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
-	    var gridObj = new CompanyRegisterGrid('@(tabEntityList)', toolbarFun);
+	    toolbar = [
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+	    ];
+
+	    var gridObj = new CompanyRegisterGrid('@(tabEntityList)', toolbar);
 
 	    initDatagrid(gridObj, url, callbackFuns);
 	}

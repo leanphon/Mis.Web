@@ -91,8 +91,16 @@
             { "name": "onDblClickRow", "fun": onDblClickRow },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu },
         ];
-        var toolbarFun = [onEditEntity, onLock, onUnlock, onExportAll];
-        var gridObj = new SalaryRecordGrid('@(tabEntityList)', toolbarFun);
+        toolbar = [
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+            { text: '锁定', iconCls: 'icon-lock', handler: onLock },
+            { text: '锁定', iconCls: 'icon-unlock', handler: onUnlock },
+            { text: '导出全部', iconCls: 'icon-export', handler: onExportAll },
+
+        ];
+
+
+        var gridObj = new SalaryRecordGrid('@(tabEntityList)', toolbar);
 
         initDatagrid(gridObj, url, callbackFuns);
 
@@ -153,72 +161,8 @@
         $('#@(tabEntityList)').datagrid('load');
     }
 
-    function onSaveSingle() {
-        if ($('#month').val() == '') {
-            showAlert('请选择考核月');
-            return;
-        }
-
-        if (!endEditing()){
-            retrun;
-        }
-        var rows = $('#@(tabEntityList)').datagrid('getSelected');
-        if (rows.length == 0) {
-            showAlert('无数据');
-            return;
-        }
-
-        var data = JSON.stringify(rows);
-        var param = {
-            "month" : $('#month').val(),
-            "salaryRecord" : data
-        }
-
-        $.post('/@(controllerName)/SaveSingle', param, function (result) {
-            if (result.status != 0) {
-                showAlert(result.content)
-            }
-            else {
-                showPrompt("保存成功")
-            }
-
-        }, "JSON").error(function (result) {
-        });
-    }
-    function onSaveAll() {
-        if ($('#month').val() == '') {
-            showAlert('请选择考核月');
-            return;
-        }
-        if (!endEditing()) {
-            retrun;
-        }
-        var rows = $('#@(tabEntityList)').datagrid('getRows');
-        if (rows.length == 0) {
-            showAlert('无修改数据');
-            return;
-        }
-
-        var data = JSON.stringify(rows);
-        var param = {
-            "month": $('#month').val(),
-            "salaryRecord": data
-        }
-
-        $.post('/@(controllerName)/SaveBatch', param, function (result) {
-            if (result.status != 0) {
-                showAlert(result.content)
-            }
-            else {
-                showPrompt("保存成功")
-            }
-
-        }, "JSON").error(function (result) {
-        });
-    }
 
     function onExportAll() {
-
         window.location.href = '/@(controllerName)/ExportAll?extendParams=' + getParamsJson();
 
     }

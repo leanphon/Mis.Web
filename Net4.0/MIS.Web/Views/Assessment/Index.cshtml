@@ -114,8 +114,14 @@
             { "name": "onDblClickRow", "fun": onDblClickRow, },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
-	    var toolbarFun = [onSaveSingle, onSaveAll];
-        var gridObj = new AssessmentInputGrid('@(tabEntityList)', toolbarFun);
+
+	    toolbar = [
+			{ text: '保存当前', iconCls: 'icon-save', handler: onSaveSingle },
+            { text: '保存全部', iconCls: 'icon-save', handler: onSaveAll },
+
+	    ];
+
+	    var gridObj = new AssessmentInputGrid('@(tabEntityList)', toolbar);
 
         initDatagrid(gridObj, url, callbackFuns);
 

@@ -1,6 +1,6 @@
 
 
-function ModuleTreeGrid(gridId, toolbarFun) {
+function ModuleTreeGrid(gridId, toolbar) {
     this.id = gridId;
     this.idField = 'id';
     this.treeField = 'name';
@@ -13,15 +13,11 @@ function ModuleTreeGrid(gridId, toolbarFun) {
                 { field: 'name', title: '模块名称', width: 250 },
     ]];
 
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
+    this.toolbar = toolbar;
 }
 
 
-function FunctionRightGrid(gridId, toolbarFun) {
+function FunctionRightGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -36,14 +32,10 @@ function FunctionRightGrid(gridId, toolbarFun) {
                 { field: 'authorize', title: '是否授权', width: 250 },
     ]];
 
-    this.toolbar = [
-            { text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
+    this.toolbar = toolbar;
 }
 
-function RoleGrid(gridId, toolbarFun) {
+function RoleGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -55,15 +47,10 @@ function RoleGrid(gridId, toolbarFun) {
                 { field: 'description', title: '描述', width: 250 },
     ]];
 
-    this.toolbar = [
-            { text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-            { text: '权限分配', iconCls: 'icon-edit', handler: toolbarFun[3] },
-    ];
+    this.toolbar = toolbar;
 }
 
-function RoleAssignRightTreeGrid(gridId, toolbarFun) {
+function RoleAssignRightTreeGrid(gridId, toolbar) {
     this.id = gridId;
     this.idField = 'id';
     this.treeField = 'name';
@@ -79,12 +66,10 @@ function RoleAssignRightTreeGrid(gridId, toolbarFun) {
                 { field: 'name', title: '功能名', width: 250 },
     ]];
 
-    this.toolbar = [
-			//{ text: '保存', iconCls: 'icon-save', handler: toolbarFun[0] },
-    ];
+    this.toolbar = toolbar;
 }
 
-function UserGrid(gridId, toolbarFun) {
+function UserGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -98,17 +83,11 @@ function UserGrid(gridId, toolbarFun) {
                 { field: 'lastLogin', title: '最后一次登录', width: 250, formatter: formatDateTime },
     ]];
 
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-            { text: '重置密码', iconCls: 'icon-edit', handler: toolbarFun[3] },
-            { text: '锁定', iconCls: 'icon-edit', handler: toolbarFun[4] },
-    ];
+    this.toolbar = toolbar;
 }
 
 
-function CompanyRegisterGrid(gridId, toolbarFun) {
+function CompanyRegisterGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -120,14 +99,10 @@ function CompanyRegisterGrid(gridId, toolbarFun) {
                 { field: 'code', title: '公司简称', width: 250 },
     ]];
 
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
+    this.toolbar = toolbar;
 }
 
-function CompanyGrid(gridId, toolbarFun) {
+function CompanyGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -142,14 +117,12 @@ function CompanyGrid(gridId, toolbarFun) {
                 { field: 'mainImg', title: '主页面背景图片', width: 250 },
     ]];
 
-    this.toolbar = [
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-    ];
+    this.toolbar = toolbar;
 }
 
 
 
-function PostGrid(gridId, toolbarFun) {
+function PostGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -164,14 +137,10 @@ function PostGrid(gridId, toolbarFun) {
                 { field: 'seniorityRewardsBase', title: '工龄奖基数', width: 150 },
     ]];
 
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
+    this.toolbar = toolbar;
 }
 
-function PerformanceGrid(gridId, toolbarFun) {
+function PerformanceGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -183,14 +152,10 @@ function PerformanceGrid(gridId, toolbarFun) {
                 { field: 'performanceRewards', title: '绩效奖金', width: 150 },
     ]];
 
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
+    this.toolbar = toolbar;
 }
 
-function BenefitGrid(gridId, toolbarFun) {
+function BenefitGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -202,14 +167,10 @@ function BenefitGrid(gridId, toolbarFun) {
                 { field: 'benefitRewards', title: '效益奖金', width: 150 },
     ]];
 
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
+    this.toolbar = toolbar;
 }
 
-function DepartmentTreeGrid(gridId, toolbarFun) {
+function DepartmentTreeGrid(gridId, toolbar) {
     this.id = gridId;
     this.idField = 'id';
     this.treeField = 'name';
@@ -223,15 +184,11 @@ function DepartmentTreeGrid(gridId, toolbarFun) {
                 { field: 'code', title: '部门编码', width: 150 },
     ]];
 
-    this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-    ];
+    this.toolbar = toolbar;
 }
 
 
-function EmployeeGrid(gridId, toolbarFun){
+function EmployeeGrid(gridId, toolbar){
     this.id = gridId;
 
 	this.forzenCols = [[
@@ -247,7 +204,7 @@ function EmployeeGrid(gridId, toolbarFun){
                 { field: 'phone', title: '联系电话', width: 150 },
                 { field: 'email', title: '工作邮箱', width: 200 },
                 { field: 'birthday', title: '出生日期', width: 150, formatter: formatDate },
-                { field: 'status', title: '在职状态', width: 150 },
+                { field: 'state', title: '在职状态', width: 150 },
                 { field: 'shouldTotal', title: '标准应发月薪', width: 150 },
                 { field: 'bankCard', title: '工资卡', width: 200 },
                 { field: 'emergencyContact', title: '紧急联系人', width: 150 },
@@ -259,19 +216,12 @@ function EmployeeGrid(gridId, toolbarFun){
             ]];
 
 
-	this.toolbar = [
-			{ text: '增加', iconCls: 'icon-add', handler: toolbarFun[0] },
-			{ text: '修改', iconCls: 'icon-edit', handler: toolbarFun[1] },
-			{ text: '删除', iconCls: 'icon-remove', handler: toolbarFun[2] },
-			{ text: '薪资设定', iconCls: 'icon-money', handler: toolbarFun[3] },
-            { text: '导入员工数据', iconCls: 'icon-upload', handler: toolbarFun[4] },
-			{ text: '导出所有', iconCls: 'icon-export', handler: toolbarFun[5] },
-		];
+	this.toolbar = toolbar;
 }
 
 
 
-function AssessmentInputGrid(gridId, toolbarFun) {
+function AssessmentInputGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -333,14 +283,10 @@ function AssessmentInputGrid(gridId, toolbarFun) {
                 },
     ]];
 
-    this.toolbar = [
-			{ text: '保存当前', iconCls: 'icon-save', handler: toolbarFun[0] },
-            { text: '保存全部', iconCls: 'icon-save', handler: toolbarFun[1] },
-
-    ];
+    this.toolbar = toolbar;
 }
 
-function AssessmentRecordGrid(gridId, toolbarFun) {
+function AssessmentRecordGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -405,14 +351,10 @@ function AssessmentRecordGrid(gridId, toolbarFun) {
                 { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDate },
     ]];
 
-    this.toolbar = [
-			{ text: '保存当前', iconCls: 'icon-save', handler: toolbarFun[0] },
-            { text: '保存全部', iconCls: 'icon-save', handler: toolbarFun[1] },
-
-    ];
+    this.toolbar = toolbar;
 }
 
-function SalaryInputGrid(gridId, toolbarFun) {
+function SalaryInputGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -466,14 +408,10 @@ function SalaryInputGrid(gridId, toolbarFun) {
     ]];
 
 
-    this.toolbar = [
-			{ text: '保存当前员工', iconCls: 'icon-save', handler: toolbarFun[0] },
-            { text: '全部保存', iconCls: 'icon-save', handler: toolbarFun[1] },
-
-    ];
+    this.toolbar = toolbar;
 }
 
-function SalaryRecordGrid(gridId, toolbarFun) {
+function SalaryRecordGrid(gridId, toolbar) {
     this.id = gridId;
 
 	this.forzenCols = [[
@@ -519,12 +457,7 @@ function SalaryRecordGrid(gridId, toolbarFun) {
             ]];
 
 
-	this.toolbar = [
-			{ text: '修改', iconCls: 'icon-save', handler: toolbarFun[0]  },
-			{ text: '锁定', iconCls: 'icon-lock', handler: toolbarFun[1]  },
-			{ text: '解锁', iconCls: 'icon-unlock', handler: toolbarFun[2]  },
-			{ text: '导出所有', iconCls: 'icon-export', handler: toolbarFun[3]  },
-		];
+	this.toolbar = toolbar;
 }
 
 

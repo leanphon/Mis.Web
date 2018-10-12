@@ -49,8 +49,15 @@
 	    var callbackFuns = [
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
-	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity, onReset, onLock];
-	    var gridObj = new UserGrid('@(tabEntityList)', toolbarFun);
+	    toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: onAddEntity },
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+			{ text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+            { text: '重置密码', iconCls: 'icon-edit', handler: onReset },
+            { text: '锁定', iconCls: 'icon-edit', handler: onLock },
+	    ];
+
+	    var gridObj = new UserGrid('@(tabEntityList)', toolbar);
 	    initDatagrid(gridObj, url, callbackFuns);
 
     }

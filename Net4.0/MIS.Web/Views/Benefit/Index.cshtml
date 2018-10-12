@@ -49,8 +49,13 @@
 	    var callbackFuns = [
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
-	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
-	    var gridObj = new BenefitGrid('@(tabEntityList)', toolbarFun);
+	    toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: onAddEntity },
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+			{ text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+	    ];
+
+	    var gridObj = new BenefitGrid('@(tabEntityList)', toolbar);
 
 	    initDatagrid(gridObj, url, callbackFuns);
 	}

@@ -98,8 +98,17 @@
 	    var callbackFuns = [
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
-	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity, onShowSalary, onImportExcel, onExportAll];
-	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbarFun);
+
+	    toolbar = [
+			{ text: '入职', iconCls: 'icon-add', handler: onAddEntity },
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+			{ text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+			{ text: '薪资设定', iconCls: 'icon-money', handler: onShowSalary },
+            { text: '导入员工数据', iconCls: 'icon-upload', handler: onImportExcel },
+			{ text: '导出所有', iconCls: 'icon-export', handler: onExportAll },
+	    ];
+
+	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbar);
 
 	    initDatagrid(gridObj, url, callbackFuns);
 	}

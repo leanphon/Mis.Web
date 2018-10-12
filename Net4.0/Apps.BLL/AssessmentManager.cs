@@ -561,7 +561,7 @@ namespace Apps.BLL
                                        employeeId = m.id,
                                        employeeName = m.name,
                                        employeeNumber = m.number,
-                                       employeeStatus = m.status,
+                                       employeeStatus = m.state,
                                        departmentId = m.departmentId,
                                        departmentName = m.department.name,
                                    };

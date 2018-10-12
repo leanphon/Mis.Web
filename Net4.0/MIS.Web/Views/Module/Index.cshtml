@@ -41,8 +41,12 @@
 	function initPage() {
 	    var url = '/@(controllerName)/GetEntities';
 	    var callbackFuns = [{ "name": "onContextMenu", "fun": onTreegridonContextMenu }];
-	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
-	    var gridObj = new ModuleTreeGrid('@(tabEntityList)', toolbarFun);
+	    toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: onAddEntity },
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+			{ text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+	    ];
+	    var gridObj = new ModuleTreeGrid('@(tabEntityList)', toolbar);
 
 	    initTreegrid(gridObj, url, callbackFuns);
     }

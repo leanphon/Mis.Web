@@ -99,6 +99,7 @@
             valueField: 'id',
             textField: 'name',
         });
+
         @{
             if (Model.department != null)
             {
@@ -111,22 +112,22 @@
         $('#sex').combobox({
             width: '100%',
             editable: false,
-            valueField: 'sex',
+            valueField: 'value',
             textField: 'text',
             data: [
-                { sex: '男', text: '男' },
-                { sex: '女', text: '女' }
+                { value: '男', text: '男' },
+                { value: '女', text: '女' }
             ]
         });
-        $('#status').combobox({
+        $('#state').combobox({
             width: '100%',
             editable: false,
-            valueField: 'sex',
+            valueField: 'value',
             textField: 'text',
             data: [
-                { sex: '试用期', text: '试用期' },
-                { sex: '在职', text: '在职' },
-                { sex: '离职', text: '离职' },
+                { value: '试用期', text: '试用期' },
+                { value: '在职', text: '在职' },
+                { value: '离职', text: '离职' },
             ]
         });
 
@@ -204,10 +205,11 @@
             </tr>
             <tr>
                 <td class="cols_4_left">
-                    @Html.LabelFor(model => model.status, new { @class = "lab" })
+                    @Html.LabelFor(model => model.state, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    @Html.EditorFor(model => model.status, new { htmlAttributes = new { @class = "parm_control" } })
+                    @Html.EditorFor(model => model.state, new { htmlAttributes = new { @class = "parm_control" } })
+                    @*<input class="parm_control" type="text" id="state" name="state" />*@
                 </td>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
