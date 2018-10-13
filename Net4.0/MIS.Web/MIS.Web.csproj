@@ -741,7 +741,10 @@
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\User\ShowResetPasswd.cshtml" />
     <Content Include="Views\Employee\Entry.cshtml" />
-    <Content Include="Views\Employee\ShowProbation.cshtml" />
+    <Content Include="Views\Employee\ShowFormal.cshtml" />
+    <Content Include="Views\Employee\Formal.cshtml" />
+    <Content Include="Views\Employee\Leave.cshtml" />
+    <Content Include="Views\Employee\ShowLeave.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

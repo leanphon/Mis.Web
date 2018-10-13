@@ -1,16 +1,16 @@
 ﻿@{
-    ViewBag.Title = "工资单历史数据";
+    ViewBag.Title = "员工管理";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string divContent = controllerName + "_divContent";
-    string tabEntityList = controllerName + "_tabEntityList_History";
-
+    string tabEntityList = controllerName + "_tabEntityList_Formal";
 }
 
 
 <div class="easyui-layout" fit="true" border="false">
     <div>
+        @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
         <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
             <form id="searchForm">
                 <table>
@@ -23,17 +23,11 @@
                         <td>
                             <input class="parm_control" type="text" id="employeeName" name="employeeName" />
                         </td>
+                        <th></th>
                         <td>
                             <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
                         </td>
 
-                    </tr>
-                    <tr>
-                        <th>月份：</th>
-                        <!--由于datebox框架上面的数据必须是时间格式的，所以我们用editable="false"来禁止用户手动输入，以免报错-->
-                        <td>
-                            <input class="parm_control"  name="month" id="month" />
-                        </td>
                     </tr>
                 </table>
             </form>
@@ -41,12 +35,13 @@
         <table class="tab_center" id="@(tabEntityList)"></table>
     </div>
 </div>
+<div id="@(divContent)"></div>
 
 <div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
     <!--放置一个隐藏的菜单Div-->
-    <div data-options="iconCls:'icon-save'" onclick="onSaveSingle()">保存</div>
-    <div data-options="iconCls:'icon-cancel'" onclick="clearRow()">清空</div>
+    <div data-options="iconCls:'icon-edit'" onclick="onFormal()">转正</div>
 </div>
+
 
 <div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
     <!--放置一个隐藏的菜单Div-->
@@ -57,63 +52,40 @@
 	    initPage();
 
 		//初始加载，表格宽度自适应
-	    $(document).ready(function () {
-		    onDatagridAdjust('@(tabEntityList)');
+		$(document).ready(function(){
+			onDatagridAdjust();
 		});
 	　　//浏览器窗口大小变化后，表格宽度自适应
-	    $(window).resize(function () {
-		    onDatagridAdjust('@(tabEntityList)');
+		$(window).resize(function(){
+			onDatagridAdjust();
 		});
     })
 
+	function initPage() {
+	    $('#departmentId').combobox({
+	        width: '100%',
+	        //editable: false,
+	        url: '/Department/GetAllEntities',
+	        mode: 'remote',
+	        valueField: 'id',
+	        textField: 'name',
+	    });
 
-    function initPage() {
-        $('#departmentId').combobox({
-            width: '100%',
-            //editable: false,
-            url: '/Department/GetAllEntities',
-            mode: 'remote',
-            valueField: 'id',
-            textField: 'name',
-        });
-
-        $('#month').datebox({
-            width: '100%',
-            formatter: databoxFormatMonth,
-            parser: databoxParser
-        });
-        $('#month').datebox('setValue', new Date);
-
-        var url = '/@(controllerName)/GetEntities';
-        var callbackFuns = [
+	    var url = '/@(controllerName)/GetEntities';
+	    var callbackFuns = [
             { "name": "onBeforeLoad", "fun": onBeforeLoad },
-            { "name": "onClickRow", "fun": onClickRow },
-            { "name": "onDblClickRow", "fun": onDblClickRow },
-            { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu },
-        ];
-        toolbar = [
-			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
-            { text: '锁定', iconCls: 'icon-lock', handler: onLock },
-            { text: '锁定', iconCls: 'icon-unlock', handler: onUnlock },
-            { text: '导出全部', iconCls: 'icon-export', handler: onExportAll },
+            { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
+	    ];
 
-        ];
+	    var toolbar = [
+            { text: "转正", iconCls: 'icon-edit', handler: onFormal },
+	    ];
 
+	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbar);
 
-        var gridObj = new SalaryRecordGrid('@(tabEntityList)', toolbar);
+	    initDatagrid(gridObj, url, callbackFuns);
+	}
 
-        initDatagrid(gridObj, url, callbackFuns);
-
-    }
-
-
-    function positiveStyler()
-    {
-        return 'background-color:yellow;';
-    }
-    function negativeStyler() {
-        return 'background-color:lightpink;';
-    }
 
     function getParamsJson() {
         var filterList = new Array;
@@ -133,20 +105,19 @@
             };
             filterList.push(p)
         }
-        if ($('#month').val().trim() != '') {
-            var p = {
-                "key": "month",
-                "action": "==",
-                "value": $('#month').val().trim()
-            };
-            filterList.push(p)
-        }
+        var p = {
+            "key": "state",
+            "action": "==",
+            "value": "试用期"
+        };
+        filterList.push(p)
 
         return JSON.stringify(filterList);
     }
 
 
     function onBeforeLoad(param) {
+
         param.extendParams = getParamsJson();
 
         return true;
@@ -161,22 +132,14 @@
         $('#@(tabEntityList)').datagrid('load');
     }
 
-
-    function onExportAll() {
-        window.location.href = '/@(controllerName)/ExportAll?extendParams=' + getParamsJson();
-
-    }
-
-    function onEditEntity() {
+    function onFormal() {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
         if (null == row) {
             showAlert("未选择")
             return;
         }
-
-
         $.ajax({
-            url: '/@(controllerName)/Edit',
+            url: '/@(controllerName)/Formal',
             type: 'GET',
             data: 'id=' + row.id,
             async: false,
@@ -184,19 +147,8 @@
                 $('#@(divContent)').append(data);
             }
         });
-        $.post('/@(controllerName)/SaveSingle', param, function (result) {
-            if (result.status != 0) {
-                showAlert(result.content)
-            }
-            else {
-                showPrompt("保存成功")
-            }
+    }
 
-        }, "JSON").error(function (result) {
-        });
-    }
-    function onLock() {
-    }
-    function onUnlock() {
-    }
 </script>
+
+

@@ -212,6 +212,48 @@ namespace Apps.BLL
 
         }
 
+        public OperateResult UpdateState(long id, string state)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var m = (from e in db.employeeList
+                             where e.id == id
+                             select e
+                             ).AsNoTracking().FirstOrDefault();
+                    if (m == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "找不到该员工"
+                        };
+
+                    }
+                    m.state = state;
+
+                    db.Entry(m).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+            }
+
+        }
+
 
 
         public OperateResult GetById(long id)
@@ -374,6 +416,17 @@ namespace Apps.BLL
                     }
                     #endregion
 
+                    // 过滤状态
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
+                        }
+                    }
+                    #endregion
 
 
 
@@ -422,6 +475,7 @@ namespace Apps.BLL
 
             }
         }
+
 
         /// <summary>
         /// 返回值中的data是DataTable

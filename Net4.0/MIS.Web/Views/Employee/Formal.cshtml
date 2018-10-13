@@ -10,7 +10,7 @@
 }
 <script>
     function show() {
-        initDivDialog("入职");
+        initDivDialog("转正");
         initForm();
 
         $('#@(divDialog)').dialog('open');
@@ -57,7 +57,7 @@
 
     function initForm() {
         $('#@(formEntity)').form({
-            url: '/@(controllerName)/CreateEntity',
+            url: '/@(controllerName)/UpdateState',
             method: 'post',
             success: function (result) {
                 var obj = JSON.parse(result);
@@ -71,12 +71,12 @@
             },
         });
         
-        $('#birthday').datebox({
+        $('#entryDate').datebox({
             width: '100%',
             formatter: databoxFormat,
             parser: databoxParser
         });
-        $('#entryDate').datebox({
+        $('#formalDate').datebox({
             width: '100%',
             formatter: databoxFormat,
             parser: databoxParser
@@ -90,19 +90,8 @@
             valueField: 'id',
             textField: 'name',
         });
-        $('#sex').combobox({
-            width: '100%',
-            editable: false,
-            valueField: 'value',
-            textField: 'text',
-            data: [
-                { value: '男', text: '男' },
-                { value: '女', text: '女' }
-            ]
-        });
     }
 </script>
-
 
 <div id="@(divDialog)" class="easyui-dialog">
     <form id="@(formEntity)" action="" method="post">
@@ -114,7 +103,7 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_4_right">
-                    @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "parm_control" } })
+                    @Html.EditorFor(model => model.name, new { @class = "parm_control" ,@readonly= "readonly" })
                 </td>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.number, new { @class = "lab" })
@@ -130,86 +119,30 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_4_right">
-                    <input class="parm_control" type="text" id="departmentId" name="departmentId" />
+                    <input class="parm_control" readonly type="text" id="departmentId" name="departmentId" value="@(Model.department.name)" />
                 </td>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.sex, new { @class = "lab" })
-                    <span class="spanInputDanger">*</span>
-                </td>
-                <td class="cols_4_right">
-                    <input class="parm_control" type="text" id="sex" name="sex" />
-                </td>
-            </tr>
-            <tr>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.idCard, new { @class = "lab" })
-                    <span class="spanInputDanger">*</span>
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.idCard, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.phone, new { @class = "lab" })
-                    <span class="spanInputDanger">*</span>
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.phone, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-            </tr>
-            <tr>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.birthday, new { @class = "lab" })
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.birthday, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.bankCard, new { @class = "lab" })
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.bankCard, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-            </tr>
-            <tr>
+
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.state, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    <input class="parm_control" readonly type="text" id="state" name="state" value="试用期" />
+                    <input class="parm_control" readonly type="text" id="state" name="state" value="转正" />
                 </td>
+            <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
                     @Html.EditorFor(model => model.entryDate, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
-            </tr>
-            <tr>
                 <td class="cols_4_left">
-                    @Html.LabelFor(model => model.emergencyContact, new { @class = "lab" })
+                    @Html.LabelFor(model => model.formalDate, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    @Html.EditorFor(model => model.emergencyContact, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.emergencyPhone, new { @class = "lab" })
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.emergencyPhone, new { htmlAttributes = new { @class = "parm_control" } })
+                    @Html.EditorFor(model => model.formalDate, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
-            @*<tr>
-                    <td class="cols_4_left" valign="middle">
-                        <label class="lab">生成帐号</label>
-                    </td>
-                    <td class="cols_4_right">
-                        <input name="autoAccount" class="parm_control" style="height:15px;width:20px;vertical-align:middle" type="checkbox" checked="checked" />
-                    </td>
-                    <td class="cols_4_left">
-                    </td>
-                    <td class="cols_4_right">
-                    </td>
-                </tr>*@
         </table>
     </form>
 </div>
+

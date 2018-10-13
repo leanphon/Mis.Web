@@ -60,10 +60,12 @@ namespace MIS.Web.Controllers
             return Json(or, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Create()
+
+        public ActionResult Entry()
         {
             return View();
         }
+        
         public ActionResult CreateEntity(Employee model)
         {
             if (!ModelState.IsValid)
@@ -125,6 +127,79 @@ namespace MIS.Web.Controllers
             return Json(or, JsonRequestBehavior.AllowGet);
 
         }
+        public ActionResult ShowFormal()
+        {
+            return View();
+        }
+        public ActionResult ShowLeave()
+        {
+            return View();
+        }
+
+        public ActionResult Formal(int? id)
+        {
+            if (id == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "访问错误",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+
+            }
+            EmployeeManager manager = new EmployeeManager();
+
+            OperateResult or = manager.GetById(id.Value);
+
+            return View(or.data);
+
+        }
+        public ActionResult Leave(int? id)
+        {
+            if (id == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "访问错误",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+
+            }
+            EmployeeManager manager = new EmployeeManager();
+
+            OperateResult or = manager.GetById(id.Value);
+
+            return View(or.data);
+
+        }
+
+
+
+        public ActionResult UpdateState(int? id, string state)
+        {
+            if (id == null || state == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "参数错误",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            EmployeeManager manager = new EmployeeManager();
+
+            OperateResult or = manager.UpdateState(id.Value, state);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+
 
         public ActionResult Delete(int? id)
         {

@@ -10,7 +10,7 @@
 }
 <script>
     function show() {
-        initDivDialog("编辑员工");
+        initDivDialog("入职");
         initForm();
 
         $('#@(divDialog)').dialog('open');
@@ -57,7 +57,7 @@
 
     function initForm() {
         $('#@(formEntity)').form({
-            url: '/@(controllerName)/EditEntity',
+            url: '/@(controllerName)/CreateEntity',
             method: 'post',
             success: function (result) {
                 var obj = JSON.parse(result);
@@ -66,26 +66,16 @@
                 }
                 else {
                     destroyDialog();
-                    $('#@(tabEntityList)').datagrid('reload');
                 }
             },
         });
+
         $('#birthday').datebox({
             width: '100%',
             formatter: databoxFormat,
             parser: databoxParser
         });
         $('#entryDate').datebox({
-            width: '100%',
-            formatter: databoxFormat,
-            parser: databoxParser
-        });
-        $('#formalDate').datebox({
-            width: '100%',
-            formatter: databoxFormat,
-            parser: databoxParser
-        });
-        $('#leaveDate').datebox({
             width: '100%',
             formatter: databoxFormat,
             parser: databoxParser
@@ -99,16 +89,6 @@
             valueField: 'id',
             textField: 'name',
         });
-
-        @{
-            if (Model.department != null)
-            {
-                <text>
-        $('#departmentId').combobox('setValue', '@(Model.departmentId)')
-                </text>
-            }
-        }
-
         $('#sex').combobox({
             width: '100%',
             editable: false,
@@ -119,26 +99,12 @@
                 { value: '女', text: '女' }
             ]
         });
-        $('#state').combobox({
-            width: '100%',
-            editable: false,
-            valueField: 'value',
-            textField: 'text',
-            data: [
-                { value: '试用期', text: '试用期' },
-                { value: '转正', text: '转正' },
-                { value: '离职', text: '离职' },
-            ]
-        });
-
     }
-
 </script>
 
 <div id="@(divDialog)" class="easyui-dialog">
     <form id="@(formEntity)" action="" method="post">
         @Html.AntiForgeryToken()
-        @Html.HiddenFor(model => model.id)
         <table style="margin:auto;width:90%">
             <tr>
                 <td class="cols_4_left">
@@ -169,8 +135,7 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_4_right">
-                    @*<input class="parm_control" type="text" id="sex" name="sex" value="" />*@
-                    @Html.EditorFor(model => model.sex, new { htmlAttributes = new { @class = "parm_control" } })
+                    <input class="parm_control" type="text" id="sex" name="sex" />
                 </td>
             </tr>
             <tr>
@@ -208,28 +173,13 @@
                     @Html.LabelFor(model => model.state, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    @Html.EditorFor(model => model.state, new { htmlAttributes = new { @class = "parm_control" } })
-                    @*<input class="parm_control" type="text" id="state" name="state" />*@
+                    <input class="parm_control" readonly   type="text" id="state" name="state" value="试用期" />
                 </td>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
                     @Html.EditorFor(model => model.entryDate, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-            </tr>
-            <tr>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.formalDate, new { @class = "lab" })
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.formalDate, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.leaveDate, new { @class = "lab" })
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.leaveDate, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
             <tr>
@@ -246,8 +196,19 @@
                     @Html.EditorFor(model => model.emergencyPhone, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
+            @*<tr>
+                    <td class="cols_4_left" valign="middle">
+                        <label class="lab">生成帐号</label>
+                    </td>
+                    <td class="cols_4_right">
+                        <input name="autoAccount" class="parm_control" style="height:15px;width:20px;vertical-align:middle" type="checkbox" checked="checked" />
+                    </td>
+                    <td class="cols_4_left">
+                    </td>
+                    <td class="cols_4_right">
+                    </td>
+                </tr>*@
         </table>
     </form>
 </div>
-
 

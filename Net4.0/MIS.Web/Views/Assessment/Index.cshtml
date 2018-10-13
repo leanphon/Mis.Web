@@ -26,7 +26,7 @@
                         </td>
                         <th>员工状态：</th>
                         <td>
-                            <input class="parm_control" type="text" id="status" name="status" />
+                            <input class="parm_control" type="text" id="state" name="state" />
                         </td>
                         <th></th>
                         <td>
@@ -48,10 +48,9 @@
     </div>
 </div>
 
-<div id="menu" class="easyui-menu" style="width: 50px; display: none;">
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
     <!--放置一个隐藏的菜单Div-->
-    <div data-options="iconCls:'icon-save'" onclick="onSaveSingle()">保存</div>
-    <div data-options="iconCls:'icon-cancel'" onclick="clearRow()">清空</div>
+    <div data-options="iconCls:'icon-save'" onclick="onSaveSingle()">保存当前</div>
 </div>
 
 
@@ -91,20 +90,20 @@
         });
         $('#month').datebox('setValue', new Date);
 
-        $('#status').combobox({
+        $('#state').combobox({
             width: '100%',
             multiple: 'true',
             editable: false,
-            valueField: 'sex',
+            valueField: 'value',
             textField: 'text',
             data: [
-                { sex: '试用期', text: '试用期' },
-                { sex: '在职', text: '在职' },
-                { sex: '离职', text: '离职' },
+                { value: '试用期', text: '试用期' },
+                { value: '转正', text: '转正' },
+                { value: '离职', text: '离职' },
             ]
         });
-        var data = '试用期,在职';
-        $('#status').combobox('setValues', data.split(','))
+        var data = '试用期,转正';
+        $('#state').combobox('setValues', data.split(','))
 
 
         var url = '/@(controllerName)/GetEmployeesByPager';
@@ -118,7 +117,8 @@
 	    toolbar = [
 			{ text: '保存当前', iconCls: 'icon-save', handler: onSaveSingle },
             { text: '保存全部', iconCls: 'icon-save', handler: onSaveAll },
-
+            { text: '导入', iconCls: 'icon-upload', handler: onImport },
+            { text: '下载模板', iconCls: 'icon-export', handler: onDownloadTemplate },
 	    ];
 
 	    var gridObj = new AssessmentInputGrid('@(tabEntityList)', toolbar);
@@ -153,11 +153,11 @@
             };
             filterList.push(p)
         }
-        if ($('#status').val().trim() != '') {
+        if ($('#state').val().trim() != '') {
             var p = {
-                "key": "status",
+                "key": "state",
                 "action": "==",
-                "value": $('#status').val().trim()
+                "value": $('#state').val().trim()
             };
             filterList.push(p)
         }
@@ -246,14 +246,14 @@
         }
     }
 
-    function clearRow() {
-        var row = $('#@(tabEntityList)').datagrid('getSelected');
-        if (null == row) {
-            showAlert("未选择")
-            return;
-        }
+    function onDownloadTemplate() {
+        window.location.href = '/Template/员工考核录入表格模板.xlsx';
+    }
+
+    function onImport() {
 
     }
+
 
     var editIndex = undefined;//定义全局变量：当前编辑的行
     function onClickRow(index) {
