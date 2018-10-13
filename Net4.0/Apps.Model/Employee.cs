@@ -42,7 +42,7 @@ namespace Apps.Model
         // 员工状态，试用期、转正、离职
         [Display(Name = "状态")]
         [Required(ErrorMessage = "{0}必须输入")]
-        public string status { get; set; }
+        public string state { get; set; }
         // 入职日期
         [Display(Name = "入职日期")]
         public DateTime? entryDate { get; set; }
@@ -110,7 +110,7 @@ namespace Apps.Model
         // 员工状态，试用期、转正、离职
         [Display(Name = "状态")]
         [Required(ErrorMessage = "{0}必须输入")]
-        public string status { get; set; }
+        public string state { get; set; }
         // 入职日期
         [Display(Name = "入职日期")]
         public DateTime? entryDate { get; set; }

@@ -561,7 +561,7 @@ namespace Apps.BLL
                                        employeeId = m.id,
                                        employeeName = m.name,
                                        employeeNumber = m.number,
-                                       employeeStatus = m.status,
+                                       employeeStatus = m.state,
                                        departmentId = m.departmentId,
                                        departmentName = m.department.name,
                                    };
@@ -619,9 +619,9 @@ namespace Apps.BLL
                     #region
                     if (param != null && param.filters != null)
                     {
-                        if (param.filters.Keys.Contains("status"))
+                        if (param.filters.Keys.Contains("state"))
                         {
-                            var p = param.filters["status"];
+                            var p = param.filters["state"];
                             elements = elements.Where(t => p.value.Contains(t.employeeStatus));
                         }
                     }

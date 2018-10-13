@@ -25,7 +25,7 @@
                         </td>
                         <th>员工状态：</th>
                         <td>
-                            <input class="parm_control" type="text" id="status" name="status" />
+                            <input class="parm_control" type="text" id="state" name="state" />
                         </td>
                         <th></th>
                         <td>
@@ -41,9 +41,9 @@
 </div>
 <div id="@(divContent)"></div>
 
-<div id="menu" class="easyui-menu" style="width: 50px; display: none;">
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
     <!--放置一个隐藏的菜单Div-->
-    <div data-options="iconCls:'icon-add'" onclick="onAddEntity()">增加</div>
+    <div data-options="iconCls:'icon-add'" onclick="onAddEntity()">入职</div>
     <div data-options="iconCls:'icon-edit'" onclick="onEditEntity()">修改</div>
     <div data-options="iconCls:'icon-remove'" onclick="onRemoveEntity()">删除</div>
     <div data-options="iconCls:'icon-money'" onclick="onShowSalary()">薪资设定</div>
@@ -78,28 +78,39 @@
 	        textField: 'name',
 	    });
 
-	    $('#status').combobox({
+	    $('#state').combobox({
 	        width: '100%',
 	        multiple: 'true',
 	        editable: false,
-	        valueField: 'sex',
+	        valueField: 'value',
 	        textField: 'text',
 	        data: [
-                { sex: '试用期', text: '试用期' },
-                { sex: '在职', text: '在职' },
-                { sex: '离职', text: '离职' },
+                { value: '试用期', text: '试用期' },
+                { value: '转正', text: '转正' },
+                { value: '离职', text: '离职' },
 	        ]
 	    });
-	    var data = '试用期,在职';
-	    $('#status').combobox('setValues', data.split(','))
+	    var data = '试用期,转正';
+	    $('#state').combobox('setValues', data.split(','))
 
 
 	    var url = '/@(controllerName)/GetEntities';
 	    var callbackFuns = [
+            { "name": "onBeforeLoad", "fun": onBeforeLoad },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
-	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity, onShowSalary, onImportExcel, onExportAll];
-	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbarFun);
+
+	    toolbar = [
+			{ text: '入职', iconCls: 'icon-add', handler: onAddEntity },
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+			{ text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+			{ text: '薪资设定', iconCls: 'icon-money', handler: onShowSalary },
+            { text: '导入员工数据', iconCls: 'icon-upload', handler: onImportExcel },
+			{ text: '下载模板', iconCls: 'icon-export', handler: onDownloadTemplate },
+            { text: '导出所有', iconCls: 'icon-export', handler: onExportAll },
+	    ];
+
+	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbar);
 
 	    initDatagrid(gridObj, url, callbackFuns);
 	}
@@ -123,11 +134,11 @@
             };
             filterList.push(p)
         }
-        if ($('#status').val().trim() != '') {
+        if ($('#state').val().trim() != '') {
             var p = {
-                "key": "status",
+                "key": "state",
                 "action": "==",
-                "value": $('#status').val().trim()
+                "value": $('#state').val().trim()
             };
             filterList.push(p)
         }
@@ -151,11 +162,13 @@
         $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
         $('#@(tabEntityList)').datagrid('load');
     }
+    function onDownloadTemplate() {
+        window.location.href = '/Template/员工信息录入表格模板.xlsx';
+    }
 
     function onExportAll() {
 
         window.location.href = '/@(controllerName)/ExportAll?extendParams=' + getParamsJson();
-
     }
     function onImportExcel() {
         $.ajax({

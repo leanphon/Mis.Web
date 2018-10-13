@@ -16,7 +16,7 @@
 </div>
 <div id="@(divContent)"></div>
 
-<div id="menu" class="easyui-menu" style="width: 50px; display: none;">
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
     <!--放置一个隐藏的菜单Div-->
     @*<div data-options="iconCls:'icon-add'" onclick="onAddEntity()">增加</div>*@
     <div data-options="iconCls:'icon-edit'" onclick="onEditEntity()">修改</div>
@@ -49,8 +49,11 @@
 	    var callbackFuns = [
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
-	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
-	    var gridObj = new CompanyRegisterGrid('@(tabEntityList)', toolbarFun);
+	    toolbar = [
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+	    ];
+
+	    var gridObj = new CompanyRegisterGrid('@(tabEntityList)', toolbar);
 
 	    initDatagrid(gridObj, url, callbackFuns);
 	}

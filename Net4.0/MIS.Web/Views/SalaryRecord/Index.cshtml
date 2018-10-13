@@ -43,7 +43,7 @@
     </div>
 </div>
 
-<div id="menu" class="easyui-menu" style="width: 50px; display: none;">
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
     <!--放置一个隐藏的菜单Div-->
     <div data-options="iconCls:'icon-save'" onclick="onSaveSingle()">保存</div>
     <div data-options="iconCls:'icon-cancel'" onclick="clearRow()">清空</div>
@@ -94,8 +94,14 @@
             { "name": "onAfterEdit", "fun": refreshSalary },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu },
         ];
-        var toolbarFun = [onSaveSingle, onSaveAll];
-        var gridObj = new SalaryInputGrid('@(tabEntityList)', toolbarFun);
+
+        toolbar = [
+			{ text: '保存当前', iconCls: 'icon-save', handler: onSaveSingle },
+            { text: '保存全部', iconCls: 'icon-save', handler: onSaveAll },
+
+        ];
+
+        var gridObj = new SalaryInputGrid('@(tabEntityList)', toolbar);
 
         initDatagrid(gridObj, url, callbackFuns);
 

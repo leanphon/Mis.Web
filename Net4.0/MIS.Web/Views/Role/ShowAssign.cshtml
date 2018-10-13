@@ -80,8 +80,9 @@
     {
         var url = '/@(controllerName)/GetRights?id=@(ViewBag.id)';
         var callbackFuns = [{ "name": "onContextMenu", "fun": onTreegridonContextMenu }];
-        var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
-        var gridObj = new RoleAssignRightTreeGrid('@(tabEntityList)', toolbarFun);
+        var toolbar = [onAddEntity, onEditEntity, onRemoveEntity];
+        
+        var gridObj = new RoleAssignRightTreeGrid('@(tabEntityList)', toolbar);
 
         initTreegrid(gridObj, url, callbackFuns);
     }
