@@ -1,4 +1,4 @@
-﻿@model Apps.Model.CompanyRegister
+﻿@model Apps.Model.Company
 @{
     Layout = null;
 
@@ -28,8 +28,8 @@
 
     function initDivDialog(titleName) {
         $('#@(divDialog)').dialog({
-            width: 400,
-            height: 250,
+            width: 550,
+            height: 500,
             title: titleName,
             modal: true,
             closed: true,
@@ -113,7 +113,6 @@
             <tr>
                 <td class="cols_2_left">
                     @Html.LabelFor(model => model.loginImg, new { @class = "lab" })
-                    <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
                     <input class="parm_control" name="loginImg" id="loginImg" type="file"

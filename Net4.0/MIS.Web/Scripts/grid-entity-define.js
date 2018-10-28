@@ -234,6 +234,14 @@ function AssessmentInputGrid(gridId, toolbar) {
 
     this.normalCols = [[
                 {
+                    field: 'performanceScore', title: '绩效得分', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'benefitScore', title: '效益得分', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
                     field: 'shouldWorkTime', title: '应出勤', width: 150,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
@@ -273,14 +281,7 @@ function AssessmentInputGrid(gridId, toolbar) {
                     field: 'annualVacationTime', title: '使用年假', width: 150,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
                 },
-                {
-                    field: 'performanceScore', title: '绩效得分', width: 150,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'benefitScore', title: '效益得分', width: 150,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
+                
     ]];
 
     this.toolbar = toolbar;
@@ -301,6 +302,14 @@ function AssessmentRecordGrid(gridId, toolbar) {
 
     this.normalCols = [[
                 {
+                    field: 'performanceScore', title: '绩效得分', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'benefitScore', title: '效益得分', width: 150,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
                     field: 'shouldWorkTime', title: '应出勤', width: 150,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
@@ -340,15 +349,7 @@ function AssessmentRecordGrid(gridId, toolbar) {
                     field: 'annualVacationTime', title: '使用年假', width: 150,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
                 },
-                {
-                    field: 'performanceScore', title: '绩效得分', width: 150,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                {
-                    field: 'benefitScore', title: '效益得分', width: 150,
-                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
-                },
-                { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDate },
+                { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDateTime },
     ]];
 
     this.toolbar = toolbar;

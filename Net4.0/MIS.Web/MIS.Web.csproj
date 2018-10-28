@@ -745,6 +745,8 @@
     <Content Include="Views\Employee\Formal.cshtml" />
     <Content Include="Views\Employee\Leave.cshtml" />
     <Content Include="Views\Employee\ShowLeave.cshtml" />
+    <Content Include="Template\员工信息录入表格模板.xlsx" />
+    <Content Include="Template\员工考核录入表格模板.xlsx" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

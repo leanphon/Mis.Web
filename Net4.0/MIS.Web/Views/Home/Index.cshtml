@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = ViewBag.companyName + " 信息管理系统";
+    ViewBag.Title = ViewBag.companyName + " 智能人力资源管理系统";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
@@ -18,31 +18,38 @@ body {
 </style>
 
 <body class="easyui-layout" id="layout">
-    <div data-options="region:'north',border:false" 
-         style="text-align:center; font-size:30px; height:60px; background:#B3DFDA; padding:10px;">
-        @(ViewBag.companyName)
+    <div data-options="region:'north',border:false" style="text-align:center; height:60px; background:#B3DFDA; padding:10px;" >
+        <span style="text-align:center; font-size:30px; ">@(ViewBag.Title)</span>
+        <span style="float:right">
+            <a class="easyui-linkbutton" href="#" onclick="logout()">
+                注销
+            </a>
+            <a class="easyui-linkbutton" href="#" onclick="quit()">
+                退出
+            </a>
+        </span>
     </div>
     <div data-options="region:'west',split:true,title:'菜单'" style="width:250px;padding:10px;">
         <div class="easyui-accordion" data-options="multiple:true, fit:false,border:false">
             <div title="薪酬管理" data-options="selected:true" style="padding:10px;">
                 <a href="#" onclick="redirectUrl(this, '/Assessment/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">考核录入</a>
+                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">工资录入</a>
                 <a href="#" onclick="redirectUrl(this, '/Assessment/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">考核记录</a>
-                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">工资单录入</a>
-                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-chart',size:'large',iconAlign:'top'">工资单记录</a>
-            </div>
-            <div title="数据分析" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeAge')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">职工年龄分析</a>
-                <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeGender')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">职工性别分析</a>
-                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">职工司龄分析</a>
-                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">职工地址分析</a>
-                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">职工薪酬分析</a>
-
+                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-chart',size:'large',iconAlign:'top'">工资记录</a>
             </div>
             <div title="员工管理" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工列表</a>
                 <a href="#" onclick="redirectUrl(this, '/Employee/Entry')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">入职</a>
                 <a href="#" onclick="redirectUrl(this, '/Employee/ShowFormal')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">转正</a>
                 <a href="#" onclick="redirectUrl(this, '/Employee/ShowLeave')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">离职</a>
+                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工列表</a>
+            </div>
+            <div title="数据分析" style="padding:10px">
+                <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeAge')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工年龄分析</a>
+                <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeGender')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工性别分析</a>
+                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工司龄分析</a>
+                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工地址分析</a>
+                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工薪酬分析</a>
+
             </div>
             <div title="组织架构" style="padding:10px">
                 <a href="#" onclick="redirectUrl(this, '/Department/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">部门管理</a>
@@ -55,9 +62,9 @@ body {
                 <a href="#" onclick="redirectUrl(this, '/Benefit/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">效益管理</a>
             </div>
             <div title="系统设置" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/Role/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">角色管理</a>
                 <a href="#" onclick="redirectUrl(this, '/User/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">用户管理</a>
-                <a href="#" onclick="redirectUrl(this, '/Log/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">权限管理</a>
+                <a href="#" onclick="redirectUrl(this, '/Role/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">角色管理</a>
+                <a href="#" onclick="redirectUrl(this, '/Company/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">公司信息</a>
                 <a href="#" onclick="redirectUrl(this, '/Log/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">系统日志</a>
             </div>
             <div title="后台设置" style="padding:10px">
@@ -92,5 +99,29 @@ body {
         center.panel('refresh', url);
     }
 
+    function logout()
+    {
+        $.ajax({
+            url: '/@(controllerName)/Logout',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                window.location.href = "/Home/";
+            }
+        });
+    }
+
+    function quit()
+    {
+        $.ajax({
+            url: '/@(controllerName)/Quit',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                window.location.href = "about:blank";
+                window.close();
+            }
+        });
+    }
 
 </script>

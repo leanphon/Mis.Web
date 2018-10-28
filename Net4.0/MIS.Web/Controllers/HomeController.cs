@@ -18,6 +18,12 @@ namespace MIS.Web.Controllers
             {
                 return RedirectToAction("Login", "Home");
             }
+            Company c = Session["company"] as Company;
+            if (c != null)
+            {
+                ViewBag.companyName = c.name;
+            }
+
 
             return View();
         }
@@ -82,6 +88,15 @@ namespace MIS.Web.Controllers
 
             }
 
+            CompanyManager cm = new CompanyManager();
+            or = cm.GetFirst();
+            if (or.status == OperateStatus.Success
+                && or.data != null)
+            {
+                Session["company"] = or.data;
+
+            }
+
             return Json(or, JsonRequestBehavior.AllowGet);
 
         }
@@ -94,5 +109,40 @@ namespace MIS.Web.Controllers
             return user != null;
         }
 
+        public ActionResult Logout()
+        {
+            Session["currentUser"] = null;
+            Session.Remove("currentUser");
+
+            Session["company"] = null;
+            Session.Remove("company");
+
+
+
+            OperateResult or = new OperateResult
+            {
+                status = OperateStatus.Success,
+            };
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult Quit()
+        {
+            Session["currentUser"] = null;
+            Session.Remove("currentUser");
+
+            Session["company"] = null;
+            Session.Remove("company");
+
+
+
+            OperateResult or = new OperateResult
+            {
+                status = OperateStatus.Success,
+            };
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+        }
     }
 }
