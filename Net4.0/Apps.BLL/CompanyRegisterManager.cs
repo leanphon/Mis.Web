@@ -27,6 +27,13 @@ namespace Apps.BLL
                     }
 
                     db.companyRegisterList.Add(model);
+                    Company c = new Company
+                    {
+                        name = model.name,
+                        code = model.code
+                    };
+                    db.companyList.Add(c);
+
                     db.SaveChanges();
 
                     return new OperateResult
@@ -51,7 +58,6 @@ namespace Apps.BLL
                 try
                 {
                     var element = db.companyRegisterList.Find(id);
-                    var elements = db.companyRegisterList.ToList();
 
                     if (element == null)
                     {
@@ -64,6 +70,14 @@ namespace Apps.BLL
                     db.companyRegisterList.Remove(element);
 
                     db.Entry(element).State = EntityState.Deleted;
+
+                    var company = (from c in db.companyList
+                                  where c.name == element.name
+                                  select c).FirstOrDefault();
+                    db.companyList.Remove(company);
+                    db.Entry(company).State = EntityState.Deleted;
+
+
                     db.SaveChanges();
 
                     return new OperateResult

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -7,6 +8,56 @@ using System.Web;
 
 namespace Apps.Model
 {
+    public enum EmployeeDeedType
+    {
+        [Description("入职")]
+        Entry = 0,
+        [Description("转正")]
+        Formal,
+        [Description("离职")]
+        Leave,
+        [Description("停薪留职")]
+        UnpaidLeave,
+        [Description("奖励")]
+        Award,
+        [Description("处罚")]
+        Punish,
+    }
+
+    public class EmployeeDeed
+    {
+        [Key]
+        public long id { get; set; }
+
+        [Display(Name = "类别")]
+        public EmployeeDeedType type { get; set; }
+
+        [Display(Name = "日期")]
+        public DateTime time { get; set; }
+
+        [Display(Name = "备注")]
+        public string remark { get; set; }
+
+        [Display(Name = "员工")]
+        public long employeeId { get; set; }
+        public virtual Employee employee { get; set; }
+
+
+    }
+
+    public enum EmployeeState
+    {
+        [Description("试用期")]
+        Entry = 0,
+        [Description("转正")]
+        Formal,
+        [Description("离职")]
+        Leave,
+        [Description("停薪留职")]
+        UnpaidLeave,
+    }
+
+
     public class Employee
     {
         public long id { get; set; }
@@ -42,6 +93,7 @@ namespace Apps.Model
         // 员工状态，试用期、转正、离职
         [Display(Name = "状态")]
         [Required(ErrorMessage = "{0}必须输入")]
+        //public EmployeeState state { get; set; }
         public string state { get; set; }
         // 入职日期
         [Display(Name = "入职日期")]

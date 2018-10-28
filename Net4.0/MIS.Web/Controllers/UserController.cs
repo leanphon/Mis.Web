@@ -154,9 +154,9 @@ namespace MIS.Web.Controllers
 
         }
 
-        public ActionResult ResetPasswd(long id, string pwd)
+        public ActionResult ResetPasswd(long id, string passwd)
         {
-            if (pwd == null || string.IsNullOrEmpty(pwd))
+            if (passwd == null || string.IsNullOrEmpty(passwd))
             {
                 return Json(
                     new OperateResult
@@ -169,7 +169,7 @@ namespace MIS.Web.Controllers
 
             UserManager manager = new UserManager();
 
-            OperateResult or = manager.ResetPasswd(id, pwd);
+            OperateResult or = manager.ResetPasswd(id, passwd);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

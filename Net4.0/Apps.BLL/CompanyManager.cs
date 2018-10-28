@@ -201,6 +201,34 @@ namespace Apps.BLL
 
         }
 
+        public OperateResult GetFirst()
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var element = (from e in db.companyList
+                                   select e).FirstOrDefault();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = element,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+        }
+
+
         public OperateResult GetAll(QueryParam param = null)
         {
             using (SystemDB db = new SystemDB())

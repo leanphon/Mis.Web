@@ -33,6 +33,18 @@ namespace Apps.BLL
                     }
 
                     db.employeeList.Add(model);
+
+                    {
+                        EmployeeDeed deed = new EmployeeDeed
+                        {
+                            type = EmployeeDeedType.Entry,
+                            time= DateTime.Now,
+                            employeeId = model.id,
+                        };
+
+                        db.employeeDeedList.Add(deed);
+                    }
+
                     db.SaveChanges();
 
                     return new OperateResult
@@ -212,6 +224,7 @@ namespace Apps.BLL
 
         }
 
+        //public OperateResult UpdateState(long id, EmployeeState state)
         public OperateResult UpdateState(long id, string state)
         {
             using (SystemDB db = new SystemDB())
@@ -874,6 +887,325 @@ namespace Apps.BLL
 
             }
         }
+
+
+        public OperateResult AddDeed(EmployeeDeed model)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    db.employeeDeedList.Add(model);
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                    };
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+            }
+
+        }
+        public OperateResult RemoveDeed(long id)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var element = db.employeeDeedList.Find(id);
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "不存在",
+                        };
+                    }
+
+                    db.employeeDeedList.Remove(element);
+
+                    db.Entry(element).State = System.Data.Entity.EntityState.Deleted;
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+
+        }
+
+        public OperateResult UpdateDeed(EmployeeDeed model)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+
+                    db.Entry(model).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+            }
+
+        }
+
+
+        public OperateResult GetDeedById(long id)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var element = (from m in db.employeeDeedList.Include("employee")
+                                   where id == m.id
+                                   select m
+                                ).FirstOrDefault();
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = element,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+
+        }
+        public OperateResult GetEmploeeDeeds(long employeeId)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var element = from m in db.employeeDeedList.Include("employee")
+                                  where employeeId == m.employeeId
+                                  select m;
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = element,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+
+        }
+
+        public OperateResult GetAllDeeds(QueryParam param = null)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var elements = (from e in db.employeeDeedList.Include("employee")
+                                    select new
+                                    {
+                                        e.id,
+                                        e.type,
+                                        e.time,
+                                        e.remark,
+                                        e.employee.name,
+                                    }
+                                  ).ToList();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = elements,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+        }
+
+
+        public OperateResult GetDeedsByPager(QueryParam param = null)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var elements = from e in db.employeeDeedList.Include("employee")
+                                   orderby e.time descending
+                                   select new
+                                   {
+                                       e.id,
+                                       e.type,
+                                       e.time,
+                                       e.remark,
+                                       e.employee.name,
+                                       e.employee.departmentId
+                                   };
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                    }
+                    #endregion
+
+                    // 模糊过滤名字
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.name.Contains(p.value));
+                        }
+                    }
+                    #endregion
+
+
+                    int total = elements.Count();
+                    int pages = 0;
+                    Pager pager = param.pager;
+                    if (pager == null || pager.rows == 0)
+                    {
+                        pages = total > 0 ? 1 : 0;
+                    }
+                    else
+                    {
+                        pages = total / (pager.rows == 0 ? 10 : pager.rows);
+                        pages = total % pager.rows == 0 ? pages : pages + 1;
+                        if (pager.page <= 1)
+                        {
+                            elements = elements.Take(pager.rows);
+                        }
+                        else
+                        {
+                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                        }
+                    }
+
+                    var data = new
+                    {
+                        pages,
+                        total,
+                        rows = elements.ToList()
+                    };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = data,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+        }
+
 
     }
 }
