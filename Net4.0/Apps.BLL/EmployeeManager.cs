@@ -149,7 +149,7 @@ namespace Apps.BLL
             {
                 try
                 {
-                    var element = (from m in db.salaryInfoList.Include("postInfo").Include("employee")
+                    var element = (from m in db.salaryInfoList.Include("levelInfo").Include("employee")
                                    .Include("performanceInfo").Include("benefitInfo")
                                    where m.employeeId == id
                                    select m
@@ -225,7 +225,7 @@ namespace Apps.BLL
         }
 
         //public OperateResult UpdateState(long id, EmployeeState state)
-        public OperateResult UpdateState(long id, string state)
+        public OperateResult Formal(long id, string state, DateTime time)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -244,6 +244,50 @@ namespace Apps.BLL
 
                     }
                     m.state = state;
+                    m.formalDate = time;
+
+                    db.Entry(m).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+            }
+
+        }
+
+        public OperateResult Leave(long id, string state, DateTime time)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var m = (from e in db.employeeList
+                             where e.id == id
+                             select e
+                             ).AsNoTracking().FirstOrDefault();
+                    if (m == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "找不到该员工"
+                        };
+
+                    }
+                    m.state = state;
+                    m.leaveDate = time;
 
                     db.Entry(m).State = System.Data.Entity.EntityState.Modified;
 

@@ -233,7 +233,7 @@ namespace Apps.BLL
                 try
                 {
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
-                                   join salaryInfo in db.salaryInfoList.Include("postInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
+                                   join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
                                    on e.assessmentInfo.employeeId equals salaryInfo.employeeId
                                    join employee in db.employeeList.Include("department")
                                    on e.assessmentInfo.employeeId equals employee.id
@@ -372,114 +372,6 @@ namespace Apps.BLL
             }
         }
 
-        //public OperateResult GetAssessmentByPager(QueryParam param = null)
-        //{
-        //    using (SystemDB db = new SystemDB())
-        //    {
-        //        try
-        //        {
-        //            if (param == null || param.filters == null || !param.filters.Keys.Contains("month"))
-        //            {
-        //                return new OperateResult
-        //                {
-        //                    content = "需要月份查询条件",
-        //                };
-        //            }
-        //            // 得到给定月份的已经存在考核数据的记录
-        //            string month = param.filters["month"].value ?? "";
-        //            var elements = from e in db.assessmentInfoList.Include("employee").AsEnumerable()
-        //                           join t in db.salaryRecordList
-        //                           on e.id equals t.assessmentInfoId
-        //                           into newTable
-        //                           from salaryRecord in newTable.DefaultIfEmpty()
-        //                           join salaryInfo in db.salaryInfoList.Include("postInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
-        //                           on e.employeeId equals salaryInfo.employeeId
-        //                           join department in db.departmentList
-        //                           on e.employee.departmentId equals department.id
-
-        //                           where e.month == month
-        //                           select new
-        //                           {
-        //                               id = (salaryRecord != null) ? salaryRecord.id : 0,
-        //                               billSerial = GenerateBillSerial(month, e.employee.number),
-        //                               assessmentInfoId = e.id,
-        //                               employeeId = e.employeeId,
-        //                               employeeName = e.employee.name,
-        //                               employeeNumber = e.employee.number,
-        //                               departmentId = e.employee.departmentId,
-        //                               departmentName = department.name,
-        //                               postSalary = CalPostSalary(salaryInfo.postInfo.postSalary, e.shouldWorkTime, e.actualWorkTime),
-        //                               shouldWorkTime = e.shouldWorkTime,
-        //                               actualWorkTime = e.actualWorkTime,
-        //                               isFullAttendance = isFullAttendanceRewards(e.shouldWorkTime, e.actualWorkTime) ? "是" : "否",
-        //                               fullAttendanceRewards = CalFullAttendanceRewards(salaryInfo.postInfo.fullAttendanceRewards, e.shouldWorkTime, e.actualWorkTime),
-        //                               performanceRewardsBase = salaryInfo.performanceInfo.performanceRewards,
-        //                               performanceScore = e.performanceScore,
-        //                               performanceRewards = CalPerformanceRewards(salaryInfo.performanceInfo.performanceRewards, e.performanceScore ?? 0),
-        //                               benefitRewardsBase = salaryInfo.benefitInfo.benefitRewards,
-        //                               benefitScore = e.benefitScore,
-        //                               benefitRewards = CalBenefitRewards(salaryInfo.benefitInfo.benefitRewards, e.benefitScore ?? 0),
-        //                               seniorityRewardsBae = salaryInfo.postInfo.seniorityRewardsBase,
-        //                               seniorityRewards = CalSeniorityRewards(salaryInfo.postInfo.seniorityRewardsBase, month, e.employee.entryDate ?? DateTime.Now),
-        //                               normalOvertimeRewards = 0,
-        //                               holidayOvertimeRewards = 0,
-        //                               subsidy = 0,
-        //                               reissue = 0,
-        //                               socialSecurity = 0,
-        //                               publicFund = 0,
-        //                               tax = 0,
-        //                               shouldTotal = 0,
-        //                               actualTotal = 0,
-        //                           };
-
-
-
-        //            int total = elements.Count();
-        //            int pages = 0;
-        //            Pager pager = param.pager;
-        //            if (pager == null || pager.rows == 0)
-        //            {
-        //                pages = total > 0 ? 1 : 0;
-        //            }
-        //            else
-        //            {
-        //                pages = total / (pager.rows == 0 ? 10 : pager.rows);
-        //                pages = total % pager.rows == 0 ? pages : pages + 1;
-        //                if (pager.page <= 1)
-        //                {
-        //                    elements = elements.Take(pager.rows);
-        //                }
-        //                else
-        //                {
-        //                    elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
-        //                }
-        //            }
-
-        //            var data = new
-        //            {
-        //                pages,
-        //                total,
-        //                rows = elements.ToList()
-        //            };
-
-        //            return new OperateResult
-        //            {
-        //                status = OperateStatus.Success,
-        //                data = data,
-        //            };
-
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return new OperateResult
-        //            {
-        //                content = ex.Message,
-        //            };
-        //        }
-
-        //    }
-        //}
-
         public OperateResult GetAssessmentByPager(QueryParam param = null)
         {
             using (SystemDB db = new SystemDB())
@@ -497,18 +389,18 @@ namespace Apps.BLL
                     // 得到给定月份的已经存在考核数据的记录
                     string month = param.filters["month"].value ?? "";
                     var elements = from e in db.assessmentInfoList.Include("employee").AsEnumerable()
-                                   join salaryInfo in db.salaryInfoList.Include("postInfo").Include("performanceInfo").Include("benefitInfo")
+                                   join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo")
                                    on e.employeeId equals salaryInfo.employeeId
                                    join department in db.departmentList
                                    on e.employee.departmentId equals department.id
 
-                                   let postSalary = CalPostSalary(salaryInfo.postInfo.postSalary, e.shouldWorkTime, e.actualWorkTime)
-                                   let fullAttendanceRewards = CalFullAttendanceRewards(salaryInfo.postInfo.fullAttendanceRewards, e.shouldWorkTime, e.actualWorkTime)
+                                   let postSalary = CalPostSalary(salaryInfo.levelInfo.postSalary, e.shouldWorkTime, e.actualWorkTime)
+                                   let fullAttendanceRewards = CalFullAttendanceRewards(salaryInfo.levelInfo.fullAttendanceRewards, e.shouldWorkTime, e.actualWorkTime)
                                    let performanceRewards = CalPerformanceRewards(salaryInfo.performanceInfo.performanceRewards, e.performanceScore ?? 0)
                                    let benefitRewards = CalBenefitRewards(salaryInfo.benefitInfo.benefitRewards, e.benefitScore ?? 0)
-                                   let seniorityRewards = CalSeniorityRewards(salaryInfo.postInfo.seniorityRewardsBase, month, e.employee.entryDate ?? DateTime.Now)
-                                   let normalOvertimeRewards = CalNormalOvertimeRewards(salaryInfo.postInfo.postSalary, e.normalOvertime??0)
-                                   let holidayOvertimeRewards = CalHolidayOvertimeRewards(salaryInfo.postInfo.postSalary, e.holidayOvertime ?? 0)
+                                   let seniorityRewards = CalSeniorityRewards(salaryInfo.levelInfo.seniorityRewardsBase, month, e.employee.entryDate ?? DateTime.Now)
+                                   let normalOvertimeRewards = CalNormalOvertimeRewards(salaryInfo.levelInfo.postSalary, e.normalOvertime??0)
+                                   let holidayOvertimeRewards = CalHolidayOvertimeRewards(salaryInfo.levelInfo.postSalary, e.holidayOvertime ?? 0)
                                    let shouldTotal = postSalary + fullAttendanceRewards + performanceRewards + benefitRewards + seniorityRewards + normalOvertimeRewards + holidayOvertimeRewards
 
                                    where e.month == month && !(db.salaryRecordList.Any(c => c.assessmentInfoId == e.id))
@@ -532,7 +424,7 @@ namespace Apps.BLL
                                        benefitRewardsBase = salaryInfo.benefitInfo.benefitRewards,
                                        benefitScore = e.benefitScore,
                                        benefitRewards = benefitRewards,
-                                       seniorityRewardsBae = salaryInfo.postInfo.seniorityRewardsBase,
+                                       seniorityRewardsBae = salaryInfo.levelInfo.seniorityRewardsBase,
                                        seniorityRewards = seniorityRewards,
                                        normalOvertimeRewards = normalOvertimeRewards,
                                        holidayOvertimeRewards = holidayOvertimeRewards,
@@ -751,7 +643,7 @@ namespace Apps.BLL
                 try
                 {
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
-                                   join salaryInfo in db.salaryInfoList.Include("postInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
+                                   join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
                                    on e.assessmentInfo.employeeId equals salaryInfo.employeeId
                                    join employee in db.employeeList.Include("department")
                                    on e.assessmentInfo.employeeId equals employee.id

@@ -179,9 +179,9 @@ namespace MIS.Web.Controllers
 
 
 
-        public ActionResult UpdateState(int? id, string state)
+        public ActionResult UpdateToFormal(int? id, string state, DateTime formalDate)
         {
-            if (id == null || state == null)
+            if (id == null || state == null || formalDate == null)
             {
                 return Json(
                     new OperateResult
@@ -194,7 +194,27 @@ namespace MIS.Web.Controllers
 
             EmployeeManager manager = new EmployeeManager();
 
-            OperateResult or = manager.UpdateState(id.Value, state);
+            OperateResult or = manager.Formal(id.Value, state, formalDate);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+        public ActionResult UpdateToLeave(int? id, string state, DateTime leaveDate)
+        {
+            if (id == null || state == null || leaveDate == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "参数错误",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            EmployeeManager manager = new EmployeeManager();
+
+            OperateResult or = manager.Leave(id.Value, state, leaveDate);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

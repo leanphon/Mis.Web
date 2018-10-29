@@ -186,7 +186,7 @@
             return;
         }
 
-        if (!endEditing()){
+        if (!endEditing($('#@(tabEntityList)'))) {
             retrun;
         }
         var rows = $('#@(tabEntityList)').datagrid('getSelected');

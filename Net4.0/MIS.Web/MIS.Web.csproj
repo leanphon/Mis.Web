@@ -596,6 +596,7 @@
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\common.js" />
     <Content Include="App_Data\sqliteMis.db" />
+    <Content Include="App_Data\sqliteDefault.db" />
     <None Include="Properties\PublishProfiles\MisConfig.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\echarts-all.js" />

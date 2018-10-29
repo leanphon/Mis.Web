@@ -14,7 +14,7 @@ namespace MIS.Web.Model
     {
         public static string GetModelStateErrors(ModelStateDictionary ModelState)
         {
-            List<string> errList = new List<string>();
+            var msg = "";
 
             foreach (var key in ModelState.Keys)
             {
@@ -22,11 +22,12 @@ namespace MIS.Web.Model
                 
                 foreach (var e in errors)
                 {
-                    errList.Add(e.ErrorMessage);
+                    msg += e.ErrorMessage + ";";
                 }
             }
 
-            return errList.ToString();
+
+            return msg;
         }
 
     }

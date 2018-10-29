@@ -57,7 +57,7 @@
 
     function initForm() {
         $('#@(formEntity)').form({
-            url: '/@(controllerName)/UpdateState',
+            url: '/@(controllerName)/UpdateToFormal',
             method: 'post',
             success: function (result) {
                 var obj = JSON.parse(result);
@@ -96,6 +96,7 @@
 <div id="@(divDialog)" class="easyui-dialog">
     <form id="@(formEntity)" action="" method="post">
         @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.id)
         <table style="margin:auto;width:90%">
             <tr>
                 <td class="cols_4_left">

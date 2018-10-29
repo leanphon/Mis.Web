@@ -37,6 +37,9 @@ namespace Apps.Model
         [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
         public string mainImg { get; set; }
 
+        [Display(Name = "公司地址")]
+        [StringLength(100, ErrorMessage = "{0}的长度在{1}个字符之内")]
+        public string address { get; set; }
 
     }
 }
