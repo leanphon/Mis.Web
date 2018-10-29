@@ -16,7 +16,7 @@
 
 
     function show() {
-        initDivDialog("修改个人薪资");
+        initDivDialog("薪资设定");
         initForm();
 
         $('#@(divDialog)').dialog('open');
@@ -208,7 +208,7 @@
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.postId, new { @class = "lab" })
+                    @Html.LabelFor(model => model.levelId, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
                     <select class="parm_control" id="levelId" name="levelId" ></select>

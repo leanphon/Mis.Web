@@ -96,7 +96,7 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    @Html.EditorFor(model => model.code, new { htmlAttributes = new { @class = "parm_control" } })
+                    @Html.EditorFor(model => model.code, new { htmlAttributes = new { @disabled = "disabled", @class = "parm_control" } })
                 </td>
             </tr>
             <tr>
@@ -106,6 +106,33 @@
                 </td>
                 <td class="cols_2_right">
                     @Html.EditorFor(model => model.address, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.logo, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" name="logo" id="logo" type="file"
+                           accept="" />
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.loginImg, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" name="loginImg" id="loginImg" type="file"
+                           accept="" />
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.mainImg, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" name="mainImg" id="mainImg" type="file"
+                           accept="" />
                 </td>
             </tr>
         </table>

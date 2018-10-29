@@ -117,6 +117,26 @@ namespace Apps.Model
         [ForeignKey("departmentId")]
         public virtual Department department { get; set; }
 
+        [Display(Name = "籍贯")]
+        public string nativePlace { get; set; }
+        [Display(Name = "现居住地")]
+        public string residence { get; set; }
+
+        [Display(Name = "学历")]
+        public string education { get; set; }
+        [Display(Name = "婚姻状况")]
+        public string marriage { get; set; }
+
+        [Display(Name = "工作年限")]
+        public string experience { get; set; }
+
+        [Display(Name = "合同编号")]
+        public string contractSerial { get; set; }
+        [Display(Name = "人才来源")]
+        public string source { get; set; }
+
+
+
     }
 
     public class EmployeeExport
