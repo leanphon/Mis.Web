@@ -130,6 +130,20 @@ function PostGrid(gridId, toolbar) {
 
     this.normalCols = [[
                 { field: 'id', hidden: true },
+                { field: 'name', title: '岗位名称', width: 150 },
+    ]];
+
+    this.toolbar = toolbar;
+}
+
+function LevelGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
                 { field: 'name', title: '层级名称', width: 150 },
                 { field: 'code', title: '层级代码', width: 150 },
                 { field: 'postSalary', title: '岗位工资', width: 150 },

@@ -86,14 +86,14 @@
         //    valueField: 'id',
         //    textField: 'name',
         //});
-        $('#postId').combogrid({
+        $('#levelId').combogrid({
             width: '100%',
             panelWidth: 370,
             panelHeight: 'auto',
             editable: false,
             idField: 'id',
             textField: 'name',
-            url: '/Post/GetAllEntities',
+            url: '/Level/GetAllEntities',
             columns: [[
                 { field: 'id', title: 'id', width: 80, hidden: true },
                 { field: 'name', title: '岗位名称', width: 120 },
@@ -147,11 +147,11 @@
 
         @{
             var total = 0.0;
-            if (Model.postInfo != null)
+            if (Model.levelInfo != null)
             {
                 <text>
-        postTotal = @(Model.postInfo.postSalary + Model.postInfo.fullAttendanceRewards)
-        $('#postId').combogrid('setValue', '@(Model.postId)')
+        postTotal = @(Model.levelInfo.postSalary + Model.levelInfo.fullAttendanceRewards)
+        $('#levelId').combogrid('setValue', '@(Model.levelId)')
                 </text>
             }
             if (Model.performanceInfo != null)
@@ -211,7 +211,7 @@
                     @Html.LabelFor(model => model.postId, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    <select class="parm_control" id="postId" name="postId" ></select>
+                    <select class="parm_control" id="levelId" name="levelId" ></select>
                     @*<input class="parm_control" type="text" id="postId" name="postId" />*@
                 </td>
             </tr>
@@ -233,7 +233,7 @@
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    <label class = "lab">标准合计</label>
+                    <label class = "lab">理论工资合计</label>
                 </td>
                 <td class="cols_2_right">
                     <input class="parm_control" disabled="disabled" type="text" id="total" value="@(total)" />

@@ -99,6 +99,15 @@
                     @Html.EditorFor(model => model.code, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.address, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_2_right">
+                    @Html.EditorFor(model => model.address, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
         </table>
     </form>
 </div>

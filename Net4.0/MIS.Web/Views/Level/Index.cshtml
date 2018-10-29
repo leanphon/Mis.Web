@@ -48,7 +48,7 @@
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
 	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
-	    var gridObj = new PostGrid('@(tabEntityList)', toolbarFun);
+	    var gridObj = new LevelGrid('@(tabEntityList)', toolbarFun);
 	    initDatagrid(gridObj, url, callbackFuns);
 
     }

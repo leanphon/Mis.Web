@@ -99,9 +99,9 @@ namespace Apps.Model
 
 
         [Display(Name = "岗位")]
-        public long postId { get; set; }
-        [ForeignKey("postId")]
-        public virtual LevelInfo postInfo { get; set; }
+        public long levelId { get; set; }
+        [ForeignKey("levelId")]
+        public virtual LevelInfo levelInfo { get; set; }
 
         [Display(Name = "绩效奖")]
         public long performanceId { get; set; }

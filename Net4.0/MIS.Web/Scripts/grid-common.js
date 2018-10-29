@@ -143,7 +143,7 @@ function onDblClickRow(index) {
 }
 
 function endEditing(gridObj) {
-
+    console.log(gridObj)
     var editIndex = gridObj.attr("editIndex");
 
     if (editIndex == -1) {

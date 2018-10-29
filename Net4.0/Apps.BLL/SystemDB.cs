@@ -59,6 +59,7 @@ namespace Apps.BLL
         //public DbSet<RoleRights> roleRightsList { get; set; }
         public DbSet<User> userList { get; set; }
         public DbSet<RootUser> rootUserList { get; set; }
+        public DbSet<LogRecord> logRecordList { get; set; }
 
 
         public DbSet<CompanyRegister> companyRegisterList { get; set; }

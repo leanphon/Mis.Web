@@ -73,7 +73,7 @@
     })
 
 	function initPage() {
-	    
+
 	    $('#departmentId').combobox({
             width: '100%',
             //editable: false,
@@ -188,7 +188,7 @@
             return;
         }
 
-        if (endEditing()) {
+        if (endEditing($('#@(tabEntityList)'))) {
             var updatedRows = $('#@(tabEntityList)').datagrid('getSelected');
             if (updatedRows.length == 0) {
                 showAlert('无修改数据');
@@ -254,42 +254,6 @@
 
     }
 
-
-    var editIndex = undefined;//定义全局变量：当前编辑的行
-    function onClickRow(index) {
-        if (editIndex != index) {
-            if (endEditing()) {
-                //$('#@(tabEntityList)').datagrid('selectRow', index).datagrid('beginEdit', index);
-                //editIndex = index;
-                $('#@(tabEntityList)').datagrid('selectRow', editIndex);
-            } else {
-
-            }
-        }
-    }
-
-    function onDblClickRow(index) {
-        if (editIndex != index) {
-            if (endEditing()) {
-                $('#@(tabEntityList)').datagrid('selectRow', index).datagrid('beginEdit', index);
-                editIndex = index;
-            } else {
-                $('#@(tabEntityList)').datagrid('selectRow', editIndex);
-            }
-        }
-    }
-    function endEditing() {
-        if (editIndex == undefined) {
-            return true
-        }
-        if ($('#@(tabEntityList)').datagrid('validateRow', editIndex)) {
-            $('#@(tabEntityList)').datagrid('endEdit', editIndex);
-            editIndex = undefined;
-            return true;
-        } else {
-            return false;
-        }
-    }
 
 </script>
 
