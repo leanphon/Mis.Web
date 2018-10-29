@@ -98,18 +98,18 @@ namespace Apps.Model
         public virtual Employee employee { get; set; }
 
 
-        [Display(Name = "岗位")]
+        [Display(Name = "层级")]
         public long levelId { get; set; }
         [ForeignKey("levelId")]
         public virtual LevelInfo levelInfo { get; set; }
 
-        [Display(Name = "绩效奖")]
+        [Display(Name = "绩效")]
         public long performanceId { get; set; }
         [ForeignKey("performanceId")]
         public virtual PerformanceInfo performanceInfo { get; set; }
 
 
-        [Display(Name = "效益奖")]
+        [Display(Name = "效益")]
         public long benefitId { get; set; }
         [ForeignKey("benefitId")]
         public virtual BenefitInfo benefitInfo { get; set; }

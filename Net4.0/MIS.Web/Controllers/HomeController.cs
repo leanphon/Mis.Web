@@ -6,6 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Apps.Model;
 using Apps.Model.Privilege;
+using Apps.Model.Uitility;
 
 namespace MIS.Web.Controllers
 {
@@ -14,6 +15,7 @@ namespace MIS.Web.Controllers
         [LoginAuthorize]
         public ActionResult Index()
         {
+
             if (!IsLogin())
             {
                 return RedirectToAction("Login", "Home");
@@ -86,15 +88,16 @@ namespace MIS.Web.Controllers
             {
                 Session["currentUser"] = or.data;
 
-            }
+                CompanyManager cm = new CompanyManager();
+                or = cm.GetFirst();
+                if (or.status == OperateStatus.Success
+                    && or.data != null)
+                {
+                    Session["company"] = or.data;
 
-            CompanyManager cm = new CompanyManager();
-            or = cm.GetFirst();
-            if (or.status == OperateStatus.Success
-                && or.data != null)
-            {
-                Session["company"] = or.data;
+                }
 
+                or.data = null;
             }
 
             return Json(or, JsonRequestBehavior.AllowGet);

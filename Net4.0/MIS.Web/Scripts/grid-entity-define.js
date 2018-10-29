@@ -112,6 +112,7 @@ function CompanyGrid(gridId, toolbar) {
                 { field: 'id', hidden: true },
                 { field: 'logo', title: 'logo图片', width: 250 },
                 { field: 'name', title: '公司名称', width: 250 },
+                { field: 'address', title: '公司地址', width: 250 },
                 { field: 'code', title: '公司简称', width: 250 },
                 { field: 'loginImg', title: '登录背景图片', width: 250 },
                 { field: 'mainImg', title: '主页面背景图片', width: 250 },
