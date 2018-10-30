@@ -214,20 +214,38 @@ function EmployeeGrid(gridId, toolbar){
             ]];
 
 	this.normalCols = [[
-                { field: 'sex', title: '性别', width: 100 },
-                { field: 'idCard', title: '身份证', width: 200 },
                 { field: 'phone', title: '联系电话', width: 150 },
-                { field: 'email', title: '工作邮箱', width: 200 },
+                { field: 'sex', title: '性别', width: 100 },
+                { field: 'nation', title: '民族', width: 100 },
+                { field: 'idCard', title: '身份证', width: 200 },
+                //{ field: 'email', title: '工作邮箱', width: 200 },
                 { field: 'birthday', title: '出生日期', width: 150, formatter: formatDate },
                 { field: 'state', title: '在职状态', width: 150 },
-                { field: 'shouldTotal', title: '标准应发月薪', width: 150 },
+                //{ field: 'shouldTotal', title: '标准应发月薪', width: 150 },
                 { field: 'bankCard', title: '工资卡', width: 200 },
-                { field: 'emergencyContact', title: '紧急联系人', width: 150 },
-                { field: 'emergencyPhone', title: '紧急联系人电话', width: 150 },
+
                 { field: 'entryDate', title: '入职日期', width: 200, formatter: formatDate },
                 { field: 'formalDate', title: '转正日期', width: 200, formatter: formatDate },
                 { field: 'leaveDate', title: '离职日期', width: 200, formatter: formatDate },
-                { field: 'address', title: '居住地', width: 250 },
+
+                { field: 'nativePlace', title: '籍贯', width: 200 },
+                { field: 'residence', title: '户口所在地', width: 250 },
+                { field: 'address', title: '现居住地', width: 250 },
+
+                { field: 'political', title: '政治面貌', width: 200 },
+                { field: 'marriage', title: '婚姻状况', width: 200 },
+                { field: 'education', title: '学历', width: 200 },
+                { field: 'experience', title: '工作年限', width: 200 },
+                { field: 'source', title: '人才来源', width: 200 },
+
+                { field: 'contractSerial', title: '合同编号', width: 200 },
+                { field: 'contractBegin', title: '合同起始日', width: 200, formatter: formatDate },
+                { field: 'contractEnd', title: '合同结束日', width: 200, formatter: formatDate },
+
+
+                { field: 'emergencyContact', title: '紧急联系人', width: 150 },
+                { field: 'emergencyPhone', title: '紧急联系人电话', width: 150 },
+
             ]];
 
 

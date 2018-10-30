@@ -65,6 +65,7 @@
     <Compile Include="Finance\PurchaseItem.cs" />
     <Compile Include="Finance\PurchaseRecord.cs" />
     <Compile Include="Finance\Supplier.cs" />
+    <Compile Include="LeaveEntities.cs" />
     <Compile Include="LogRecord.cs" />
     <Compile Include="Privilege\FunctionRight.cs" />
     <Compile Include="MD5Encode.cs" />
@@ -83,9 +84,9 @@
     <Compile Include="QueryParam.cs" />
     <Compile Include="SalaryInfo.cs" />
     <Compile Include="SalaryRecord.cs" />
-    <Compile Include="Uitility\DataTableHelper.cs" />
-    <Compile Include="Uitility\LambdaQueryCondition.cs" />
-    <Compile Include="Uitility\MapHelper.cs" />
+    <Compile Include="Utility\DataTableHelper.cs" />
+    <Compile Include="Utility\LambdaQueryCondition.cs" />
+    <Compile Include="Utility\MapHelper.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -1,5 +1,5 @@
 ﻿using Apps.Model;
-using Apps.Model.Uitility;
+using Apps.Model.Utility;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

@@ -94,7 +94,12 @@ namespace Apps.BLL
         //: base(SessionHelper.GetDbName())
         {
         }
-        
+
+        public SystemDB(string dbName)
+            : base(dbName)
+        {
+        }
+
     }
 
 }

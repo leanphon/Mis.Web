@@ -28,7 +28,7 @@
     function initDivDialog(titleName) {
         $('#@(divDialog)').dialog({
             width: 800,
-            height: 500,
+            height: 700,
             title: titleName,
             modal: true,
             closed: true,
@@ -70,12 +70,37 @@
             },
         });
 
+        $('#idCard').on('input', function () {
+            var val = $(this).val()
+            if (val.length == 18) {
+                var year = val.substr(6, 4)
+                var month = val.substr(10, 2)
+                var day = val.substr(12, 2)
+                var date = new Date(year, month - 1, day);
+
+                $('#birthday').datebox('setValue', date);
+            }
+        });
+
         $('#birthday').datebox({
             width: '100%',
             formatter: databoxFormat,
             parser: databoxParser
         });
+        
         $('#entryDate').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+        $('#entryDate').datebox('setValue', new Date);
+
+        $('#contractBegin').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+        $('#contractEnd').datebox({
             width: '100%',
             formatter: databoxFormat,
             parser: databoxParser
@@ -99,6 +124,46 @@
                 { value: '女', text: '女' }
             ]
         });
+
+        $('#education').combobox({
+            width: '100%',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '小学', text: '小学' },
+                { value: '初中', text: '初中' },
+                { value: '中专', text: '中专' },
+                { value: '高中', text: '高中' },
+                { value: '专科', text: '专科' },
+                { value: '本科', text: '本科' },
+                { value: '硕士', text: '硕士' },
+                { value: '博士', text: '博士' }
+            ]
+        });
+        $('#marriage').combobox({
+            width: '100%',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '未婚', text: '未婚' },
+                { value: '已婚', text: '已婚' },
+                { value: '离异', text: '离异' }
+            ]
+        });
+        $('#political').combobox({
+            width: '100%',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '群众', text: '群众' },
+                { value: '共青团', text: '共青团' },
+                { value: '党员', text: '党员' }
+            ]
+        });
+
     }
 </script>
 
@@ -115,14 +180,21 @@
                     @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
                 <td class="cols_4_left">
+                    @Html.LabelFor(model => model.phone, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.phone, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
                     @Html.LabelFor(model => model.number, new { @class = "lab" })
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_4_right">
                     @Html.EditorFor(model => model.number, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
-            </tr>
-            <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.departmentId, new { @class = "lab" })
                     <span class="spanInputDanger">*</span>
@@ -130,12 +202,20 @@
                 <td class="cols_4_right">
                     <input class="parm_control" type="text" id="departmentId" name="departmentId" />
                 </td>
+            </tr>
+            <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.sex, new { @class = "lab" })
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_4_right">
                     <input class="parm_control" type="text" id="sex" name="sex" />
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.nation, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.nation, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
             <tr>
@@ -147,19 +227,87 @@
                     @Html.EditorFor(model => model.idCard, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
                 <td class="cols_4_left">
-                    @Html.LabelFor(model => model.phone, new { @class = "lab" })
-                    <span class="spanInputDanger">*</span>
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.phone, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-            </tr>
-            <tr>
-                <td class="cols_4_left">
                     @Html.LabelFor(model => model.birthday, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
                     @Html.EditorFor(model => model.birthday, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.education, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.education, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.experience, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.experience, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.political, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.political, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.marriage, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.marriage, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.nativePlace, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.nativePlace, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.residence, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.residence, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.address, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.address, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.source, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.source, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.entryDate, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.state, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    <input class="parm_control" readonly type="text" id="state" name="state" value="试用期" />
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.contractSerial, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.contractSerial, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.bankCard, new { @class = "lab" })
@@ -170,18 +318,19 @@
             </tr>
             <tr>
                 <td class="cols_4_left">
-                    @Html.LabelFor(model => model.state, new { @class = "lab" })
+                    @Html.LabelFor(model => model.contractBegin, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    <input class="parm_control" readonly   type="text" id="state" name="state" value="试用期" />
+                    @Html.EditorFor(model => model.contractBegin, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
                 <td class="cols_4_left">
-                    @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
+                    @Html.LabelFor(model => model.contractEnd, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    @Html.EditorFor(model => model.entryDate, new { htmlAttributes = new { @class = "parm_control" } })
+                    @Html.EditorFor(model => model.contractEnd, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
+
             <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.emergencyContact, new { @class = "lab" })
@@ -196,18 +345,7 @@
                     @Html.EditorFor(model => model.emergencyPhone, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
-            @*<tr>
-                    <td class="cols_4_left" valign="middle">
-                        <label class="lab">生成帐号</label>
-                    </td>
-                    <td class="cols_4_right">
-                        <input name="autoAccount" class="parm_control" style="height:15px;width:20px;vertical-align:middle" type="checkbox" checked="checked" />
-                    </td>
-                    <td class="cols_4_left">
-                    </td>
-                    <td class="cols_4_right">
-                    </td>
-                </tr>*@
+
         </table>
     </form>
 </div>
