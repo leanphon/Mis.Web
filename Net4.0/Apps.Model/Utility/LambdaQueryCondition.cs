@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Apps.Model.Uitility
+namespace Apps.Model.Utility
 {
 
     public class LambdaQueryCondition

@@ -1,5 +1,5 @@
 ﻿using Apps.Model;
-using Apps.Model.Uitility;
+using Apps.Model.Utility;
 using LinqToExcel;
 using System;
 using System.Collections.Generic;
@@ -293,6 +293,9 @@ namespace Apps.BLL
 
                     db.SaveChanges();
 
+                    LeaveManager.Leave(m);
+
+
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
@@ -375,7 +378,19 @@ namespace Apps.BLL
                                         e.emergencyContact,
                                         e.emergencyPhone,
                                         e.departmentId,
-                                        departmentName = e.department.name
+                                        departmentName = e.department.name,
+                                        e.nation,
+                                        e.nativePlace,
+                                        e.residence,
+                                        e.address,
+                                        e.political,
+                                        e.marriage,
+                                        e.education,
+                                        e.experience,
+                                        e.source,
+                                        e.contractSerial,
+                                        e.contractBegin,
+                                        e.contractEnd,
                                     }
                                   ).ToList();
 
@@ -422,7 +437,19 @@ namespace Apps.BLL
                                        e.emergencyContact,
                                        e.emergencyPhone,
                                        e.departmentId,
-                                       departmentName = e.department.name
+                                       departmentName = e.department.name,
+                                       e.nation,
+                                       e.nativePlace,
+                                       e.residence,
+                                       e.address,
+                                       e.political,
+                                       e.marriage,
+                                       e.education,
+                                       e.experience,
+                                       e.source,
+                                       e.contractSerial,
+                                       e.contractBegin,
+                                       e.contractEnd,
                                    };
 
                     // 先查询出部门及子部门，再过滤

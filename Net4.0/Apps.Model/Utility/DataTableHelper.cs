@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Text;
 
 
-namespace Apps.Model.Uitility
+namespace Apps.Model.Utility
 {
     /// <summary>
     /// 从枚举列表转换为DataTable，转换后的表中列名为model的diaplay属性的name值
