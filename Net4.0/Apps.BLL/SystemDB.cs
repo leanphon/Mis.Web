@@ -31,7 +31,8 @@ namespace Apps.BLL
             modelBuilder.Entity<SalaryInfo>().ToTable("SalaryInfos");
             modelBuilder.Entity<SalaryRecord>().ToTable("SalaryRecords");
             modelBuilder.Entity<AssessmentInfo>().ToTable("AssessmentInfos");
-            modelBuilder.Entity<User>().ToTable("Users");
+            //modelBuilder.Entity<RoleRights>().ToTable("RoleRights");
+            modelBuilder.Entity<Company>().ToTable("Companys");
             modelBuilder.Entity<Company>().ToTable("Companys");
 
             modelBuilder.Entity<Role>()
@@ -56,7 +57,7 @@ namespace Apps.BLL
         public DbSet<Module> moduleList { get; set; }
         public DbSet<FunctionRight> rightList { get; set; }
         public DbSet<Role> roleList { get; set; }
-        //public DbSet<RoleRights> roleRightsList { get; set; }
+        public DbSet<RoleRights> roleRightsList { get; set; }
         public DbSet<User> userList { get; set; }
         public DbSet<RootUser> rootUserList { get; set; }
         public DbSet<LogRecord> logRecordList { get; set; }

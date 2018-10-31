@@ -595,8 +595,8 @@
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
     <Content Include="Scripts\common.js" />
-    <Content Include="App_Data\sqliteMis.db" />
     <Content Include="App_Data\sqliteDefault.db" />
+    <Content Include="App_Data\sqliteLeave.db" />
     <None Include="Properties\PublishProfiles\MisConfig.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\echarts-all.js" />
@@ -659,6 +659,7 @@
     <Compile Include="Controllers\BenefitController.cs" />
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
+    <Compile Include="Controllers\UserAuthorizeAttribute.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\RoleController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -716,8 +717,6 @@
     <Content Include="Views\Level\Create.cshtml" />
     <Content Include="Views\Level\Edit.cshtml" />
     <Content Include="Views\Level\Index.cshtml" />
-    <Content Include="Views\Analyse\Create.cshtml" />
-    <Content Include="Views\Analyse\Edit.cshtml" />
     <Content Include="Views\Analyse\EmployeeAge.cshtml" />
     <Content Include="Views\Analyse\Index.cshtml" />
     <Content Include="Views\Analyse\EmployeeGender.cshtml" />
@@ -748,6 +747,8 @@
     <Content Include="Views\Employee\ShowLeave.cshtml" />
     <Content Include="Template\员工信息录入表格模板.xlsx" />
     <Content Include="Template\员工考核录入表格模板.xlsx" />
+    <Content Include="Views\Analyse\EmployeeSalary.cshtml" />
+    <Content Include="Views\Analyse\EmployeeWorkAge.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

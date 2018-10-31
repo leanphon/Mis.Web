@@ -87,6 +87,7 @@
     <Compile Include="Utility\DataTableHelper.cs" />
     <Compile Include="Utility\LambdaQueryCondition.cs" />
     <Compile Include="Utility\MapHelper.cs" />
+    <Compile Include="Utility\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

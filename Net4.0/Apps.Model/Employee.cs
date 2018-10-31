@@ -103,7 +103,7 @@ namespace Apps.Model
         public string education { get; set; }
 
         [Display(Name = "工作年限")]
-        public int experience { get; set; }
+        public int? experience { get; set; }
 
         [Display(Name = "政治面貌")]
         public string political { get; set; }

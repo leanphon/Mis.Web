@@ -16,6 +16,19 @@ namespace Apps.BLL
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<LeaveAddress>().ToTable("Address");
+            modelBuilder.Entity<LeaveAge>().ToTable("Age");
+            modelBuilder.Entity<LeaveDepartment>().ToTable("Department");
+            modelBuilder.Entity<LeaveEducation>().ToTable("Education");
+            modelBuilder.Entity<LeaveExperience>().ToTable("Experience");
+            modelBuilder.Entity<LeaveMarriage>().ToTable("Marriage");
+            modelBuilder.Entity<LeaveNation>().ToTable("Nation");
+            modelBuilder.Entity<LeaveNativePlace>().ToTable("NativePlace");
+            modelBuilder.Entity<LeaveSex>().ToTable("Sex");
+            modelBuilder.Entity<LeaveSource>().ToTable("Source");
+            modelBuilder.Entity<LeaveWorkAge>().ToTable("WorkAge");
+
         }
 
 

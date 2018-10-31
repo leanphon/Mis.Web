@@ -17,15 +17,15 @@
                     <tr>
                         <th>部门：</th>
                         <td>
-                            <input class="parm_control" type="text" id="departmentId" name="departmentId" />
+                            <input class="parm_control" type="text" id="departmentIdFilter" name="departmentIdFilter" />
                         </td>
                         <th>员工姓名：</th>
                         <td>
-                            <input class="parm_control" type="text" id="employeeName" name="employeeName" />
+                            <input class="parm_control" type="text" id="employeeNameFilter" name="employeeNameFilter" />
                         </td>
                         <th>员工状态：</th>
                         <td>
-                            <input class="parm_control" type="text" id="state" name="state" />
+                            <input class="parm_control" type="text" id="stateFilter" name="stateFilter" />
                         </td>
                         <th></th>
                         <td>
@@ -69,7 +69,7 @@
     })
 
 	function initPage() {
-	    $('#departmentId').combobox({
+	    $('#departmentIdFilter').combobox({
 	        width: '100%',
 	        //editable: false,
 	        url: '/Department/GetAllEntities',
@@ -78,7 +78,7 @@
 	        textField: 'name',
 	    });
 
-	    $('#state').combobox({
+	    $('#stateFilter').combobox({
 	        width: '100%',
 	        multiple: 'true',
 	        editable: false,
@@ -91,7 +91,7 @@
 	        ]
 	    });
 	    var data = '试用期,转正';
-	    $('#state').combobox('setValues', data.split(','))
+	    $('#stateFilter').combobox('setValues', data.split(','))
 
 
 	    var url = '/@(controllerName)/GetEntities';
@@ -119,27 +119,27 @@
 
     function getParamsJson() {
         var filterList = new Array;
-        if ($('#departmentId').val().trim() != '') {
+        if ($('#departmentIdFilter').val().trim() != '') {
             var p = {
                 "key": "departmentId",
                 "action": "==",
-                "value": $('#departmentId').val().trim()
+                "value": $('#departmentIdFilter').val().trim()
             };
             filterList.push(p)
         }
-        if ($('#employeeName').val().trim() != '') {
+        if ($('#employeeNameFilter').val().trim() != '') {
             var p = {
                 "key": "employeeName",
                 "action": "==",
-                "value": $('#employeeName').val().trim()
+                "value": $('#employeeNameFilter').val().trim()
             };
             filterList.push(p)
         }
-        if ($('#state').val().trim() != '') {
+        if ($('#stateFilter').val().trim() != '') {
             var p = {
                 "key": "state",
                 "action": "==",
-                "value": $('#state').val().trim()
+                "value": $('#stateFilter').val().trim()
             };
             filterList.push(p)
         }

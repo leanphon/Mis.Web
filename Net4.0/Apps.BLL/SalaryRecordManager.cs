@@ -1,5 +1,5 @@
 ﻿using Apps.Model;
-using Apps.Model.Uitility;
+using Apps.Model.Utility;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -578,7 +578,7 @@ namespace Apps.BLL
                 int days = DateTime.DaysInMonth(dtMonth.Year, dtMonth.Month);
                 dtMonth = dtMonth.AddDays(days - 1);
 
-                int seniority = Utility.Utility.CalYears(entryDate, dtMonth);
+                int seniority = Model.Utility.Utility.CalYears(entryDate, dtMonth);
 
                 return Math.Round(seniority * rewardsBase, 2);
             }

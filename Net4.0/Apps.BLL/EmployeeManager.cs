@@ -3,6 +3,7 @@ using Apps.Model.Utility;
 using LinqToExcel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Data.Entity;
 using System.IO;
@@ -781,7 +782,7 @@ namespace Apps.BLL
                                    select new
                                    {
                                        e.id,
-                                       years = Utility.Utility.CalYears(e.birthday, now),
+                                       years = Model.Utility.Utility.CalYears(e.birthday, now),
                                        e.departmentId,
                                    };
 
@@ -918,15 +919,15 @@ namespace Apps.BLL
 
 
                     var results = elements.GroupBy(e => e.sex)
-                        .Select(e => new {gender = e.Key, count = e.Count() });
+                        .Select(e => new {e.Key, count = e.Count() });
 
                     var category = new List<object>();
                     var data = new List<object>();
 
                     foreach (var e in results)
                     {
-                        category.Add(e.gender);
-                        data.Add(e.count);
+                        category.Add(e.Key);
+                        data.Add(new { value = e.count, name = e.Key});
                     }
                     var series = new List<object>();
                     series.Add(new { name = "员工性别", data });
@@ -936,6 +937,237 @@ namespace Apps.BLL
                     var resultData = new
                     {
                         title = "性别分析",
+                        category,
+                        legend = legend,
+                        series = series,
+                    };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = resultData,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+        }
+        public OperateResult AnalyseByWorkAge(QueryParam param = null)
+        {
+
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var elements = from e in db.employeeList.AsEnumerable()
+                                   let workAge = Model.Utility.Utility.CalYears(e.entryDate !=null ? e.entryDate.Value : DateTime.Now, DateTime.Now)
+                                   orderby workAge
+                                   select new
+                                   {
+                                       e.id,
+                                       workAge,
+                                       e.departmentId,
+                                   };
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                    }
+                    #endregion
+
+
+                    var results = elements.GroupBy(e => e.workAge)
+                        .Select(e => new { e.Key, count = e.Count() });
+
+                    var category = new List<object>();
+                    var data = new List<object>();
+
+                    foreach (var e in results)
+                    {
+                        category.Add(e.Key);
+                        data.Add(new {value= e.count , name = e.Key+"年" } );
+                    }
+                    var series = new List<object>();
+                    series.Add(new { name = "员工司龄", data });
+                    var legend = new List<object>();
+                    legend.Add("员工司龄");
+
+                    var resultData = new
+                    {
+                        title = "司龄分析",
+                        category,
+                        legend = legend,
+                        series = series,
+                    };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = resultData,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+        }
+
+        class KeyLevel
+        {
+            public string key { get; set; }
+            public int min { get; set; }
+            public int max { get; set; }
+            public int count { get; set; }
+            
+        }
+        public OperateResult AnalyseBySalary(QueryParam param = null)
+        {
+
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var elements = from s in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
+                                   join e in db.employeeList
+                                   on s.employeeId equals e.id
+                                   let salary = s.GetSalaryTotal()
+                                   select new
+                                   {
+                                       e.id,
+                                       salary,
+                                       e.departmentId,
+                                   };
+
+
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                    }
+                    #endregion
+
+                    /// 分几个档次：0~2000,2000~3000,3000~5000,5000~8000,8000~12000,12000~20000,20000以上
+                    /// 
+
+                    var keyList = new List<KeyLevel>{
+                        new  KeyLevel{key="2000以下", min = 0, max = 2000, count=0},
+                        new KeyLevel{key="2000~3000", min = 2000, max = 3000, count=0},
+                        new KeyLevel{key="3000~5000", min = 3000, max = 5000, count=0},
+                        new KeyLevel{key="5000~8000", min = 5000, max = 8000, count=0},
+                        new KeyLevel{key="8000~12000", min = 8000, max = 12000, count=0},
+                        new KeyLevel{key="12000~20000", min = 12000, max = 20000, count=0},
+                        new KeyLevel{key="20000以上", min = 20000, max = Int32.MaxValue, count=0},
+                    };
+
+                    var category = new List<object>();
+                    var data = new List<object>();
+
+                    var ruslt = elements.ToList();
+
+                    foreach (var e in ruslt)
+                    {
+                        foreach (var k in keyList)
+                        {
+                            if (e.salary >= k.min && e.salary < k.max)
+                            {
+                                k.count++;
+                                break;
+
+                            }
+                        }
+
+                    }
+
+
+                    foreach (var e in keyList)
+                    {
+                        if (e.count > 0)
+                        {
+                            data.Add(new { value = e.count, name = e.key });
+                        }
+                        
+                    }
+                    var series = new List<object>();
+                    series.Add(new { name = "员工薪酬", data });
+                    var legend = new List<object>();
+                    legend.Add("员工薪酬");
+
+                    var resultData = new
+                    {
+                        title = "薪酬分析",
                         category,
                         legend = legend,
                         series = series,

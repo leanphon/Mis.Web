@@ -344,7 +344,7 @@ namespace Apps.BLL
                 {
                     status = OperateStatus.Success,
                     content = "登录成功",
-                    data = new RootUser { name = "root", passwd = "" }
+                    data = new User { name = "root", passwd = "" }
                 };
             }
 

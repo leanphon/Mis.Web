@@ -40,7 +40,10 @@
 
 	function initPage() {
 	    var url = '/@(controllerName)/GetEntities';
-	    var callbackFuns = [{ "name": "onContextMenu", "fun": onTreegridonContextMenu }];
+	    var callbackFuns = [
+            { "name": "onDblClickRow", "fun": onEditEntity },
+            { "name": "onContextMenu", "fun": onTreegridonContextMenu }
+	    ];
 	    toolbar = [
 			{ text: '增加', iconCls: 'icon-add', handler: onAddEntity },
 			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
