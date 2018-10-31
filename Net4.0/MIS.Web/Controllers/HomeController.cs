@@ -6,7 +6,7 @@ using System.Web;
 using System.Web.Mvc;
 using Apps.Model;
 using Apps.Model.Privilege;
-using Apps.Model.Uitility;
+using Apps.Model.Utility;
 
 namespace MIS.Web.Controllers
 {

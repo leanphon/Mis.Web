@@ -39,7 +39,7 @@
 
 <div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
     <!--放置一个隐藏的菜单Div-->
-    <div data-options="iconCls:'icon-edit'" onclick="onFormal()">离职</div>
+    <div data-options="iconCls:'icon-edit'" onclick="onLeave()">离职</div>
 </div>
 
 
@@ -73,6 +73,7 @@
 
 	    var url = '/@(controllerName)/GetEntities';
 	    var callbackFuns = [
+            { "name": "onBeforeLoad", "fun": onBeforeLoad },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
 

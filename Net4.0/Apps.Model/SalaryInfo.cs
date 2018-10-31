@@ -115,7 +115,16 @@ namespace Apps.Model
         public virtual BenefitInfo benefitInfo { get; set; }
 
 
+        public double GetSalaryTotal()
+        {
+            double total = levelInfo.postSalary + levelInfo.fullAttendanceRewards;
+            int year = Utility.Utility.CalYears(employee.entryDate != null ? employee.entryDate.Value : DateTime.Now, DateTime.Now);
 
+            total += levelInfo.seniorityRewardsBase * year
+                + performanceInfo.performanceRewards + benefitInfo.benefitRewards;
+
+            return total;
+        }
     }
 
 

@@ -47,6 +47,7 @@
 	function initPage() {
 	    var url = '/@(controllerName)/GetEntities';
 	    var callbackFuns = [
+            { "name": "onDblClickRow", "fun": onEditEntity },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
 	    toolbar = [

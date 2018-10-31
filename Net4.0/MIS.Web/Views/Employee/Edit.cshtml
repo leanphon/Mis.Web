@@ -325,7 +325,7 @@
                     @Html.LabelFor(model => model.state, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    <input class="parm_control" readonly type="text" id="state" name="state" value="试用期" />
+                    @Html.EditorFor(model => model.state, new { htmlAttributes = new {@readonly= "readonly", @class = "parm_control" } })
                 </td>
             </tr>
             <tr>

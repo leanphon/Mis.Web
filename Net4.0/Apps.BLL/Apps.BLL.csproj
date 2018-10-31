@@ -97,7 +97,6 @@
     <Compile Include="LogManager.cs" />
     <Compile Include="UserManager.cs" />
     <Compile Include="Utility\SessionHelper.cs" />
-    <Compile Include="Utility\Utility.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Apps.Model\Apps.Model.csproj">

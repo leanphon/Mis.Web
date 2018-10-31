@@ -60,7 +60,7 @@
             success: function (result) {
                 if (result.status == 0)
                 {
-                    var viewEntity = new EmployeeGenderReport(
+                    var viewEntity = new EmployeeGenderReportPie(
                         '@(reportView)',
                         result.data.title,
                         result.data.category,
@@ -68,7 +68,7 @@
                         result.data.series
                         );
 
-                    showReport(viewEntity);
+                    showReportPie(viewEntity);
                 }
                 else
                 {
