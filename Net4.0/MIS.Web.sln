@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Apps.Model", "Apps.Model\Ap
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIS.Web", "MIS.Web\MIS.Web.csproj", "{04E14025-F26A-440D-AE82-E7A80D1A99E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIS.UITest", "MIS.UITest\MIS.UITest.csproj", "{3A4A433E-7353-48C5-ADCC-62CDF5DA5C8A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MIS.UnitTest", "MIS.UnitTest\MIS.UnitTest.csproj", "{BF1AB2F5-6B73-46E3-915F-0ADC004FD45A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{04E14025-F26A-440D-AE82-E7A80D1A99E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{04E14025-F26A-440D-AE82-E7A80D1A99E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{04E14025-F26A-440D-AE82-E7A80D1A99E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A4A433E-7353-48C5-ADCC-62CDF5DA5C8A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A4A433E-7353-48C5-ADCC-62CDF5DA5C8A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A4A433E-7353-48C5-ADCC-62CDF5DA5C8A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A4A433E-7353-48C5-ADCC-62CDF5DA5C8A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BF1AB2F5-6B73-46E3-915F-0ADC004FD45A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BF1AB2F5-6B73-46E3-915F-0ADC004FD45A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BF1AB2F5-6B73-46E3-915F-0ADC004FD45A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BF1AB2F5-6B73-46E3-915F-0ADC004FD45A}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

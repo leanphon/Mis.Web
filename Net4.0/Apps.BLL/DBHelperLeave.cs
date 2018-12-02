@@ -17,6 +17,7 @@ namespace Apps.BLL
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<LeaveSalary>().ToTable("Salary");
             modelBuilder.Entity<LeaveAddress>().ToTable("Address");
             modelBuilder.Entity<LeaveAge>().ToTable("Age");
             modelBuilder.Entity<LeaveDepartment>().ToTable("Department");
@@ -28,10 +29,13 @@ namespace Apps.BLL
             modelBuilder.Entity<LeaveSex>().ToTable("Sex");
             modelBuilder.Entity<LeaveSource>().ToTable("Source");
             modelBuilder.Entity<LeaveWorkAge>().ToTable("WorkAge");
+            modelBuilder.Entity<LeaveRecord>().ToTable("LeaveRecord");
+            modelBuilder.Entity<LeavePolitical>().ToTable("Political");
 
         }
 
-
+        public DbSet<LeaveRecord> leaveRecordList { get; set; }
+        public DbSet<LeaveSalary> salaryList { get; set; }
         public DbSet<LeaveAddress> addressList { get; set; }
         public DbSet<LeaveAge> ageList { get; set; }
         public DbSet<LeaveDepartment> departmentList { get; set; }

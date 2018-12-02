@@ -74,6 +74,7 @@
 	    var url = '/@(controllerName)/GetEntities';
 	    var callbackFuns = [
             { "name": "onBeforeLoad", "fun": onBeforeLoad },
+            { "name": "onDblClickRow", "fun": onLeave },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
 

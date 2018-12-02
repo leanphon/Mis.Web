@@ -86,6 +86,23 @@ function UserGrid(gridId, toolbar) {
     this.toolbar = toolbar;
 }
 
+function LogGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+                { field: 'id', hidden: true },
+                { field: 'time', title: '时间', width: 250, formatter: formatDateTime },
+                { field: 'content', title: '日志内容', width: 250 },
+                { field: 'type', title: '类型', width: 250 },
+                { field: 'name', title: '用户', width: 250},
+    ]];
+
+    this.toolbar = toolbar;
+}
+
 
 function CompanyRegisterGrid(gridId, toolbar) {
     this.id = gridId;
@@ -494,4 +511,46 @@ function SalaryRecordGrid(gridId, toolbar) {
 	this.toolbar = toolbar;
 }
 
+
+function LeaveWarningGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+                { field: 'id', hidden: true },
+                { field: 'number', title: '工号', width: 150 },
+                { field: 'name', title: '姓名', width: 150 },
+                { field: 'departmentName', title: '所在部门', width: 150, },
+    ]];
+
+    this.normalCols = [[
+                { field: 'grade', title: '预警等级', width: 150, formatter: formatGrade },
+                { field: 'resultScore', title: '综合分数', width: 150, formatter: formatScore },
+                { field: 'dimensions', hidden: true },
+
+    ]];
+
+
+    this.toolbar = toolbar;
+}
+
+function LeaveWarningDetailGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+                { field: 'id', hidden: true },
+                { field: 'number', title: '工号', width: 150 },
+                { field: 'name', title: '姓名', width: 150 },
+                { field: 'departmentName', title: '所在部门', width: 150, },
+    ]];
+
+    this.normalCols = [[
+                { field: 'dimension', title: '考察维度', width: 150 },
+                { field: 'score', title: '维度值得分', width: 100 },
+                { field: 'average', title: '维度均值', width: 100 },
+                { field: 'bias', title: '偏差', width: 100 },
+    ]];
+
+
+    this.toolbar = toolbar;
+}
 

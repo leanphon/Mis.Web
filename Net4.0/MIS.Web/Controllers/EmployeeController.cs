@@ -279,16 +279,16 @@ namespace MIS.Web.Controllers
         }
         public ActionResult EditSalary(SalaryInfo model)
         {
-            if (!ModelState.IsValid)
-            {
-                return Json(
-                    new OperateResult
-                    {
-                        content = Model.Utility.GetModelStateErrors(ModelState),
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
-            }
+            //if (!ModelState.IsValid)
+            //{
+            //    return Json(
+            //        new OperateResult
+            //        {
+            //            content = Model.Utility.GetModelStateErrors(ModelState),
+            //        },
+            //        JsonRequestBehavior.AllowGet
+            //    );
+            //}
 
             EmployeeManager manager = new EmployeeManager();
 

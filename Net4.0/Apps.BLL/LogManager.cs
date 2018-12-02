@@ -1,6 +1,7 @@
 ﻿using Apps.BLL.Utility;
 using Apps.Model;
 using Apps.Model.Privilege;
+using Apps.Model.Utility;
 using System;
 using System.Data;
 using System.Data.Entity;
@@ -10,7 +11,7 @@ namespace Apps.BLL
 {
     public class LogManager
     {
-        public OperateResult Add(LogRecord model)
+        public static OperateResult Add(LogRecord model)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -44,7 +45,7 @@ namespace Apps.BLL
             }
 
         }
-        public OperateResult Remove(long id)
+        public static OperateResult Remove(long id)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -69,7 +70,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult Update(LogRecord model)
+        public static OperateResult Update(LogRecord model)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -93,7 +94,7 @@ namespace Apps.BLL
             }
 
         }
-        public OperateResult GetById(long id)
+        public static OperateResult GetById(long id)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -131,7 +132,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult GetAll(QueryParam param = null)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -141,8 +142,9 @@ namespace Apps.BLL
                                     select new
                                     {
                                         e.id,
-                                        e.serial,
                                         e.time,
+                                        e.content,
+                                        e.type,
                                         e.user.name
                                     }
                                   ).ToList();
@@ -166,7 +168,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult GetByPager(QueryParam param = null)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -176,8 +178,9 @@ namespace Apps.BLL
                                    select new
                                    {
                                        e.id,
-                                       e.serial,
                                        e.time,
+                                       e.content,
+                                       e.type,
                                        e.user.name
                                    };
 
@@ -225,6 +228,85 @@ namespace Apps.BLL
                 }
 
             }
+        }
+
+        /// <summary>
+        /// 返回值中的data是DataTable
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        public static OperateResult ExportAll(QueryParam param = null)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                try
+                {
+                    var elements = from e in db.logRecordList.Include("user")
+                                   select new
+                                   {
+                                       e.id,
+                                       e.time,
+                                       e.content,
+                                       e.type,
+                                       e.user.name
+                                   };
+
+
+                    // 过滤时间
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("timeBegin"))
+                        {
+                            var p = param.filters["timeBegin"];
+                            var t = Convert.ToDateTime(p.value);
+                            elements = elements.Where(m => m.time >= t);
+                        }
+                    }
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("timeEnd"))
+                        {
+                            var p = param.filters["timeEnd"];
+                            var t = Convert.ToDateTime(p.value);
+                            elements = elements.Where(m => m.time <= t);
+                        }
+                    }
+                    #endregion
+
+
+                    long rowIndex = 1;
+                    var results = from e in elements.AsEnumerable()
+                                  let index = rowIndex++
+                                  select new LogRecordExport
+                                  {
+                                      index = index,
+                                      time = e.time,
+                                      content = e.content,
+                                      type = e.type,
+                                      username = e.name,
+                                  };
+
+                    DataTable dt = DataTableHelper.ToDataTable<LogRecordExport>(results.ToList());
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "导出成功",
+                        data = dt,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = ex.Message,
+                    };
+                }
+
+            }
+
         }
 
 

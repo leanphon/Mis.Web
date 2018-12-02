@@ -32,6 +32,14 @@ namespace Apps.BLL
                     db.userList.Add(model);
                     db.SaveChanges();
 
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加用户:"+model.name
+                    });
+
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
@@ -78,6 +86,14 @@ namespace Apps.BLL
 
                     db.Entry(element).State = System.Data.Entity.EntityState.Deleted;
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除用户:" + element.name
+                    });
 
                     return new OperateResult
                     {
@@ -126,6 +142,14 @@ namespace Apps.BLL
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改用户:" + model.name
+                    });
 
                     return new OperateResult
                     {
@@ -310,6 +334,14 @@ namespace Apps.BLL
                         db.Entry(element).State = System.Data.Entity.EntityState.Modified;
                         db.SaveChanges();
 
+                        LogManager.Add(new LogRecord
+                        {
+                            userId = element.id,
+                            time = DateTime.Now,
+                            type = "Info",
+                            content = "登录系统"
+                        });
+
                         return new OperateResult
                         {
                             status = OperateStatus.Success,
@@ -417,6 +449,15 @@ namespace Apps.BLL
 
                     db.SaveChanges();
 
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "重置密码:" + element.name
+                    });
+
+
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
@@ -460,6 +501,15 @@ namespace Apps.BLL
                     db.Entry(element).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "锁定用户:" + element.name
+                    });
+
 
                     return new OperateResult
                     {

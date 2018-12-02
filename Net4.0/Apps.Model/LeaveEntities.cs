@@ -5,6 +5,20 @@ using System.Text;
 
 namespace Apps.Model.Leave
 {
+    public class LeaveRecord
+    {
+        public long id { get; set; }
+        public long employeeId { get; set; }
+
+    }
+
+    public class LeaveSalary
+    {
+        public long id { get; set; }
+        public long employeeId { get; set; }
+
+        public double salary { get; set; }
+    }
     public class LeaveAddress
     {
         public long id { get; set; }

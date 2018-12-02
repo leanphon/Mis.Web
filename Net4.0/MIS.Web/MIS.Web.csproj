@@ -660,6 +660,7 @@
     <Compile Include="Controllers\DepartmentController.cs" />
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\UserAuthorizeAttribute.cs" />
+    <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Controllers\RoleController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -718,7 +719,6 @@
     <Content Include="Views\Level\Edit.cshtml" />
     <Content Include="Views\Level\Index.cshtml" />
     <Content Include="Views\Analyse\EmployeeAge.cshtml" />
-    <Content Include="Views\Analyse\Index.cshtml" />
     <Content Include="Views\Analyse\EmployeeGender.cshtml" />
     <Content Include="Views\Module\Create.cshtml" />
     <Content Include="Views\Module\Edit.cshtml" />
@@ -749,6 +749,10 @@
     <Content Include="Template\员工考核录入表格模板.xlsx" />
     <Content Include="Views\Analyse\EmployeeSalary.cshtml" />
     <Content Include="Views\Analyse\EmployeeWorkAge.cshtml" />
+    <Content Include="Views\Analyse\LeaveWarning.cshtml" />
+    <Content Include="Views\Log\Create.cshtml" />
+    <Content Include="Views\Log\Edit.cshtml" />
+    <Content Include="Views\Log\Index.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

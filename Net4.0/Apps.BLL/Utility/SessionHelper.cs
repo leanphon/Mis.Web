@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Apps.Model.Privilege;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,6 +16,13 @@ namespace Apps.BLL.Utility
             string db = session["CompanyName"] as string;
 
             return db ?? "null";
+        }
+        public static long GetUserId()
+        {
+            HttpSessionState session = HttpContext.Current.Session;
+            User u = session["currentUser"] as User;
+
+            return u != null ? u.id : -1;
         }
     }
 }
