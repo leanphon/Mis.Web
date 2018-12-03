@@ -134,7 +134,15 @@ function onDblClickRow(index) {
 
     if (editIndex != index) {
         if (endEditing($(this))) {
-            $(this).datagrid('selectRow', index).datagrid('beginEdit', index);
+            $(this).datagrid('selectRow', index);
+
+            var row = $(this).datagrid('getSelected');
+
+            $.data(this, "lastRowData", row)
+
+            console.log(row)
+
+            $(this).datagrid('beginEdit', index);
             $(this).attr("editIndex", index);
         } else {
             $(this).datagrid('selectRow', editIndex);
@@ -143,6 +151,32 @@ function onDblClickRow(index) {
 }
 
 function endEditing(gridObj) {
+    var editIndex = gridObj.attr("editIndex");
+
+    if (editIndex == -1) {
+        return true
+    }
+
+    if (gridObj.datagrid('validateRow', editIndex)) {
+        gridObj.datagrid('endEdit', editIndex);
+
+
+        var lastData = $.data(gridObj.get(0), "lastRowData")
+        console.log(lastData)
+
+        var row = { index: editIndex, row: lastData }
+        gridObj.datagrid('updateRow', row);
+
+        
+        gridObj.attr("editIndex", -1);
+
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function ExitEditing(gridObj) {
     console.log(gridObj)
     var editIndex = gridObj.attr("editIndex");
 
@@ -161,6 +195,7 @@ function endEditing(gridObj) {
         return false;
     }
 }
+
 
 /************** end 表格编辑相关  *************/
 /**************************************** end datagrid 相关  *************************/
