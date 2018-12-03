@@ -1,0 +1,261 @@
+﻿@{
+    ViewBag.Title = "考核录入";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divContent = controllerName + "_divContent";
+    string tabEntityList = controllerName + "_tabEntityList";
+
+}
+
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+    @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <div  style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+            <form id="searchForm">
+                <table>
+                    <tr>
+                        <th>部门：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="departmentId" name="departmentId" />
+                        </td>
+                        <th>员工姓名：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="employeeName" name="employeeName" />
+                        </td>
+                        <th>员工状态：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="state" name="state" />
+                        </td>
+                        <th></th>
+                        <td>
+                            <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
+                        </td>
+                    
+                    </tr>
+                    <tr>
+                        <th>月份：</th>
+                        <!--由于datebox框架上面的数据必须是时间格式的，所以我们用editable="false"来禁止用户手动输入，以免报错-->
+                        <td>
+                            <input class="parm_control"  editable="false" name="month" id="month" />
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <table class="tab_center" id="@(tabEntityList)"></table>
+    </div>
+</div>
+
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+    <div data-options="iconCls:'icon-save'" onclick="onSaveSingle()">保存当前</div>
+</div>
+
+
+<div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+</div>
+
+<script>
+	$(function () {
+	    initPage();
+
+		//初始加载，表格宽度自适应
+		$(document).ready(function(){
+			onDatagridAdjust();
+		});
+	　　//浏览器窗口大小变化后，表格宽度自适应
+		$(window).resize(function(){
+			onDatagridAdjust();
+		});
+    })
+
+	function initPage() {
+
+	    $('#departmentId').combobox({
+            width: '100%',
+            //editable: false,
+            url: '/Department/GetAllEntities',
+            mode: 'remote',
+            valueField: 'id',
+            textField: 'name',
+        });
+
+        $('#month').datebox({
+            width: '100%',
+            formatter: databoxFormatMonth,
+            parser: databoxParser
+        });
+        $('#month').datebox('setValue', new Date);
+
+        $('#state').combobox({
+            width: '100%',
+            multiple: 'true',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '试用期', text: '试用期' },
+                { value: '转正', text: '转正' },
+                { value: '离职', text: '离职' },
+            ]
+        });
+        var data = '试用期,转正';
+        $('#state').combobox('setValues', data.split(','))
+
+
+        var url = '/@(controllerName)/GetEmployeesByPager';
+	    var callbackFuns = [
+            { "name": "onBeforeLoad", "fun": onBeforeLoad },
+            { "name": "onClickRow", "fun": onClickRow },
+            { "name": "onDblClickRow", "fun": onDblClickRow, },
+            { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
+	    ];
+
+	    toolbar = [
+			//{ text: '退出编辑', iconCls: 'icon-save', handler: onExitEdit },
+            { text: '保存当前', iconCls: 'icon-save', handler: onSaveSingle },
+            { text: '保存全部', iconCls: 'icon-save', handler: onSaveAll },
+            { text: '导入', iconCls: 'icon-upload', handler: onImport },
+            { text: '下载模板', iconCls: 'icon-export', handler: onDownloadTemplate },
+	    ];
+
+	    var gridObj = new AssessmentInputGrid('@(tabEntityList)', toolbar);
+
+        initDatagrid(gridObj, url, callbackFuns);
+
+    }
+
+    function getParamsJson() {
+        var filterList = new Array;
+        if ($('#departmentId').val().trim() != '') {
+            var p = {
+                "key": "departmentId",
+                "action": "==",
+                "value": $('#departmentId').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#employeeName').val().trim() != '') {
+            var p = {
+                "key": "employeeName",
+                "action": "==",
+                "value": $('#employeeName').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#month').val().trim() != '') {
+            var p = {
+                "key": "month",
+                "action": "==",
+                "value": $('#month').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#state').val().trim() != '') {
+            var p = {
+                "key": "state",
+                "action": "==",
+                "value": $('#state').val().trim()
+            };
+            filterList.push(p)
+        }
+
+        return JSON.stringify(filterList);
+    }
+
+
+    function onBeforeLoad(param) {
+
+        param.extendParams = getParamsJson();
+
+        return true;
+    }
+
+    function filter() {
+        var queryParams = $('#@(tabEntityList)').datagrid('options').queryParams;
+
+        queryParams.extendParams = getParamsJson();
+
+        $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
+        $('#@(tabEntityList)').datagrid('load');
+    }
+
+    function onSaveSingle() {
+        if ($('#month').val() == '') {
+            showAlert('请选择考核月');
+            return;
+        }
+
+        if (endEditing($('#@(tabEntityList)'))) {
+            var updatedRows = $('#@(tabEntityList)').datagrid('getSelected');
+            if (updatedRows.length == 0) {
+                showAlert('无修改数据');
+                return;
+            }
+
+
+            var data = JSON.stringify(updatedRows);
+            var param = {
+                "month" : $('#month').val(),
+                "assessmentData" : data
+            }
+
+            $.post('/@(controllerName)/AddSingle', param, function (result) {
+                if (result.status != 0) {
+                    showAlert(result.content)
+                }
+                else {
+                    showPrompt("保存成功")
+                }
+
+            }, "JSON").error(function (result) {
+            });
+        }
+    }
+    function onSaveAll() {
+        if ($('#month').val() == '') {
+            showAlert('请选择考核月');
+            return;
+        }
+
+        if (endEditing()) {
+            var updatedRows = $('#@(tabEntityList)').datagrid('getChanges', 'updated');
+            if (updatedRows.length == 0) {
+                showAlert('无修改数据');
+                return;
+            }
+
+            var data = JSON.stringify(updatedRows);
+            var param = {
+                "month" : $('#month').val(),
+                "assessmentData" : data
+            }
+
+            $.post('/@(controllerName)/AddBatch', param, function (result) {
+                if (result.status != 0) {
+                    showAlert(result.content)
+                }
+                else {
+                    showPrompt("保存成功")
+                }
+
+            }, "JSON").error(function (result) {
+            });
+        }
+    }
+
+    function onDownloadTemplate() {
+        window.location.href = '/Template/员工考核录入表格模板.xlsx';
+    }
+
+    function onImport() {
+
+    }
+
+
+</script>
+
+

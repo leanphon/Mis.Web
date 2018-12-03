@@ -1,0 +1,155 @@
+﻿@{
+    ViewBag.Title = "员工管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divContent = controllerName + "_divContent";
+    string tabEntityList = controllerName + "_tabEntityList_Formal";
+}
+
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+        @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+            <form id="searchForm">
+                <table>
+                    <tr>
+                        <th>部门：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="departmentId" name="departmentId" />
+                        </td>
+                        <th>员工姓名：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="employeeName" name="employeeName" />
+                        </td>
+                        <th></th>
+                        <td>
+                            <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
+                        </td>
+
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <table class="tab_center" id="@(tabEntityList)"></table>
+    </div>
+</div>
+<div id="@(divContent)"></div>
+
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+    <div data-options="iconCls:'icon-edit'" onclick="onFormal()">转正</div>
+</div>
+
+
+<div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+</div>
+
+<script>
+	$(function () {
+	    initPage();
+
+		//初始加载，表格宽度自适应
+		$(document).ready(function(){
+			onDatagridAdjust();
+		});
+	　　//浏览器窗口大小变化后，表格宽度自适应
+		$(window).resize(function(){
+			onDatagridAdjust();
+		});
+    })
+
+	function initPage() {
+	    $('#departmentId').combobox({
+	        width: '100%',
+	        //editable: false,
+	        url: '/Department/GetAllEntities',
+	        mode: 'remote',
+	        valueField: 'id',
+	        textField: 'name',
+	    });
+
+	    var url = '/@(controllerName)/GetEntities';
+	    var callbackFuns = [
+            { "name": "onBeforeLoad", "fun": onBeforeLoad },
+            { "name": "onDblClickRow", "fun": onFormal },
+            { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
+	    ];
+
+	    var toolbar = [
+            { text: "转正", iconCls: 'icon-edit', handler: onFormal },
+	    ];
+
+	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbar);
+
+	    initDatagrid(gridObj, url, callbackFuns);
+	}
+
+
+    function getParamsJson() {
+        var filterList = new Array;
+        if ($('#departmentId').val().trim() != '') {
+            var p = {
+                "key": "departmentId",
+                "action": "==",
+                "value": $('#departmentId').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#employeeName').val().trim() != '') {
+            var p = {
+                "key": "employeeName",
+                "action": "==",
+                "value": $('#employeeName').val().trim()
+            };
+            filterList.push(p)
+        }
+        var p = {
+            "key": "state",
+            "action": "==",
+            "value": "试用期"
+        };
+        filterList.push(p)
+
+        return JSON.stringify(filterList);
+    }
+
+
+    function onBeforeLoad(param) {
+
+        param.extendParams = getParamsJson();
+
+        return true;
+    }
+
+    function filter() {
+        var queryParams = $('#@(tabEntityList)').datagrid('options').queryParams;
+
+        queryParams.extendParams = getParamsJson();
+
+        $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
+        $('#@(tabEntityList)').datagrid('load');
+    }
+
+    function onFormal() {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            showAlert("未选择")
+            return;
+        }
+        $.ajax({
+            url: '/@(controllerName)/Formal',
+            type: 'GET',
+            data: 'id=' + row.id,
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+
+</script>
+
+
