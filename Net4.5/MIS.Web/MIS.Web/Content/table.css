@@ -1,0 +1,55 @@
+﻿table.tab_center{
+    width:90%;
+    /*border:1px solid;*/
+    margin:0px auto;
+    padding:0px;
+}
+
+caption.tab_caption{
+    margin-bottom:5px;
+    font:10px;
+}
+
+th .thcontent{
+    width:200px;
+}
+
+tr.tr_odd{
+    background-color:#a6f2f3
+}
+tr.tr_even{
+    background-color:#c1d0e4
+}
+
+td.cols_2_left{
+    width:30%;
+    padding:15px;
+    text-align:right;
+    /*border:1px solid;*/
+}
+td.cols_2_right{
+    width:70%;
+    padding:15px;
+    text-align:left;
+    /*border:1px solid;*/
+}
+td.cols_4_left{
+    width:20%;
+    padding:5px;
+    text-align:right;
+    /*border:1px solid;*/
+}
+td.cols_4_right{
+    width:30%;
+    padding:5px;
+    text-align:left;
+    /*border:1px solid;*/
+}
+select.td_select{
+    width:200px;
+    height:30px;
+}
+
+.spanInputDanger{
+    color:red
+}

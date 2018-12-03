@@ -1,0 +1,161 @@
+﻿@model Apps.Model.Employee
+@{
+    Layout = null;
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divDialog = controllerName + "_divDialog";
+    string divContent = controllerName + "_divContent";
+    string formEntity = controllerName + "_formEntity";
+    string tabEntityList = controllerName + "_tabEntityList";
+}
+<script>
+    function show() {
+        initDivDialog("转正");
+        initForm();
+
+        $('#@(divDialog)').dialog('open');
+        $('#@(divDialog)').dialog('center');
+    }
+    $(function () {
+        show();
+    });
+
+    function destroyDialog() {
+        $('#@(divDialog)').dialog('destroy');
+        $('#@(divContent)').empty();
+    }
+
+    function initDivDialog(titleName) {
+        $('#@(divDialog)').dialog({
+            width: 800,
+            height: 500,
+            title: titleName,
+            modal: true,
+            closed: true,
+            collapsible: false,// 是否显示可折叠按钮
+            minimizable: false,// 是否显示最小化按钮
+            maximizable: false,// 是否显示最大化按钮
+            resizable: false,// 是否可以改变对话框窗口大小
+            onClose: destroyDialog,
+            // 对话框窗口底部按钮
+            buttons: [
+                {
+                    text: '保存',
+                    iconCls: 'icon-ok',
+                    handler: function () {
+                        $('#@(formEntity)').submit();
+                    }
+                },
+                {
+                    text: '取消',
+                    iconCls: 'icon-cancel',
+                    handler: destroyDialog
+                }
+            ]
+        });
+    }
+
+    function initForm() {
+        $('#@(formEntity)').form({
+            url: '/@(controllerName)/UpdateToLeave',
+            method: 'post',
+            success: function (result) {
+                var obj = JSON.parse(result);
+                if (obj.status != 0) {
+                    showAlert(obj.content);
+                }
+                else {
+                    destroyDialog();
+                    $('#@(tabEntityList)').datagrid('reload');
+                }
+            },
+        });
+
+        $('#entryDate').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+        $('#formalDate').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+        $('#leaveDate').datebox({
+            width: '100%',
+            formatter: databoxFormat,
+            parser: databoxParser
+        });
+
+        $('#departmentId').combobox({
+            width: '100%',
+            editable: false,
+            url: '/Department/GetAllEntities',
+            mode: 'remote',
+            valueField: 'id',
+            textField: 'name',
+        });
+    }
+</script>
+
+<div id="@(divDialog)" class="easyui-dialog">
+    <form id="@(formEntity)" action="" method="post">
+        @Html.AntiForgeryToken()
+        @Html.HiddenFor(model => model.id)
+        <table style="margin:auto;width:90%">
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.name, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.name, new { @class = "parm_control", @readonly = "@Html.EditorFor" })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.number, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.number, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.departmentId, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_4_right">
+                    <input class="parm_control" readonly type="text" id="departmentId" name="departmentId" value="@(Model.department.name)" />
+                </td>
+
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.state, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    <input class="parm_control" readonly type="text" id="state" name="state" value="离职" />
+                </td>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.entryDate, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.formalDate, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.formalDate, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.leaveDate, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.leaveDate, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+            </tr>
+        </table>
+    </form>
+</div>
+

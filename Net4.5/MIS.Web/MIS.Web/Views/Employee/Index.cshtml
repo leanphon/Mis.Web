@@ -1,0 +1,258 @@
+﻿@{
+    ViewBag.Title = "员工管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divContent = controllerName + "_divContent";
+    string tabEntityList = controllerName + "_tabEntityList";
+}
+
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+        @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+            <form id="searchForm">
+                <table>
+                    <tr>
+                        <th>部门：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="departmentIdFilter" name="departmentIdFilter" />
+                        </td>
+                        <th>员工姓名：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="employeeNameFilter" name="employeeNameFilter" />
+                        </td>
+                        <th>员工状态：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="stateFilter" name="stateFilter" />
+                        </td>
+                        <th></th>
+                        <td>
+                            <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
+                        </td>
+
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <table class="tab_center" id="@(tabEntityList)"></table>
+    </div>
+</div>
+<div id="@(divContent)"></div>
+
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+    <div data-options="iconCls:'icon-add'" onclick="onAddEntity()">入职</div>
+    <div data-options="iconCls:'icon-edit'" onclick="onEditEntity()">修改</div>
+    <div data-options="iconCls:'icon-remove'" onclick="onRemoveEntity()">删除</div>
+    <div data-options="iconCls:'icon-money'" onclick="onShowSalary()">薪资设定</div>
+</div>
+
+
+<div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+</div>
+
+<script>
+	$(function () {
+	    initPage();
+
+		//初始加载，表格宽度自适应
+		$(document).ready(function(){
+			onDatagridAdjust();
+		});
+	　　//浏览器窗口大小变化后，表格宽度自适应
+		$(window).resize(function(){
+			onDatagridAdjust();
+		});
+    })
+
+	function initPage() {
+	    $('#departmentIdFilter').combobox({
+	        width: '100%',
+	        //editable: false,
+	        url: '/Department/GetAllEntities',
+	        mode: 'remote',
+	        valueField: 'id',
+	        textField: 'name',
+	    });
+
+	    $('#stateFilter').combobox({
+	        width: '100%',
+	        multiple: 'true',
+	        editable: false,
+	        valueField: 'value',
+	        textField: 'text',
+	        data: [
+                { value: '试用期', text: '试用期' },
+                { value: '转正', text: '转正' },
+                { value: '离职', text: '离职' },
+	        ]
+	    });
+	    var data = '试用期,转正';
+	    $('#stateFilter').combobox('setValues', data.split(','))
+
+
+	    var url = '/@(controllerName)/GetEntities';
+	    var callbackFuns = [
+            { "name": "onBeforeLoad", "fun": onBeforeLoad },
+            { "name": "onDblClickRow", "fun": onEditEntity },
+            { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
+	    ];
+
+	    toolbar = [
+			//{ text: '入职', iconCls: 'icon-add', handler: onAddEntity },
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+			{ text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+			{ text: '薪资设定', iconCls: 'icon-money', handler: onShowSalary },
+            { text: '导入员工数据', iconCls: 'icon-upload', handler: onImportExcel },
+			{ text: '下载模板', iconCls: 'icon-export', handler: onDownloadTemplate },
+            { text: '导出全部', iconCls: 'icon-export', handler: onExportAll },
+	    ];
+
+	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbar);
+
+	    initDatagrid(gridObj, url, callbackFuns);
+	}
+
+
+    function getParamsJson() {
+        var filterList = new Array;
+        if ($('#departmentIdFilter').val().trim() != '') {
+            var p = {
+                "key": "departmentId",
+                "action": "==",
+                "value": $('#departmentIdFilter').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#employeeNameFilter').val().trim() != '') {
+            var p = {
+                "key": "employeeName",
+                "action": "==",
+                "value": $('#employeeNameFilter').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#stateFilter').val().trim() != '') {
+            var p = {
+                "key": "state",
+                "action": "==",
+                "value": $('#stateFilter').val().trim()
+            };
+            filterList.push(p)
+        }
+
+        return JSON.stringify(filterList);
+    }
+
+
+    function onBeforeLoad(param) {
+
+        param.extendParams = getParamsJson();
+
+        return true;
+    }
+
+    function filter() {
+        var queryParams = $('#@(tabEntityList)').datagrid('options').queryParams;
+
+        queryParams.extendParams = getParamsJson();
+
+        $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
+        $('#@(tabEntityList)').datagrid('load');
+    }
+    function onDownloadTemplate() {
+        window.location.href = '/Template/员工信息录入表格模板.xlsx';
+    }
+
+    function onExportAll() {
+
+        window.location.href = '/@(controllerName)/ExportAll?extendParams=' + getParamsJson();
+    }
+    function onImportExcel() {
+        $.ajax({
+            url: '/@(controllerName)/ShowImport',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+
+    function onAddEntity() {
+        $.ajax({
+            url: '/@(controllerName)/Create',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+    function onEditEntity() {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            showAlert("未选择")
+            return;
+        }
+
+        $.ajax({
+            url: '/@(controllerName)/Edit',
+            type: 'GET',
+            data: 'id='+row.id,
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+    function onRemoveEntity(id) {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            showAlert("未选择");
+            return;
+        }
+        if (!confirm("确定删除吗")){
+            return;
+        }
+
+        $.ajax({
+            url: '/@(controllerName)/Delete',
+            type: 'GET',
+            data: 'id=' + row.id,
+            async: false,
+            success: function (result) {
+                if (result.status != 0) {
+                    showAlert(result.content);
+                }
+                else {
+                    $('#@(tabEntityList)').datagrid('reload');
+                }
+            }
+        });
+    }
+
+    function onShowSalary() {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            showAlert("未选择")
+            return;
+        }
+
+        $.ajax({
+            url: '/@(controllerName)/ShowSalary',
+            type: 'GET',
+            data: 'id=' + row.id,
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+
+</script>
+
+

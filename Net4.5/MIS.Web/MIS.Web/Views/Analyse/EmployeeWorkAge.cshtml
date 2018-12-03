@@ -1,0 +1,120 @@
+﻿@{
+    ViewBag.Title = "员工司龄分析";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string actionName = ViewContext.RouteData.Values["action"].ToString();
+    string divContent = controllerName + "_divContent";
+    string reportView = controllerName + actionName +  "_reportView";
+}
+
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+        <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+            <form id="searchForm">
+                <table>
+                    <tr>
+                        <th>部门：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="departmentId" name="departmentId" />
+                        </td>
+                        <td>
+                            <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
+                        </td>
+
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <div class="reportView" style="border:1px solid;height:500px; width:100%" id="@(reportView)"></div>
+    </div>
+</div>
+
+<script src="~/Scripts/echarts-all.js"></script>
+<script src="~/Scripts/echarts-entity-define.js"></script>
+<script src="~/Scripts/echarts-common.js"></script>
+<script>
+	$(function () {
+	    initPage();
+	    //初始加载，表格宽度自适应
+	    $(document).ready(function () {
+	        $('@(reportView)').resize();
+	    });
+	    //浏览器窗口大小变化后，表格宽度自适应
+	    $(window).resize(function () {
+	        $('@(reportView)').resize();
+	    });
+
+	})
+
+    function loadReport(param) {
+        var url = '/@(controllerName)/LoadEmployeeWorkAge';
+        if (param)
+        {
+            url = url + "?extendParams=" + param;
+        }
+        $.ajax({
+            url: url,
+            type: 'GET',
+            async: false,
+            success: function (result) {
+                if (result.status == 0)
+                {
+                    var viewEntity = new EmployeeWorkAgeReportPie(
+                        '@(reportView)',
+                        result.data.title,
+                        result.data.category,
+                        result.data.legend,
+                        result.data.series
+                        );
+
+                    showReportPie(viewEntity);
+                }
+                else
+                {
+                    showAlert(result.content);
+                }
+            }
+        });
+    }
+
+
+	function initPage() {
+	    $('#departmentId').combobox({
+	        width: '100%',
+	        //editable: false,
+	        url: '/Department/GetAllEntities',
+	        mode: 'remote',
+	        valueField: 'id',
+	        textField: 'name',
+	    });
+
+	    loadReport();
+	}
+
+	function getParamsJson() {
+	    var filterList = new Array;
+	    if ($('#departmentId').val().trim() != '') {
+	        var p = {
+	            "key": "departmentId",
+	            "action": "==",
+	            "value": $('#departmentId').val().trim()
+	        };
+	        filterList.push(p)
+	    }
+
+	    return JSON.stringify(filterList);
+	}
+
+
+	function filter() {
+
+	    var extendParams = getParamsJson();
+	    loadReport(extendParams);
+
+	}
+
+</script>
+
+

@@ -1,0 +1,134 @@
+﻿@model Apps.Model.Privilege.Role
+@{
+    Layout = null;
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divDialog = controllerName + "_divDialog";
+    string divContent = controllerName + "_divContent";
+    string formEntity = controllerName + "_formEntity";
+    string tabEntityList = controllerName + "_tabRightList";
+}
+
+<script>
+    function show() {
+        initDivDialog("分配权限");
+        //initForm();
+        initGrid();
+
+        $('#@(divDialog)').dialog('open');
+        $('#@(divDialog)').dialog('center');
+    }
+    $(function () {
+        show();
+    });
+
+    function destroyDialog() {
+        $('#@(divDialog)').dialog('destroy');
+        $('#@(divContent)').empty();
+    }
+
+    function initDivDialog(titleName) {
+        $('#@(divDialog)').dialog({
+            width: 450,
+            height: 600,
+            title: titleName,
+            modal: true,
+            closed: true,
+            collapsible: false,// 是否显示可折叠按钮
+            minimizable: false,// 是否显示最小化按钮
+            maximizable: false,// 是否显示最大化按钮
+            resizable: false,// 是否可以改变对话框窗口大小
+            onClose: destroyDialog,
+            // 对话框窗口底部按钮
+            buttons: [
+                {
+                    text: '保存',
+                    iconCls: 'icon-ok',
+                    handler: function () {
+                        saveAssin();
+                    }
+                },
+                {
+                    text: '取消',
+                    iconCls: 'icon-cancel',
+                    handler: function () {
+                        destroyDialog();
+                    }
+                }
+            ]
+        });
+    }
+
+    function initForm() {
+        $('#@(formEntity)').form({
+            url: '/@(controllerName)/EditEntity',
+            method: 'post',
+            success: function (result) {
+                var obj = JSON.parse(result);
+                if (obj.status != 0) {
+                    showAlert(obj.content);
+                }
+                else {
+                    destroyDialog();
+                    $('#@(tabEntityList)').treegrid('reload');
+                }
+            },
+        });
+    }
+
+    function initGrid()
+    {
+        var url = '/@(controllerName)/GetRights?id=@(ViewBag.id)';
+        var callbackFuns = [{ "name": "onContextMenu", "fun": onTreegridonContextMenu }];
+        var toolbar = [onAddEntity, onEditEntity, onRemoveEntity];
+        
+        var gridObj = new RoleAssignRightTreeGrid('@(tabEntityList)', toolbar);
+
+        initTreegrid(gridObj, url, callbackFuns);
+    }
+
+    function saveAssin()
+    {
+        var rightArray = new Array();
+        var rows = $('#@(tabEntityList)').treegrid('getChecked');
+        for (var i=0; i<rows.length; i++)
+        {
+            if (rows[i].rightId != -1)
+            {
+                rightArray.push(rows[i].rightId);
+            }
+        }
+
+        console.log(rows);
+
+        var data = JSON.stringify(rightArray);
+        var param = {
+            "roleId" : @(ViewBag.id),
+            "extendData": data
+        }
+
+        $.post('/@(controllerName)/AssignRight', param, function (result) {
+            if (result.status != 0) {
+                showAlert(result.content)
+            }
+            else {
+                showPrompt("保存成功")
+                destroyDialog();
+            }
+
+        }, "JSON").error(function (result) {
+        });
+    }
+
+</script>
+
+<div id="@(divDialog)" class="easyui-dialog">
+    <div class="easyui-layout" fit="true" border="false">
+        <div>
+            <table class="tab_center" id="@(tabEntityList)"></table>
+        </div>
+    </div>
+</div>
+
+
+

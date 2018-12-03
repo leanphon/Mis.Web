@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title = "模块管理";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divContent = controllerName + "_divContent";
+    string tabEntityList = controllerName + "_tabEntityList";
+
+}
+
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+    @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <table class="tab_center" id="@(tabEntityList)"></table>
+    </div>
+</div>
+<div id="@(divContent)"></div>
+
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+    <div data-options="iconCls:'icon-add'" onclick="onAddEntity()">增加</div>
+    <div data-options="iconCls:'icon-edit'" onclick="onEditEntity()">修改</div>
+    <div data-options="iconCls:'icon-remove'" onclick="onRemoveEntity()">删除</div>
+</div>
+
+<script>
+	$(function () {
+        initPage();
+
+		//初始加载，表格宽度自适应
+		$(document).ready(function(){
+		    onTreegridAdjust();
+		});
+	　　//浏览器窗口大小变化后，表格宽度自适应
+		$(window).resize(function(){
+		    onTreegridAdjust();
+		});
+	})
+
+	function initPage() {
+	    var url = '/@(controllerName)/GetEntities';
+	    var callbackFuns = [
+            { "name": "onDblClickRow", "fun": onEditEntity },
+            { "name": "onContextMenu", "fun": onTreegridonContextMenu }
+	    ];
+	    toolbar = [
+			{ text: '增加', iconCls: 'icon-add', handler: onAddEntity },
+			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+			{ text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+	    ];
+	    var gridObj = new ModuleTreeGrid('@(tabEntityList)', toolbar);
+
+	    initTreegrid(gridObj, url, callbackFuns);
+    }
+
+
+    function onAddEntity() {
+        $.ajax({
+            url: '/@(controllerName)/Create',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+    function onEditEntity() {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            showAlert("未选择")
+            return;
+        }
+
+        $('#@(divContent)').empty();
+
+        $.ajax({
+            url: '/@(controllerName)/Edit',
+            type: 'GET',
+            data: 'id='+row.id,
+            async: false,
+            success: function (data) {
+                $('#@(divContent)').append(data);
+            }
+        });
+    }
+    function onRemoveEntity(id) {
+        var row = $('#@(tabEntityList)').datagrid('getSelected');
+        if (null == row) {
+            showAlert("未选择")
+            return;
+        }
+        if (!confirm("确定删除吗")){
+            return;
+        }
+
+        $.ajax({
+            url: '/@(controllerName)/Delete',
+            type: 'GET',
+            data: 'id=' + row.id,
+            async: false,
+            success: function (result) {
+                //var obj = JSON.parse(result);
+                if (result.status != 0) {
+                    showAlert(result.content);
+                }
+                else {
+                    showAlert(result.content);
+                    $('#@(tabEntityList)').datagrid('reload');
+                }
+            }
+        });
+    }
+</script>
+
+
+
