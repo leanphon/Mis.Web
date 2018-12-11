@@ -400,6 +400,8 @@ function AssessmentRecordGrid(gridId, toolbar) {
                     editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
                 },
                 { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDateTime },
+
+                { field: 'status', title: '状态', width: 200,  },
     ]];
 
     this.toolbar = toolbar;
@@ -504,6 +506,7 @@ function SalaryRecordGrid(gridId, toolbar) {
                 { field: 'shouldTotal', title: '应发工资', width: 150, styler: positiveStyler, },
                 { field: 'actualTotal', title: '实发工资', width: 150, styler: positiveStyler, },
                 { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDate },
+                { field: 'status', title: '状态', width: 200 },
 
             ]];
 

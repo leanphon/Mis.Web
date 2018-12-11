@@ -57,7 +57,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -95,7 +95,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -137,7 +137,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -175,7 +175,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -218,7 +218,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -262,7 +262,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -308,7 +308,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -347,7 +347,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -406,7 +406,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -554,7 +554,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -591,7 +591,19 @@ namespace Apps.BLL
                                         e.emergencyContact,
                                         e.emergencyPhone,
                                         e.departmentId,
-                                        departmentName = e.department.name
+                                        departmentName = e.department.name,
+                                        e.nation,
+                                        e.nativePlace,
+                                        e.residence,
+                                        e.address,
+                                        e.political,
+                                        e.marriage,
+                                        e.education,
+                                        e.experience,
+                                        e.source,
+                                        e.contractSerial,
+                                        e.contractBegin,
+                                        e.contractEnd,
                                     };
 
                     // 先查询出部门及子部门，再过滤
@@ -663,6 +675,20 @@ namespace Apps.BLL
                                       leaveDate = e.leaveDate,
                                       emergencyContact = e.emergencyContact,
                                       emergencyPhone = e.emergencyPhone,
+
+                                      nation = e.nation,
+                                      nativePlace = e.nativePlace,
+                                      residence = e.residence,
+                                      address = e.address,
+                                      political = e.political,
+                                      marriage = e.marriage,
+                                      education = e.education,
+                                      experience = e.experience,
+                                      source = e.source,
+                                      contractSerial = e.contractSerial,
+                                      contractBegin = e.contractBegin,
+                                      contractEnd = e.contractEnd,
+
                                   };
 
 
@@ -680,7 +706,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -693,7 +719,12 @@ namespace Apps.BLL
             try
             {
                 var excelFile = new ExcelQueryFactory(fileName);
-                ExcelMapping<EmployeeExport>(excelFile);
+                var props = typeof(EmployeeExport).GetProperties();
+                foreach (var p in props)
+                {
+                    var colName = DataTableHelper.GetColumnDisplay(p);
+                    excelFile.AddMapping(p.Name, colName);
+                }
 
                 var tsheet = excelFile.Worksheet<EmployeeExport>(0);
                 var query = (from e in tsheet
@@ -721,6 +752,20 @@ namespace Apps.BLL
                                     leaveDate = e.leaveDate,
                                     emergencyContact = e.emergencyContact,
                                     emergencyPhone = e.emergencyPhone,
+
+                                    nation = e.nation,
+                                    nativePlace = e.nativePlace,
+                                    residence = e.residence,
+                                    address = e.address,
+                                    political = e.political,
+                                    marriage = e.marriage,
+                                    education = e.education,
+                                    experience = e.experience,
+                                    source = e.source,
+                                    contractSerial = e.contractSerial,
+                                    contractBegin = e.contractBegin,
+                                    contractEnd = e.contractEnd,
+
                                 }).ToList();
                 }
                     
@@ -759,16 +804,6 @@ namespace Apps.BLL
                 }
             }
         }
-        public static void ExcelMapping<T>(ExcelQueryFactory excelFile)
-        {
-            var props = typeof(T).GetProperties();
-            foreach (var p in props)
-            {
-                var colName = DataTableHelper.GetColumnDisplay(p);
-                excelFile.AddMapping(p.Name, colName);
-            }
-        }
-
 
         public OperateResult AnalyseByAge(QueryParam param = null)
         {
@@ -858,7 +893,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -953,7 +988,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -1048,13 +1083,16 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
             }
         }
 
+        /// <summary>
+        /// 用于统计薪酬等级划分
+        /// </summary>
         class KeyLevel
         {
             public string key { get; set; }
@@ -1184,7 +1222,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -1210,7 +1248,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -1248,7 +1286,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -1278,7 +1316,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -1316,7 +1354,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -1352,7 +1390,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -1388,7 +1426,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -1502,7 +1540,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 

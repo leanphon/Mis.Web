@@ -35,6 +35,11 @@
                         <td>
                             <input class="parm_control" name="month" id="month" />
                         </td>
+                        <th>状态：</th>
+                        <!--由于datebox框架上面的数据必须是时间格式的，所以我们用editable="false"来禁止用户手动输入，以免报错-->
+                        <td>
+                            <input class="parm_control" name="status_filter" id="status_filter" />
+                        </td>
                     </tr>
                 </table>
             </form>
@@ -52,6 +57,8 @@
 <div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
     <!--放置一个隐藏的菜单Div-->
 </div>
+
+<div id="@(divContent)"></div>
 
 <script>
 	$(function () {
@@ -85,26 +92,61 @@
         });
         $('#month').datebox('setValue', new Date);
 
+        $('#status_filter').combobox({
+	        width: '100%',
+	        //editable: false,
+	        //url: '/Department/GetAllEntities',
+	        //mode: 'remote',
+	        valueField: 'id',
+	        textField: 'name',
+	        data: [
+	            { id: '未审核', name: '未审核' },
+                { id: '审核', name: '审核' }
+	            ]
+	    });
+
+
         var url = '/@(controllerName)/GetEntities';
 	    var callbackFuns = [
             { "name": "onBeforeLoad", "fun": onBeforeLoad },
+	        { "name": "onBeforeEdit", "fun": onBeforeEdit },
             { "name": "onClickRow", "fun": onClickRow },
             { "name": "onDblClickRow", "fun": onDblClickRow, },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
 
 	    toolbar = [
+	        { text: '锁定', iconCls: 'icon-lock', handler: onLock },
+	        { text: '全部锁定', iconCls: 'icon-lock', handler: onLockAll },
+	        { text: '解锁', iconCls: 'icon-unlock', handler: onUnlock },
+	        { text: '全部解锁', iconCls: 'icon-unlock', handler: onUnlockAll },
+	        '-',
 			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
-            { text: '锁定', iconCls: 'icon-lock', handler: onLock },
-            { text: '锁定', iconCls: 'icon-unlock', handler: onUnlock },
+	        '-',
             { text: '导出全部', iconCls: 'icon-export', handler: onExportAll },
+	        { text: '导入考核', iconCls: 'icon-upload', handler: onImportExcel },
+	        { text: '下载考核模板', iconCls: 'icon-export', handler: onDownloadTemplate },
+
 
 	    ];
 
 	    var gridObj = new AssessmentRecordGrid('@(tabEntityList)', toolbar);
         initDatagrid(gridObj, url, callbackFuns);
 
-    }
+	}
+
+	function onBeforeEdit() {
+	    console.log("onBeforeEdit")
+	    var row = $('#@(tabEntityList)').datagrid('getSelected');
+	    if (null == row) {
+	        return false;
+	    }
+        if (row.status == "未审核") {
+            return true;
+        }
+
+	    return false;
+	}
 
     function getParamsJson() {
         var filterList = new Array;
@@ -129,6 +171,14 @@
                 "key": "month",
                 "action": "==",
                 "value": $('#month').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#status_filter').val().trim() != '') {
+            var p = {
+                "key": "status",
+                "action": "==",
+                "value": $('#status_filter').val().trim()
             };
             filterList.push(p)
         }
@@ -159,6 +209,20 @@
         window.location.href = '/@(controllerName)/ExportAll?extendParams='+getParamsJson();
 
     }
+	function onImportExcel() {
+	    $.ajax({
+	        url: '/@(controllerName)/ShowImport',
+	        type: 'GET',
+	        async: false,
+	        success: function (data) {
+	            $('#@(divContent)').append(data);
+	        }
+	    });
+	}
+
+	function onDownloadTemplate() {
+	    window.location.href = '/Template/员工考核录入表格模板.xlsx';
+	}
 
     function clearRow() {
         var row = $('#@(tabEntityList)').datagrid('getSelected');
@@ -169,73 +233,149 @@
 
     }
 
-    var editIndex = undefined;//定义全局变量：当前编辑的行
-    function onClickRow(index) {
-        if (editIndex != index) {
-            if (endEditing()) {
-                //$('#@(tabEntityList)').datagrid('selectRow', index).datagrid('beginEdit', index);
-                //editIndex = index;
-                $('#@(tabEntityList)').datagrid('selectRow', editIndex);
-            } else {
-
-            }
-        }
-    }
-
-    function onDblClickRow(index) {
-        if (editIndex != index) {
-            if (endEditing()) {
-                $('#@(tabEntityList)').datagrid('selectRow', index).datagrid('beginEdit', index);
-                editIndex = index;
-            } else {
-                $('#@(tabEntityList)').datagrid('selectRow', editIndex);
-            }
-        }
-    }
-    function endEditing() {
-        if (editIndex == undefined) {
-            return true
-        }
-        if ($('#@(tabEntityList)').datagrid('validateRow', editIndex)) {
-            $('#@(tabEntityList)').datagrid('endEdit', editIndex);
-            editIndex = undefined;
-            return true;
-        } else {
-            return false;
-        }
-    }
 
     function onEditEntity() {
-        var row = $('#@(tabEntityList)').datagrid('getSelected');
-        if (null == row) {
+        if (endEditing($('#@(tabEntityList)'))) {
+            var updatedRows = $('#@(tabEntityList)').datagrid('getSelected');
+            if (updatedRows.length == 0) {
+                showAlert('无修改数据');
+                return;
+            }
+
+            updatedRows.inputDate = formatDateTime(updatedRows.inputDate);
+
+            var param = {
+                "assessmentData": JSON.stringify(updatedRows)
+            }
+
+            $.post('/@(controllerName)/EditEntity', param, function (result) {
+                if (result.status != 0) {
+                    showAlert(result.content)
+                }
+                else {
+                    showPrompt("保存成功");
+                    $('#@(tabEntityList)').datagrid('reload');
+                }
+
+            }, "JSON").error(function (result) {
+            });
+        }
+    }
+
+    function onLock() {
+        var rows = $('#@(tabEntityList)').datagrid('getSelected');
+        console.log(rows);
+
+        if (rows.length == 0) {
             showAlert("未选择")
             return;
         }
 
-
-        $.ajax({
-            url: '/@(controllerName)/Edit',
-            type: 'GET',
-            data: 'id=' + row.id,
-            async: false,
-            success: function (data) {
-                $('#@(divContent)').append(data);
-            }
-        });
-        $.post('/@(controllerName)/SaveSingle', param, function (result) {
+        var param = {
+            "status": "审核",
+            "id": rows.id
+        }
+        console.log(param);
+        $.post('/@(controllerName)/UpdateStatus', param, function (result) {
             if (result.status != 0) {
                 showAlert(result.content)
             }
             else {
-                showPrompt("保存成功")
+                showPrompt("锁定成功");
+                $('#@(tabEntityList)').datagrid('reload');
             }
 
         }, "JSON").error(function (result) {
         });
+
+
     }
-    function onLock() {
-    }
-    function onUnlock() {
+	function onLockAll() {
+	    var rows = $('#@(tabEntityList)').datagrid('getRows');
+
+	    if (rows.length == 0) {
+	        showAlert("未选择")
+	        return;
+	    }
+	    var idList = new Array();
+	    for( var i=0; i<rows.length; i++)
+	    {
+	        idList.push(rows[i].id);
+	    }
+
+	    var param = {
+	        "status": "审核",
+	        "assessmentData": JSON.stringify(idList)
+	    }
+	    console.log(param);
+
+	    $.post('/@(controllerName)/UpdateStatusBatch', param, function (result) {
+	        if (result.status != 0) {
+	            showAlert(result.content)
+	        }
+	        else {
+	            showPrompt("锁定成功");
+	            $('#@(tabEntityList)').datagrid('reload');
+	        }
+
+	    }, "JSON").error(function (result) {
+	    });
+	}
+	function onUnlock() {
+	    var rows = $('#@(tabEntityList)').datagrid('getSelected');
+
+	    if (rows.length == 0) {
+	        showAlert("未选择")
+	        return;
+	    }
+
+	    var param = {
+	        "status": "未审核",
+	        "id": rows.id
+	    }
+	    console.log(param);
+
+	    $.post('/@(controllerName)/UpdateStatus', param, function (result) {
+	        if (result.status != 0) {
+	            showAlert(result.content)
+	        }
+	        else {
+	            showPrompt("解锁成功");
+	            $('#@(tabEntityList)').datagrid('reload');
+	        }
+
+	    }, "JSON").error(function (result) {
+	    });
+	}
+    function onUnlockAll() {
+        var rows = $('#@(tabEntityList)').datagrid('getRows');
+        if (rows.length == 0) {
+            showAlert("未选择")
+            return;
+        }
+        var idList = new Array();
+        for( var i=0; i<rows.length; i++)
+        {
+            idList.push(rows[i].id);
+        }
+
+        var param = {
+            "status": "未审核",
+            "assessmentData": JSON.stringify(idList)
+        }
+        console.log(param);
+
+        $.post('/@(controllerName)/UpdateStatusBatch', param, function (result) {
+            if (result.status != 0) {
+                showAlert(result.content)
+            }
+            else {
+                showPrompt("解锁成功");
+                $('#@(tabEntityList)').datagrid('reload');
+            }
+
+        }, "JSON").error(function (result) {
+        });
     }
 
 </script>

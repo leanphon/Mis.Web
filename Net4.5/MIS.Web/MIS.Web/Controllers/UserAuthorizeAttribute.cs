@@ -19,7 +19,8 @@ namespace MIS.Web.Controllers
 
                 return;
             }
-            else if (user.name == "root")
+
+            if (user.name == "root")
             {
                 return;
             }
@@ -31,11 +32,21 @@ namespace MIS.Web.Controllers
 
                 using (SystemDB db = new SystemDB())
                 {
-                    var elements = from e in db.roleRightsList
-                                   join r in db.rightList on e.rightId equals r.id
-                                   where e.roleId == user.roleId
-                                   select e;
-                    if (elements.Count() <= 0)
+                    var role = (from e in db.roleList.Include("rightList")
+                        where e.id == user.roleId
+                        select e).FirstOrDefault();
+                    if (role == null)
+                    {
+                        filterContext.RequestContext.HttpContext.Response.Write("无权访问");
+                        filterContext.RequestContext.HttpContext.Response.End();
+
+                        return;
+                    }
+
+                    var right = (from e in role.rightList
+                        where e.url == url
+                        select e).FirstOrDefault();
+                    if (right == null)
                     {
                         filterContext.RequestContext.HttpContext.Response.Write("无权访问");
                         filterContext.RequestContext.HttpContext.Response.End();

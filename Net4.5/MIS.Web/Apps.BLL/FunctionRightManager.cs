@@ -39,7 +39,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -78,7 +78,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -120,7 +120,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -156,7 +156,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -179,7 +179,28 @@ namespace Apps.BLL
                                        e.name,
                                        e.url,
                                        e.icon,
+                                       e.show,
+                                       e.authorize
                                    };
+
+                    #region 查询过滤
+                    if (param != null && param.filters != null)
+                    {
+
+                        // 过滤显示
+                        #region 过滤显示
+                        if (param.filters.Keys.Contains("show"))
+                        {
+                            var p = param.filters["show"];
+                            bool v = Convert.ToBoolean(p.value);
+                            elements = elements.Where(t => t.show == v);
+                        }
+                        #endregion
+
+                    }
+
+                    #endregion
+
 
                     return new OperateResult
                     {
@@ -192,7 +213,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -214,8 +235,28 @@ namespace Apps.BLL
                                        e.name,
                                        e.url,
                                        e.icon,
+                                       e.show,
                                        e.authorize
                                    };
+
+                    #region 查询过滤
+                    if (param != null && param.filters != null)
+                    {
+
+                        // 过滤显示
+                        #region 过滤显示
+                        if (param.filters.Keys.Contains("show"))
+                        {
+                            var p = param.filters["show"];
+                            bool v = Convert.ToBoolean(p.value);
+                            elements = elements.Where(t => t.show == v);
+                        }
+                        #endregion
+
+                    }
+
+                    #endregion
+
 
                     int total = elements.Count();
                     int pages = 0;
@@ -256,7 +297,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 

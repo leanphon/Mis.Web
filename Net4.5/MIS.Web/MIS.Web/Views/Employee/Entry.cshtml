@@ -1,6 +1,8 @@
 ﻿@model Apps.Model.Employee
 @{
-    Layout = null;
+    ViewBag.Title = "入职";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
     string divDialog = controllerName + "_divDialog";
@@ -10,11 +12,11 @@
 }
 <script>
     function show() {
-        initDivDialog("入职");
+        //initDivDialog("入职");
         initForm();
 
-        $('#@(divDialog)').dialog('open');
-        $('#@(divDialog)').dialog('center');
+        //$('#@(divDialog)').dialog('open');
+        //$('#@(divDialog)').dialog('center');
     }
     $(function () {
         show();
@@ -60,12 +62,14 @@
             url: '/@(controllerName)/CreateEntity',
             method: 'post',
             success: function (result) {
+                console.log(result)
                 var obj = JSON.parse(result);
                 if (obj.status != 0) {
                     showAlert(obj.content);
                 }
                 else {
-                    destroyDialog();
+                    //destroyDialog();
+                    document.location.href = '/@(controllerName)';
                 }
             },
         });
@@ -87,7 +91,7 @@
             formatter: databoxFormat,
             parser: databoxParser
         });
-        
+
         $('#entryDate').datebox({
             width: '100%',
             formatter: databoxFormat,
@@ -165,12 +169,30 @@
         });
 
     }
+
+    function submit() {
+        //document.location.href = '/@(controllerName)';
+        $('#@(formEntity)').submit();
+    }
 </script>
 
-<div id="@(divDialog)" class="easyui-dialog">
+<style type="text/css">
+    .div-center {
+        margin: 0 auto;
+        width: 700px;
+        font-size: 15px;
+    }
+    .a-button {
+        margin: 15px;
+        background: aqua;
+        width: 150px;
+    }
+</style>
+
+<div id="@(divDialog)" class="easyui-dialog2 div-center">
     <form id="@(formEntity)" action="" method="post">
         @Html.AntiForgeryToken()
-        <table style="margin:auto;width:90%">
+        <table style="margin:auto; width: 90%; border: 1px solid #f0fff0">
             <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.name, new { @class = "lab" })
@@ -262,18 +284,18 @@
                 </td>
             </tr>
             <tr>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.nativePlace, new { @class = "lab" })
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.nativePlace, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
-                <td class="cols_4_left">
-                    @Html.LabelFor(model => model.residence, new { @class = "lab" })
-                </td>
-                <td class="cols_4_right">
-                    @Html.EditorFor(model => model.residence, new { htmlAttributes = new { @class = "parm_control" } })
-                </td>
+            <td class="cols_4_left">
+                @Html.LabelFor(model => model.nativePlace, new { @class = "lab" })
+            </td>
+            <td class="cols_4_right">
+                @Html.EditorFor(model => model.nativePlace, new { htmlAttributes = new { @class = "parm_control" } })
+            </td>
+            <td class="cols_4_left">
+                @Html.LabelFor(model => model.residence, new { @class = "lab" })
+            </td>
+            <td class="cols_4_right">
+                @Html.EditorFor(model => model.residence, new { htmlAttributes = new { @class = "parm_control" } })
+            </td>
             <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.address, new { @class = "lab" })
@@ -347,6 +369,8 @@
             </tr>
 
         </table>
+        <a href="#" onclick="submit()" class="easyui-linkbutton a-button"  >入职</a>
+
     </form>
 </div>
 

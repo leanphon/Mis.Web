@@ -21,6 +21,8 @@
 
         $('#@(divDialog)').dialog('open');
         $('#@(divDialog)').dialog('center');
+
+        openFormEdit();
     }
     $(function () {
         show();
@@ -29,6 +31,7 @@
     function destroyDialog() {
         $('#@(divDialog)').dialog('destroy');
         $('#@(divContent)').empty();
+        closeFormEdit();
     }
 
     function initDivDialog(titleName) {

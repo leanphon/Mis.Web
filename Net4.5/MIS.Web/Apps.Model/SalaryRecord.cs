@@ -73,6 +73,13 @@ namespace Apps.Model
 
         [Display(Name = "录入时间")]
         public DateTime inputDate { get; set; }
+
+        /// <summary>
+        /// 可取值：待审核、已审核
+        /// </summary>
+        [Display(Name = "状态")]
+        public string status { get; set; }
+
     }
 
 
@@ -148,5 +155,9 @@ namespace Apps.Model
 
         [Display(Name = "录入时间")]
         public DateTime inputDate { get; set; }
+
+        [Display(Name = "状态")]
+        public string status { get; set; }
+
     }
 }
