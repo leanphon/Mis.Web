@@ -49,7 +49,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -106,7 +106,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -162,7 +162,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -198,7 +198,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -231,7 +231,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -294,7 +294,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -342,6 +342,8 @@ namespace Apps.BLL
                             content = "登录系统"
                         });
 
+                        element.passwd = "******";
+
                         return new OperateResult
                         {
                             status = OperateStatus.Success,
@@ -361,7 +363,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message + ex.InnerException !=null ? ex.InnerException.Message : "",
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -384,42 +386,6 @@ namespace Apps.BLL
             {
                 content = "用户名或密码不正确"
             };
-
-            //using (SystemDB db = new SystemDB())
-            //{
-            //    try
-            //    {
-            //        var passwd = MD5Encode.Encode16(model.passwd);
-
-            //        var element = (from e in db.rootUserList
-            //                       where e.passwd == passwd && e.name == model.name
-            //                       select e
-            //                        ).FirstOrDefault();
-            //        if (element != null)
-            //        {
-            //            return new OperateResult
-            //            {
-            //                status = OperateStatus.Success,
-            //                content = "登录成功",
-            //                data = element
-            //            };
-            //        }
-
-
-            //        return new OperateResult
-            //        {
-            //            content = "用户名或密码不正确"
-            //        };
-
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        return new OperateResult
-            //        {
-            //            content = ex.Message,
-            //        };
-            //    }
-            //}
 
         }
 
@@ -469,7 +435,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -522,7 +488,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 

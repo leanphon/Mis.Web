@@ -82,6 +82,16 @@
             textField: 'name',
         });
 
+        $('#show').combobox({
+            width: '100%',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '1', text: '是' },
+                { value: '0', text: '否' }
+            ]
+        });
         $('#authorize').combobox({
             width: '100%',
             editable: false,
@@ -92,7 +102,6 @@
                 { value: '否', text: '否' }
             ]
         });
-
     }
 </script>
 
@@ -135,6 +144,15 @@
                 <td class="cols_2_right">
                     <input class="parm_control" name="icon" id="icon" type="file"
                            accept="" />
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.show, new { @class = "lab" })
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" type="text" id="show" name="show" />
                 </td>
             </tr>
             <tr>

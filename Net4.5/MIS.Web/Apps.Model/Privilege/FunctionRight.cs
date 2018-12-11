@@ -34,6 +34,11 @@ namespace Apps.Model.Privilege
         [Display(Name = "授权")]
         public string authorize { get; set; }
 
+        [Display(Name = "可显示")]
+        public bool show { get; set; }
+
+
+
         [JsonIgnore]
         public ICollection<Role> roleList { get; set; }
     }

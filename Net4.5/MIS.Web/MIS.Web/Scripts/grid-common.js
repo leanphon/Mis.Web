@@ -118,7 +118,9 @@ function onDatagridRowContextMenu(e, rowIndex, rowData) { //右键时触发事�
 
 function onClickRow(index) {
     var editIndex = $(this).attr("editIndex")
-
+    console.log(editIndex);
+    console.log(index);
+     
     if (editIndex != index) {
         if (endEditing($(this))) {
             $(this).datagrid('selectRow', editIndex);
@@ -131,6 +133,8 @@ function onClickRow(index) {
 
 function onDblClickRow(index) {
     var editIndex = $(this).attr("editIndex");
+    console.log(editIndex);
+    console.log(index);
 
     if (editIndex != index) {
         if (endEditing($(this))) {
@@ -140,10 +144,12 @@ function onDblClickRow(index) {
 
             $.data(this, "lastRowData", row)
 
-            console.log(row)
+            console.log("begin edit")
 
-            $(this).datagrid('beginEdit', index);
-            $(this).attr("editIndex", index);
+            if ($(this).datagrid('beginEdit', index)) {
+                $(this).attr("editIndex", index);
+            }
+
         } else {
             $(this).datagrid('selectRow', editIndex);
         }
@@ -152,6 +158,7 @@ function onDblClickRow(index) {
 
 function endEditing(gridObj) {
     var editIndex = gridObj.attr("editIndex");
+    console.log(editIndex);
 
     if (editIndex == -1) {
         return true
@@ -195,6 +202,7 @@ function ExitEditing(gridObj) {
         return false;
     }
 }
+
 
 
 /************** end 表格编辑相关  *************/

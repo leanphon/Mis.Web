@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 using Apps.Model;
 using Apps.Model.Privilege;
 using Apps.Model.Utility;
@@ -24,6 +25,25 @@ namespace MIS.Web.Controllers
             if (c != null)
             {
                 ViewBag.companyName = c.name;
+            }
+
+
+            QueryParam queryParam = new QueryParam {filters = new Dictionary<string, FilterModel>()};
+
+            FilterModel m = new FilterModel
+            {
+                action = "==",
+                dataType = "bool",
+                key = "show",
+                value = Convert.ToString(true)
+            };
+
+            queryParam.filters.Add("show", m);
+            FunctionRightManager manager = new FunctionRightManager();
+            OperateResult or = manager.GetAll(queryParam);
+            if (or.status == OperateStatus.Success)
+            {
+                return View(or.data);
             }
 
 
@@ -73,15 +93,7 @@ namespace MIS.Web.Controllers
             }
 
             UserManager manager = new UserManager();
-            OperateResult or;
-            if (model.name == "root")
-            {
-                or = manager.RootLogin(model);
-            }
-            else
-            {
-                or = manager.Login(model);
-            }
+            var or = model.name == "root" ? manager.RootLogin(model) : manager.Login(model);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

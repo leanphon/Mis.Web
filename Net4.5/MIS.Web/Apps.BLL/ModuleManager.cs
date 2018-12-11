@@ -39,7 +39,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -88,7 +88,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -141,7 +141,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -177,7 +177,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -192,7 +192,8 @@ namespace Apps.BLL
                 try
                 {
                     var elements = (from e in db.moduleList
-                                    select new
+                                    orderby e.showIndex ascending 
+                            select new
                                     {
                                         e.id,
                                         e.name,
@@ -212,7 +213,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -227,6 +228,7 @@ namespace Apps.BLL
                 try
                 {
                     var elements = from e in db.moduleList
+                        orderby e.showIndex ascending
                                    select new
                                    {
                                        e.id,
@@ -274,7 +276,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 

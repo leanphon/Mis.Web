@@ -44,7 +44,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -106,7 +106,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -136,7 +136,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -172,7 +172,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -218,7 +218,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -261,7 +261,8 @@ namespace Apps.BLL
                                        e.tax,
                                        e.shouldTotal,
                                        e.actualTotal,
-                                       e.inputDate
+                                       e.inputDate,
+                                       e.status
                                    };
 
                     // 先查询出部门及子部门，再过滤
@@ -365,7 +366,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -527,7 +528,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -778,7 +779,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 

@@ -1,10 +1,12 @@
 ﻿using Apps.Model;
 using Apps.Model.Utility;
+using LinqToExcel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Entity;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 
@@ -42,7 +44,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -112,7 +114,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -126,6 +128,7 @@ namespace Apps.BLL
             {
                 try
                 {
+                    model.inputDate = DateTime.Now;
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
@@ -141,7 +144,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -178,6 +181,77 @@ namespace Apps.BLL
             return result;
         }
 
+        public OperateResult UpdateStatusBatch(List<long> listModel, string status)
+        {
+            bool fail = false;
+            OperateResult result = new OperateResult();
+
+            foreach (var id in listModel)
+            {
+                OperateResult or = UpdateStatus(id, status);
+                if (or.status != OperateStatus.Success)
+                {
+                    fail = true;
+
+                    result.content += "id(" + id + ") 考核数据保存失败, error（" + or.content + "） ;";
+                }
+
+            }
+            if (!fail)
+            {
+                result.status = OperateStatus.Success;
+                result.content = "批量考核数据保存成功";
+            }
+            return result;
+        }
+
+        public OperateResult UpdateStatus(long id, string status)
+        {
+            using (SystemDB db = new SystemDB())
+            {
+                if (status != "未审核" && status != "审核")
+                {
+                    return new OperateResult
+                    {
+                        content = "数据错误",
+                    };
+                }
+
+                try
+                {
+                    var element = (from m in db.assessmentInfoList
+                            where id == m.id
+                            select m
+                        ).AsNoTracking().FirstOrDefault();
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    element.status = status;
+                    db.Entry(element).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                    };
+
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
+                    };
+                }
+
+            }
+        }
 
         public OperateResult GetById(long id)
         {
@@ -209,7 +283,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -243,7 +317,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -259,6 +333,7 @@ namespace Apps.BLL
                     var elements = from e in db.assessmentInfoList.Include("employee").Include("department")
                                    select new
                                    {
+                                       e.id,
                                        e.month,
                                        employeeId = e.employee.id,
                                        employeeNumber = e.employee.number,
@@ -277,13 +352,16 @@ namespace Apps.BLL
                                        e.annualVacationTime,
                                        e.performanceScore,
                                        e.benefitScore,
-                                       e.inputDate
+                                       e.inputDate,
+                                       e.status
+
                                    };
 
-                    // 先查询出部门及子部门，再过滤
-                    #region
+                    #region 查询过滤
                     if (param != null && param.filters != null)
                     {
+                        // 先查询出部门及子部门，再过滤
+                        #region 过滤部门
                         if (param.filters.Keys.Contains("departmentId"))
                         {
                             var p = param.filters["departmentId"];
@@ -295,8 +373,8 @@ namespace Apps.BLL
                             {
                                 // 查找属于给定部门的员工
                                 var sons = from e in db.departmentList
-                                           where e.parentId == id
-                                           select e.id;
+                                    where e.parentId == id
+                                    select e.id;
                                 IQueryable<long> many = sons;
                                 // 查找属于给定部门子部门的员工
                                 foreach (var it in sons)
@@ -308,38 +386,46 @@ namespace Apps.BLL
 
                             // 所有部门
                             var departments = (from e in db.departmentList
-                                               where e.id == departmentId
-                                               select e.id).Concat(GetSonFun(departmentId));
+                                where e.id == departmentId
+                                select e.id).Concat(GetSonFun(departmentId));
 
                             elements = elements.Where(t => departments.Contains(t.departmentId));
                         }
-                    }
-                    #endregion
+                        #endregion
 
-                    // 过滤月份
-                    #region
-                    if (param != null && param.filters != null)
-                    {
+                        // 过滤月份
+                        #region 过滤月份
                         if (param.filters.Keys.Contains("month"))
                         {
                             var p = param.filters["month"];
                             elements = elements.Where(t => t.month == p.value);
                         }
-                    }
-                    #endregion
+                        #endregion
 
-                    // 模糊过滤名字
-                    #region
-                    if (param != null && param.filters != null)
-                    {
+                        // 模糊过滤员工名字
+                        #region 过滤名字
                         if (param.filters.Keys.Contains("employeeName"))
                         {
                             var p = param.filters["employeeName"];
                             elements = elements.Where(t => t.employeeName.Contains(p.value));
                         }
-                    }
-                    #endregion
+                        #endregion
 
+                        // 精确过滤状态
+                        #region 过滤状态
+                        if (param != null && param.filters != null)
+                        {
+                            if (param.filters.Keys.Contains("status"))
+                            {
+                                var p = param.filters["status"];
+                                elements = elements.Where(t => t.status.Equals(p.value));
+                            }
+                        }
+                        #endregion
+
+                    }
+
+                    #endregion
 
 
                     int total = elements.Count();
@@ -381,7 +467,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -529,7 +615,7 @@ namespace Apps.BLL
         //        {
         //            return new OperateResult
         //            {
-        //                content = ex.Message,
+        //                content = Model.Utility.Utility.GetExceptionMsg(ex),
         //            };
         //        }
 
@@ -666,7 +752,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -705,7 +791,8 @@ namespace Apps.BLL
                                        e.annualVacationTime,
                                        e.performanceScore,
                                        e.benefitScore,
-                                       e.inputDate
+                                       e.inputDate,
+                                       e.status
                                    };
 
                     // 先查询出部门及子部门，再过滤
@@ -807,7 +894,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -815,6 +902,84 @@ namespace Apps.BLL
 
         }
 
+        public OperateResult ImportExcel(string fileName)
+        {
+            try
+            {
+                var excelFile = new ExcelQueryFactory(fileName);
+                var props = typeof(AssessmentInfoExport).GetProperties();
+                foreach (var p in props)
+                {
+                    var colName = DataTableHelper.GetColumnDisplay(p);
+                    excelFile.AddMapping(p.Name, colName);
+                }
+
+                var tsheet = excelFile.Worksheet<AssessmentInfoExport>(0);
+                var query = (from e in tsheet
+                             select e).ToList();
+
+                IEnumerable<AssessmentInfo> elements;
+                using (SystemDB db = new SystemDB())
+                {
+                    elements = (from e in query
+                                join d in db.employeeList
+                                 on e.employeeNumber equals d.number
+                                select new AssessmentInfo
+                                {
+                                    month = e.month,
+                                    employeeId = d.id,
+                                    shouldWorkTime = e.shouldWorkTime,
+                                    actualWorkTime = e.actualWorkTime,
+                                    normalOvertime = e.normalOvertime,
+                                    lateTime = e.lateTime,
+                                    earlyTime = e.earlyTime,
+                                    absenteeismTime = e.absenteeismTime,
+                                    personalLeaveTime = e.personalLeaveTime,
+                                    sickLeaveTime = e.sickLeaveTime,
+                                    annualVacationTime = e.annualVacationTime,
+                                    performanceScore = e.performanceScore,
+                                    benefitScore = e.benefitScore,
+                                    inputDate = e.inputDate,
+                                    status = e.status,
+
+                                }).ToList();
+                }
+
+
+
+                bool fail = false;
+                OperateResult result = new OperateResult();
+                foreach (var model in elements)
+                {
+                    OperateResult or = Add(model);
+                    if (or.status != OperateStatus.Success)
+                    {
+                        fail = true;
+
+                        result.content += "工号(" + model.employeeId + ")数据保存失败, error（" + or.content + "） ;";
+                    }
+
+                }
+                if (!fail)
+                {
+                    result.status = OperateStatus.Success;
+                    result.content = "批量数据保存成功";
+                }
+                return result;
+
+            }
+            catch (Exception ex)
+            {
+                throw (ex);
+            }
+            finally
+            {
+                if (File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+            }
+        }
 
     }
 }

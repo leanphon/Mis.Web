@@ -109,7 +109,7 @@
         var url = '/@(controllerName)/GetEmployeesByPager';
 	    var callbackFuns = [
             { "name": "onBeforeLoad", "fun": onBeforeLoad },
-            { "name": "onClickRow", "fun": onClickRow },
+	        { "name": "onClickRow", "fun": onClickRow },
             { "name": "onDblClickRow", "fun": onDblClickRow, },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
@@ -118,15 +118,14 @@
 			//{ text: '退出编辑', iconCls: 'icon-save', handler: onExitEdit },
             { text: '保存当前', iconCls: 'icon-save', handler: onSaveSingle },
             { text: '保存全部', iconCls: 'icon-save', handler: onSaveAll },
-            { text: '导入', iconCls: 'icon-upload', handler: onImport },
-            { text: '下载模板', iconCls: 'icon-export', handler: onDownloadTemplate },
+            
 	    ];
 
 	    var gridObj = new AssessmentInputGrid('@(tabEntityList)', toolbar);
 
         initDatagrid(gridObj, url, callbackFuns);
 
-    }
+	}
 
     function getParamsJson() {
         var filterList = new Array;
@@ -246,15 +245,6 @@
             });
         }
     }
-
-    function onDownloadTemplate() {
-        window.location.href = '/Template/员工考核录入表格模板.xlsx';
-    }
-
-    function onImport() {
-
-    }
-
 
 </script>
 

@@ -40,7 +40,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -78,7 +78,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -120,7 +120,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
             }
@@ -156,7 +156,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -184,7 +184,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -240,7 +240,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -316,7 +316,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 
@@ -367,7 +367,7 @@ namespace Apps.BLL
                 {
                     return new OperateResult
                     {
-                        content = ex.Message,
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
                     };
                 }
 

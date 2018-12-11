@@ -25,6 +25,13 @@ namespace Apps.Model
         [Display(Name = "月份")]
         public string month { get; set; }
 
+        [Display(Name = "绩效得分")]
+        public double? performanceScore { get; set; }
+
+
+        [Display(Name = "效益得分")]
+        public double? benefitScore { get; set; }
+
         [Display(Name = "应出勤")]
         public double shouldWorkTime { get; set; }
 
@@ -55,17 +62,14 @@ namespace Apps.Model
         [Display(Name = "使用年假")]
         public double? annualVacationTime { get; set; }
 
-
-        [Display(Name = "绩效得分")]
-        public double? performanceScore { get; set; }
-
-
-        [Display(Name = "效益得分")]
-        public double? benefitScore { get; set; }
-
-
         [Display(Name = "录入时间")]
         public DateTime inputDate { get; set; }
+
+        /// <summary>
+        /// 可取值：待审核、已审核
+        /// </summary>
+        [Display(Name = "状态")]
+        public string status { get; set; }
 
 
     }
@@ -130,6 +134,8 @@ namespace Apps.Model
         [Display(Name = "录入时间")]
         public DateTime inputDate { get; set; }
 
+        [Display(Name = "状态")]
+        public string status { get; set; }
 
     }
 }

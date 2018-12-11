@@ -79,6 +79,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
+
             EmployeeManager manager = new EmployeeManager();
 
             OperateResult or = manager.Add(model);

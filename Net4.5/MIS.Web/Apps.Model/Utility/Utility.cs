@@ -16,5 +16,18 @@ namespace Apps.Model.Utility
             }
             return years;
         }
+
+        public static string GetExceptionMsg(Exception ex)
+        {
+            string msg = ex.Message;
+            Exception inner = ex.InnerException;
+            while (inner != null)
+            {
+                msg += ";" + inner.Message;
+                inner = inner.InnerException;
+            }
+
+            return msg;
+        }
     }
 }
