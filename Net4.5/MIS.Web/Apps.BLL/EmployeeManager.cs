@@ -18,10 +18,11 @@ namespace Apps.BLL
     {
         public OperateResult Add(Employee model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var match = from m in db.employeeList
                                 where m.number.Equals(model.number)
                                 select m;
@@ -39,7 +40,7 @@ namespace Apps.BLL
                         EmployeeDeed deed = new EmployeeDeed
                         {
                             type = EmployeeDeedType.Entry,
-                            time= DateTime.Now,
+                            time = DateTime.Now,
                             employeeId = model.id,
                         };
 
@@ -53,22 +54,23 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult Remove(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = db.employeeList.Find(id);
 
                     if (element == null)
@@ -91,24 +93,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult Update(Employee model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.employeeList
                                     where e.id != model.id && e.number == model.number
                                     select e
@@ -133,23 +136,24 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult GetSalaryInfoById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.salaryInfoList.Include("levelInfo").Include("employee")
                                    .Include("performanceInfo").Include("benefitInfo")
                                    where m.employeeId == id
@@ -171,24 +175,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult UpdateSalary(SalaryInfo model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.salaryInfoList
                                     where e.id == model.id
                                     select e
@@ -214,24 +219,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         //public OperateResult UpdateState(long id, EmployeeState state)
         public OperateResult Formal(long id, string state, DateTime time)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var m = (from e in db.employeeList
                              where e.id == id
                              select e
@@ -258,23 +264,24 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult Leave(long id, string state, DateTime time)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var m = (from e in db.employeeList
                              where e.id == id
                              select e
@@ -304,25 +311,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
 
 
         public OperateResult GetById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.employeeList.Include("department")
                                    where id == m.id
                                    select m
@@ -343,24 +351,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult GetAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.employeeList
                                     select new
                                     {
@@ -402,24 +411,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult GetByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.employeeList
                                    select new
                                    {
@@ -550,15 +561,16 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
             }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
         }
 
 
@@ -569,42 +581,43 @@ namespace Apps.BLL
         /// <returns></returns>
         public OperateResult ExportAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.employeeList
-                                    select new
-                                    {
-                                        e.id,
-                                        e.name,
-                                        e.number,
-                                        e.sex,
-                                        e.phone,
-                                        e.idCard,
-                                        e.birthday,
-                                        e.bankCard,
-                                        e.state,
-                                        e.entryDate,
-                                        e.formalDate,
-                                        e.leaveDate,
-                                        e.emergencyContact,
-                                        e.emergencyPhone,
-                                        e.departmentId,
-                                        departmentName = e.department.name,
-                                        e.nation,
-                                        e.nativePlace,
-                                        e.residence,
-                                        e.address,
-                                        e.political,
-                                        e.marriage,
-                                        e.education,
-                                        e.experience,
-                                        e.source,
-                                        e.contractSerial,
-                                        e.contractBegin,
-                                        e.contractEnd,
-                                    };
+                                   select new
+                                   {
+                                       e.id,
+                                       e.name,
+                                       e.number,
+                                       e.sex,
+                                       e.phone,
+                                       e.idCard,
+                                       e.birthday,
+                                       e.bankCard,
+                                       e.state,
+                                       e.entryDate,
+                                       e.formalDate,
+                                       e.leaveDate,
+                                       e.emergencyContact,
+                                       e.emergencyPhone,
+                                       e.departmentId,
+                                       departmentName = e.department.name,
+                                       e.nation,
+                                       e.nativePlace,
+                                       e.residence,
+                                       e.address,
+                                       e.political,
+                                       e.marriage,
+                                       e.education,
+                                       e.experience,
+                                       e.source,
+                                       e.contractSerial,
+                                       e.contractBegin,
+                                       e.contractEnd,
+                                   };
 
                     // 先查询出部门及子部门，再过滤
                     #region
@@ -702,16 +715,16 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult ImportExcel(string fileName)
@@ -728,14 +741,14 @@ namespace Apps.BLL
 
                 var tsheet = excelFile.Worksheet<EmployeeExport>(0);
                 var query = (from e in tsheet
-                            select e).ToList();
+                             select e).ToList();
 
                 IEnumerable<Employee> elements;
                 using (SystemDB db = new SystemDB())
                 {
                     elements = (from e in query
-                               join d in db.departmentList
-                                on e.departmentName equals d.name
+                                join d in db.departmentList
+                                 on e.departmentName equals d.name
                                 select new Employee
                                 {
                                     number = e.number,
@@ -768,7 +781,7 @@ namespace Apps.BLL
 
                                 }).ToList();
                 }
-                    
+
 
 
                 bool fail = false;
@@ -807,11 +820,12 @@ namespace Apps.BLL
 
         public OperateResult AnalyseByAge(QueryParam param = null)
         {
-
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+
+                using (SystemDB db = new SystemDB())
                 {
+
                     var now = DateTime.Now;
                     var elements = from e in db.employeeList.AsEnumerable()
                                    select new
@@ -889,32 +903,33 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult AnalyseByGender(QueryParam param = null)
         {
-
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.employeeList.AsEnumerable()
-                                    select new
-                                    {
-                                        e.id,
-                                        e.sex,
-                                        e.departmentId,
-                                    };
+                                   select new
+                                   {
+                                       e.id,
+                                       e.sex,
+                                       e.departmentId,
+                                   };
 
                     // 先查询出部门及子部门，再过滤
                     #region
@@ -931,8 +946,8 @@ namespace Apps.BLL
                             {
                                 // 查找属于给定部门的员工
                                 var sons = from e in db.departmentList
-                                            where e.parentId == id
-                                            select e.id;
+                                           where e.parentId == id
+                                           select e.id;
                                 IQueryable<long> many = sons;
                                 // 查找属于给定部门子部门的员工
                                 foreach (var it in sons)
@@ -944,8 +959,8 @@ namespace Apps.BLL
 
                             // 所有部门
                             var departments = (from e in db.departmentList
-                                                where e.id == departmentId
-                                                select e.id).Concat(GetSonFun(departmentId));
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
 
                             elements = elements.Where(t => departments.Contains(t.departmentId));
                         }
@@ -954,7 +969,7 @@ namespace Apps.BLL
 
 
                     var results = elements.GroupBy(e => e.sex)
-                        .Select(e => new {e.Key, count = e.Count() });
+                        .Select(e => new { e.Key, count = e.Count() });
 
                     var category = new List<object>();
                     var data = new List<object>();
@@ -962,7 +977,7 @@ namespace Apps.BLL
                     foreach (var e in results)
                     {
                         category.Add(e.Key);
-                        data.Add(new { value = e.count, name = e.Key});
+                        data.Add(new { value = e.count, name = e.Key });
                     }
                     var series = new List<object>();
                     series.Add(new { name = "员工性别", data });
@@ -984,25 +999,27 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
         public OperateResult AnalyseByWorkAge(QueryParam param = null)
         {
-
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.employeeList.AsEnumerable()
-                                   let workAge = Model.Utility.Utility.CalYears(e.entryDate !=null ? e.entryDate.Value : DateTime.Now, DateTime.Now)
+                                   let workAge = Model.Utility.Utility.CalYears(e.entryDate != null ? e.entryDate.Value : DateTime.Now, DateTime.Now)
                                    orderby workAge
                                    select new
                                    {
@@ -1057,7 +1074,7 @@ namespace Apps.BLL
                     foreach (var e in results)
                     {
                         category.Add(e.Key);
-                        data.Add(new {value= e.count , name = e.Key+"年" } );
+                        data.Add(new { value = e.count, name = e.Key + "年" });
                     }
                     var series = new List<object>();
                     series.Add(new { name = "员工司龄", data });
@@ -1079,14 +1096,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
@@ -1099,15 +1117,15 @@ namespace Apps.BLL
             public int min { get; set; }
             public int max { get; set; }
             public int count { get; set; }
-            
+
         }
         public OperateResult AnalyseBySalary(QueryParam param = null)
         {
-
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from s in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
                                    join e in db.employeeList
                                    on s.employeeId equals e.id
@@ -1196,7 +1214,7 @@ namespace Apps.BLL
                         {
                             data.Add(new { value = e.count, name = e.key });
                         }
-                        
+
                     }
                     var series = new List<object>();
                     series.Add(new { name = "员工薪酬", data });
@@ -1218,24 +1236,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult AddDeed(EmployeeDeed model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     db.employeeDeedList.Add(model);
                     db.SaveChanges();
 
@@ -1244,22 +1264,23 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult RemoveDeed(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = db.employeeDeedList.Find(id);
 
                     if (element == null)
@@ -1282,24 +1303,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
 
         public OperateResult UpdateDeed(EmployeeDeed model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
 
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
@@ -1312,24 +1335,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
 
         public OperateResult GetDeedById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.employeeDeedList.Include("employee")
                                    where id == m.id
                                    select m
@@ -1350,23 +1374,24 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetEmploeeDeeds(long employeeId)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = from m in db.employeeDeedList.Include("employee")
                                   where employeeId == m.employeeId
                                   select m;
@@ -1386,24 +1411,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
 
         public OperateResult GetAllDeeds(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.employeeDeedList.Include("employee")
                                     select new
                                     {
@@ -1422,24 +1449,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult GetDeedsByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.employeeDeedList.Include("employee")
                                    orderby e.time descending
                                    select new
@@ -1536,14 +1565,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 

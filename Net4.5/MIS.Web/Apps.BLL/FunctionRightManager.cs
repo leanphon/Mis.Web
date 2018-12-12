@@ -12,10 +12,11 @@ namespace Apps.BLL
     {
         public OperateResult Add(FunctionRight model)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var match = from m in db.rightList
                                 where m.name.Equals(model.name) || m.url.Equals(model.url)
                                 select m;
@@ -35,22 +36,24 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
         public OperateResult Remove(long id)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var element = db.rightList.Find(id);
                     var elements = db.rightList.ToList();
 
@@ -74,24 +77,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult Update(FunctionRight model)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var elements = (from e in db.rightList
                                     where e.id != model.id && e.name == model.name
                                     select e
@@ -116,22 +120,23 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetById(long id)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var element = (from m in db.rightList
                                    where id == m.id
                                    select m
@@ -152,24 +157,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult GetAll(QueryParam param = null)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var elements = from e in db.rightList.Include("module")
                                    orderby e.moduleId
                                    select new
@@ -209,25 +215,27 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
             }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
         }
 
         public OperateResult GetByPager(QueryParam param = null)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var elements = from e in db.rightList.Include("module")
-                                   orderby e.moduleId 
+                                   orderby e.moduleId
                                    select new
                                    {
                                        e.id,
@@ -293,14 +301,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 

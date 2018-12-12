@@ -393,234 +393,244 @@ namespace Apps.BLL
 
         public static OperateResult LeaveWarning(QueryParam param = null)
         {
-
-            DbHelperLeave dbLeave = new DbHelperLeave();
-            SystemDB db = new SystemDB();
-
-            /// 计算历史库样本值
-            #region
-
-            // 到公司距离
-            #region
-            double min = 0;
-            double max = 0;
-            double ave = 0;
             try
             {
-                min = (from e in dbLeave.addressList.AsEnumerable()
-                       let dis = e.toCompanyDistance
-                       select e.toCompanyDistance).Min();
-                max = (from e in dbLeave.addressList
-                       select e.toCompanyDistance).Max();
-                ave = (from e in dbLeave.addressList
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                SystemDB db = new SystemDB();
+
+                /// 计算历史库样本值
+                #region
+
+                // 到公司距离
+                #region
+                double min = 0;
+                double max = 0;
+                double ave = 0;
+                try
+                {
+                    min = (from e in dbLeave.addressList.AsEnumerable()
+                           let dis = e.toCompanyDistance
+                           select e.toCompanyDistance).Min();
+                    max = (from e in dbLeave.addressList
+                           select e.toCompanyDistance).Max();
+                    ave = (from e in dbLeave.addressList
                            select e.toCompanyDistance).Average();
 
-            }
-            catch (Exception ex)
-            {
-            }
+                }
+                catch (Exception)
+                {
+                }
 
-            
-            var addressSample = new
-            {
-                min,
-                max,
-                ave
-            };
 
-            #endregion
+                var addressSample = new
+                {
+                    min,
+                    max,
+                    ave
+                };
 
-            // 年龄
-            #region
-            long ageMin = 0;
-            long ageMax = 0;
-            double ageAve = 0;
+                #endregion
 
-            try
-            {
-                ageMin = (from e in dbLeave.ageList
-                          select e.age).Min();
-                ageMax = (from e in dbLeave.ageList
-                          select e.age).Max();
-                ageAve = (from e in dbLeave.ageList
+                // 年龄
+                #region
+                long ageMin = 0;
+                long ageMax = 0;
+                double ageAve = 0;
+
+                try
+                {
+                    ageMin = (from e in dbLeave.ageList
+                              select e.age).Min();
+                    ageMax = (from e in dbLeave.ageList
+                              select e.age).Max();
+                    ageAve = (from e in dbLeave.ageList
                               select e.age).Average();
 
-            }
-            catch (Exception ex)
-            {
-            }
-
-            
-            var ageSample = new
-            {
-                min = ageMin,
-                max = ageMax,
-                ave = ageAve
-            };
-
-            #endregion
-
-
-            // 工资
-            #region
-
-            double salaryMin = 0;
-            double salaryMax = 0;
-            double salaryAve = 0;
-
-            try
-            {
-                salaryMin = (from e in dbLeave.salaryList
-                             select e.salary).Min();
-                salaryMax = (from e in dbLeave.salaryList
-                             select e.salary).Max();
-                salaryAve = (from e in dbLeave.salaryList
-                             select e.salary).Average();
-            }
-            catch (Exception ex)
-            {
-            }
-            
-            var salarySample = new
-            {
-                min = salaryMin,
-                max = salaryMax,
-                ave = salaryAve
-            };
-
-            #endregion
-
-
-
-            #endregion
-
-
-            /// 预警计算
-            #region
-            var company = (from e in db.companyList
-                            select e).FirstOrDefault();
-
-            var elements = from e in db.employeeList.Include("department").AsEnumerable()
-                            join s in db.salaryInfoList on e.id equals s.employeeId
-                            let salary = s.GetSalaryTotal()
-                            let age = Model.Utility.Utility.CalYears(e.birthday, DateTime.Now)
-                            let distance = Model.Utility.MapHelper.GetTowPointDistance(company.address, e.address)
-                            let workAge = Model.Utility.Utility.CalYears(e.entryDate !=null ? e.entryDate.Value : DateTime.Now, DateTime.Now)
-
-                            where e.state != "离职"
-                            select new
-                            {
-                                e.id,
-                                e.number,
-                                e.name,
-                                e.departmentId,
-                                departmentName = e.department.name,
-
-                                distance,
-                                age,
-                                e.education,
-                                e.experience,
-                                e.marriage,
-                                e.nation,
-                                e.nativePlace,
-                                e.political,
-                                salary,
-                                e.sex,
-                                e.source,
-                                workAge
-                            };
-
-            // 先查询出部门及子部门，再过滤
-            #region
-            if (param != null && param.filters != null)
-            {
-                if (param.filters.Keys.Contains("departmentId"))
+                }
+                catch (Exception )
                 {
-                    var p = param.filters["departmentId"];
-                    long departmentId = Convert.ToInt64(p.value ?? "0");
+                }
 
 
-                    Func<long, IQueryable<long>> GetSonFun = null;
-                    GetSonFun = id =>
+                var ageSample = new
+                {
+                    min = ageMin,
+                    max = ageMax,
+                    ave = ageAve
+                };
+
+                #endregion
+
+
+                // 工资
+                #region
+
+                double salaryMin = 0;
+                double salaryMax = 0;
+                double salaryAve = 0;
+
+                try
+                {
+                    salaryMin = (from e in dbLeave.salaryList
+                                 select e.salary).Min();
+                    salaryMax = (from e in dbLeave.salaryList
+                                 select e.salary).Max();
+                    salaryAve = (from e in dbLeave.salaryList
+                                 select e.salary).Average();
+                }
+                catch (Exception )
+                {
+                }
+
+                var salarySample = new
+                {
+                    min = salaryMin,
+                    max = salaryMax,
+                    ave = salaryAve
+                };
+
+                #endregion
+
+
+
+                #endregion
+
+
+                /// 预警计算
+                #region
+                var company = (from e in db.companyList
+                               select e).FirstOrDefault();
+
+                var elements = from e in db.employeeList.Include("department").AsEnumerable()
+                               join s in db.salaryInfoList on e.id equals s.employeeId
+                               let salary = s.GetSalaryTotal()
+                               let age = Model.Utility.Utility.CalYears(e.birthday, DateTime.Now)
+                               let distance = Model.Utility.MapHelper.GetTowPointDistance(company.address, e.address)
+                               let workAge = Model.Utility.Utility.CalYears(e.entryDate != null ? e.entryDate.Value : DateTime.Now, DateTime.Now)
+
+                               where e.state != "离职"
+                               select new
+                               {
+                                   e.id,
+                                   e.number,
+                                   e.name,
+                                   e.departmentId,
+                                   departmentName = e.department.name,
+
+                                   distance,
+                                   age,
+                                   e.education,
+                                   e.experience,
+                                   e.marriage,
+                                   e.nation,
+                                   e.nativePlace,
+                                   e.political,
+                                   salary,
+                                   e.sex,
+                                   e.source,
+                                   workAge
+                               };
+
+                // 先查询出部门及子部门，再过滤
+                #region
+                if (param != null && param.filters != null)
+                {
+                    if (param.filters.Keys.Contains("departmentId"))
                     {
+                        var p = param.filters["departmentId"];
+                        long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                        Func<long, IQueryable<long>> GetSonFun = null;
+                        GetSonFun = id =>
+                        {
                         // 查找属于给定部门的员工
                         var sons = from e in db.departmentList
-                                    where e.parentId == id
-                                    select e.id;
-                        IQueryable<long> many = sons;
+                                       where e.parentId == id
+                                       select e.id;
+                            IQueryable<long> many = sons;
                         // 查找属于给定部门子部门的员工
                         foreach (var it in sons)
-                        {
-                            many = many.Concat(GetSonFun(it));
-                        }
-                        return many;
-                    };
+                            {
+                                many = many.Concat(GetSonFun(it));
+                            }
+                            return many;
+                        };
 
-                    // 所有部门
-                    var departments = (from e in db.departmentList
-                                        where e.id == departmentId
-                                        select e.id).Concat(GetSonFun(departmentId));
+                        // 所有部门
+                        var departments = (from e in db.departmentList
+                                           where e.id == departmentId
+                                           select e.id).Concat(GetSonFun(departmentId));
 
-                    elements = elements.Where(t => departments.Contains(t.departmentId));
+                        elements = elements.Where(t => departments.Contains(t.departmentId));
+                    }
                 }
+                #endregion
+
+                List<object> data = new List<object>();
+
+                foreach (var e in elements)
+                {
+                    List<Dimension> dimensions = new List<Dimension>();
+
+                    var addressScore = CalAddressScore(addressSample.min, addressSample.max, addressSample.ave, e.distance);
+                    dimensions.Add(new Dimension
+                    {
+                        dimension = "居住地到公司距离",
+                        score = addressScore,
+                        value = e.distance,
+                        average = addressSample.ave
+                    });
+
+                    var ageScore = CalAgeScore(ageSample.min, ageSample.max, ageSample.ave, e.age);
+                    dimensions.Add(new Dimension
+                    {
+                        dimension = "年龄",
+                        score = ageScore,
+                        value = e.age,
+                        average = ageSample.ave
+                    });
+
+                    var salayScore = CalSalaryScore(salarySample.min, salarySample.min, salarySample.ave, e.salary);
+                    dimensions.Add(new Dimension
+                    {
+                        dimension = "薪资",
+                        score = salayScore,
+                        value = e.salary,
+                        average = salarySample.ave
+                    });
+                    var resultScore = (from d in dimensions
+                                       select d.score).Average();
+
+                    data.Add(new
+                    {
+                        e.id,
+                        e.number,
+                        e.name,
+                        e.departmentName,
+                        resultScore,
+                        dimensions
+                    });
+
+                }
+
+
+                #endregion
+
+
+                return new OperateResult
+                {
+                    status = OperateStatus.Success,
+                    data = data,
+                };
             }
-            #endregion
-
-            List<object> data = new List<object>();
-            
-            foreach (var e in elements)
+            catch (Exception ex)
             {
-                List<Dimension> dimensions = new List<Dimension>();
-
-                var addressScore = CalAddressScore(addressSample.min, addressSample.max, addressSample.ave, e.distance);
-                dimensions.Add(new Dimension
+                return new OperateResult
                 {
-                    dimension = "居住地到公司距离",
-                    score = addressScore,
-                    value = e.distance,
-                    average = addressSample.ave
-                });
-
-                var ageScore = CalAgeScore(ageSample.min, ageSample.max, ageSample.ave, e.age);
-                dimensions.Add(new Dimension
-                {
-                    dimension = "年龄",
-                    score = ageScore,
-                    value = e.age,
-                    average = ageSample.ave
-                });
-
-                var salayScore = CalSalaryScore(salarySample.min, salarySample.min, salarySample.ave, e.salary);
-                dimensions.Add(new Dimension
-                {
-                    dimension = "薪资",
-                    score = salayScore,
-                    value = e.salary,
-                    average = salarySample.ave
-                });
-                var resultScore = (from d in dimensions
-                             select d.score).Average();
-
-                data.Add(new {
-                    e.id,
-                    e.number,
-                    e.name,
-                    e.departmentName,
-                    resultScore,
-                    dimensions
-                });
-
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
-
-
-            #endregion
-
-
-            return new OperateResult
-            {
-                status = OperateStatus.Success,
-                data = data,
-            };
 
         }
 

@@ -11,10 +11,11 @@ namespace Apps.BLL
     {
         public OperateResult AddRegister(CompanyRegister model)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var match = from m in db.companyRegisterList
                                 where m.name.Equals(model.name) || m.code.Equals(model.code)
                                 select m;
@@ -41,22 +42,23 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult RemoveRegister(long id)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var element = db.companyRegisterList.Find(id);
 
                     if (element == null)
@@ -72,8 +74,8 @@ namespace Apps.BLL
                     db.Entry(element).State = EntityState.Deleted;
 
                     var company = (from c in db.companyList
-                                  where c.name == element.name
-                                  select c).FirstOrDefault();
+                                   where c.name == element.name
+                                   select c).FirstOrDefault();
                     db.companyList.Remove(company);
                     db.Entry(company).State = EntityState.Deleted;
 
@@ -87,24 +89,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult UpdateRegister(CompanyRegister model)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var elements = (from e in db.companyRegisterList
                                     where e.id != model.id && e.name == model.name
                                     select e
@@ -129,22 +132,23 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetRegisterByCode(string code)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var element = (from m in db.companyRegisterList
                                    where code == m.code
                                    select m
@@ -165,23 +169,24 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetRegisterById(long id)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var element = (from m in db.companyRegisterList
                                    where id == m.id
                                    select m
@@ -202,24 +207,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
 
         public OperateResult GetRegisterAll(QueryParam param = null)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var elements = from e in db.companyRegisterList
                                    select e;
 
@@ -230,23 +236,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
         public OperateResult GetRegisterByPager(QueryParam param = null)
         {
-            using (DbContextRoot db = new DbContextRoot())
+            try
             {
-                try
+                using (DbContextRoot db = new DbContextRoot())
                 {
+
                     var elements = from e in db.companyRegisterList
                                    select e;
 
@@ -285,14 +293,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
