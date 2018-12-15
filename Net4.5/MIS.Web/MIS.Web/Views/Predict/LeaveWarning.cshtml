@@ -1,0 +1,15 @@
+﻿@model Apps.Model.LevelInfo
+@{
+    Layout = null;
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divDialog = controllerName + "_divDialog";
+    string divContent = controllerName + "_divContent";
+    string formEntity = controllerName + "_formEntity";
+    string tabEntityList = controllerName + "_tabEntityList";
+}
+
+<div >
+    数据不完整，暂无法预测
+</div>
+
