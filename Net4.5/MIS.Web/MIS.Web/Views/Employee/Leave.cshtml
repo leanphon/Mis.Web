@@ -10,7 +10,7 @@
 }
 <script>
     function show() {
-        initDivDialog("转正");
+        initDivDialog("离职");
         initForm();
 
         $('#@(divDialog)').dialog('open');
@@ -73,11 +73,13 @@
 
         $('#entryDate').datebox({
             width: '100%',
+            disabled: true,
             formatter: databoxFormat,
             parser: databoxParser
         });
         $('#formalDate').datebox({
             width: '100%',
+            disabled: true,
             formatter: databoxFormat,
             parser: databoxParser
         });
@@ -109,14 +111,14 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_4_right">
-                    @Html.EditorFor(model => model.name, new { @class = "parm_control", @readonly = "@Html.EditorFor" })
+                    @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "parm_control", @readonly="readonly" } })
                 </td>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.number, new { @class = "lab" })
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_4_right">
-                    @Html.EditorFor(model => model.number, new { htmlAttributes = new { @class = "parm_control" } })
+                    @Html.EditorFor(model => model.number, new { htmlAttributes = new { @class = "parm_control", @readonly = "readonly" } })
                 </td>
             </tr>
             <tr>

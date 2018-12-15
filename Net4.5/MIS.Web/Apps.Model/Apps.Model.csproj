@@ -88,6 +88,7 @@
     <Compile Include="SalaryRecord.cs" />
     <Compile Include="Utility\DataTableHelper.cs" />
     <Compile Include="Utility\LambdaQueryCondition.cs" />
+    <Compile Include="Utility\LogHelper.cs" />
     <Compile Include="Utility\MapHelper.cs" />
     <Compile Include="Utility\Utility.cs" />
   </ItemGroup>

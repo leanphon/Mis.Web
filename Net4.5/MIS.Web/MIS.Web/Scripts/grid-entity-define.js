@@ -206,6 +206,7 @@ function DepartmentTreeGrid(gridId, toolbar) {
     this.id = gridId;
     this.idField = 'id';
     this.treeField = 'name';
+    this.pager = true;
 
     this.forzenCols = [[
     ]];
@@ -214,6 +215,7 @@ function DepartmentTreeGrid(gridId, toolbar) {
                 { field: 'id', hidden: true },
                 { field: 'name', title: '部门名称', width: 250 },
                 { field: 'code', title: '部门编码', width: 150 },
+                { field: 'persons', title: '当前人数', width: 150 },
     ]];
 
     this.toolbar = toolbar;

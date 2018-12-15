@@ -12,10 +12,11 @@ namespace Apps.BLL
     {
         public OperateResult Add(Module model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var match = from m in db.moduleList
                                 where m.name.Equals(model.name)
                                 select m;
@@ -35,22 +36,23 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult Remove(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = db.moduleList.Find(id);
                     var elements = db.moduleList.ToList();
 
@@ -84,24 +86,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult Update(Module model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.moduleList
                                     where e.id != model.id && e.name == model.name
                                     select e
@@ -137,22 +140,23 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.moduleList.Include("parent")
                                    where id == m.id
                                    select m
@@ -173,27 +177,28 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
 
         public OperateResult GetAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.moduleList
-                                    orderby e.showIndex ascending 
-                            select new
+                                    orderby e.showIndex ascending
+                                    select new
                                     {
                                         e.id,
                                         e.name,
@@ -209,26 +214,28 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
             }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
         }
 
 
         public OperateResult GetByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.moduleList
-                        orderby e.showIndex ascending
+                                   orderby e.showIndex ascending
                                    select new
                                    {
                                        e.id,
@@ -272,14 +279,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 

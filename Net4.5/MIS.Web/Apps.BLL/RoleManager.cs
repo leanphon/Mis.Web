@@ -13,10 +13,11 @@ namespace Apps.BLL
     {
         public OperateResult Add(Role model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var match = from m in db.roleList
                                 where m.name.Equals(model.name)
                                 select m;
@@ -36,22 +37,23 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult Remove(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = db.roleList.Find(id);
 
                     if (element == null)
@@ -74,24 +76,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
 
         public OperateResult Update(Role model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.roleList
                                     where e.id != model.id && e.name == model.name
                                     select e
@@ -116,22 +120,23 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.roleList
                                    where id == m.id
                                    select m
@@ -152,24 +157,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult GetAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.roleList
                                    select e;
 
@@ -180,24 +186,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult GetByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.roleList
                                    select e;
 
@@ -236,23 +244,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
         public OperateResult GetRightById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     // 根据给定的roleId和rightId，判断它是否已经被授权
                     Func<long, long, bool> AssignCheck = (roleId, rightId) =>
                     {
@@ -269,7 +279,7 @@ namespace Apps.BLL
                     };
 
                     var modules = (from e in db.moduleList
-                                   where e.onlyRoot!=1
+                                   where e.onlyRoot != 1
                                    select new
                                    {
                                        id = e.id,
@@ -281,7 +291,7 @@ namespace Apps.BLL
 
                     var max = (from e in db.moduleList
                                    //where e.onlyRoot != 1
-                                   select e.id).Max();
+                               select e.id).Max();
 
                     var rights = (from e in db.rightList.Include("module").AsEnumerable()
                                   where e.module.onlyRoot != 1
@@ -291,7 +301,7 @@ namespace Apps.BLL
                                   {
                                       id = rid,
                                       name = e.name,
-                                      _parentId = (long ?)e.moduleId,
+                                      _parentId = (long?)e.moduleId,
                                       rightId = e.id,
                                       @checked = check,
                                   }).ToList();
@@ -312,36 +322,38 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult AssignRight(long roleId, List<long> idList)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var role = (from e in db.roleList.Include("rightList")
                                 where e.id == roleId
                                 select e).FirstOrDefault();
                     if (role != null)
                     {
-                        foreach( var rid in idList)
+                        foreach (var rid in idList)
                         {
                             var model = db.rightList.Find(rid);
 
                             var query = (from e in role.rightList
                                          where e.id == rid
-                                        select e).FirstOrDefault();
+                                         select e).FirstOrDefault();
 
                             if (model != null && query == null)
                             {
@@ -363,14 +375,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
     }

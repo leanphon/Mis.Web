@@ -16,12 +16,12 @@ namespace Apps.BLL
     {
         public OperateResult Add(AssessmentInfo model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
                     var match = from m in db.assessmentInfoList
-                                where m.employeeId==model.employeeId && m.month==model.month
+                                where m.employeeId == model.employeeId && m.month == model.month
                                 select m;
                     if (match.Count() > 0)
                     {
@@ -31,6 +31,7 @@ namespace Apps.BLL
                         };
                     }
                     model.inputDate = DateTime.Now;
+                    model.status = "未审核";
 
                     db.assessmentInfoList.Add(model);
                     db.SaveChanges();
@@ -40,13 +41,13 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
@@ -84,9 +85,9 @@ namespace Apps.BLL
 
         public OperateResult Remove(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
                     var element = db.benefitInfoList.Find(id);
 
@@ -110,23 +111,22 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
 
         public OperateResult Update(AssessmentInfo model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
                     model.inputDate = DateTime.Now;
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
@@ -138,17 +138,15 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                         content = "更新成功"
                     };
-
-                }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
                 }
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult SaveBatch(List<AssessmentInfo> listModel)
@@ -207,21 +205,21 @@ namespace Apps.BLL
 
         public OperateResult UpdateStatus(long id, string status)
         {
-            using (SystemDB db = new SystemDB())
+            if (status != "未审核" && status != "审核")
             {
-                if (status != "未审核" && status != "审核")
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = "数据错误",
-                    };
-                }
+                    content = "数据错误",
+                };
+            }
 
-                try
+            try
+            {
+                using (SystemDB db = new SystemDB())
                 {
                     var element = (from m in db.assessmentInfoList
-                            where id == m.id
-                            select m
+                                   where id == m.id
+                                   select m
                         ).AsNoTracking().FirstOrDefault();
 
                     if (element == null)
@@ -240,16 +238,14 @@ namespace Apps.BLL
                     {
                         status = OperateStatus.Success,
                     };
-
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
@@ -293,9 +289,9 @@ namespace Apps.BLL
 
         public OperateResult GetAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
                     var elements = (from e in db.benefitInfoList
                                     select new
@@ -311,24 +307,22 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                         data = elements,
                     };
-
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
         public OperateResult GetByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
                     var elements = from e in db.assessmentInfoList.Include("employee").Include("department")
                                    select new
@@ -373,8 +367,8 @@ namespace Apps.BLL
                             {
                                 // 查找属于给定部门的员工
                                 var sons = from e in db.departmentList
-                                    where e.parentId == id
-                                    select e.id;
+                                           where e.parentId == id
+                                           select e.id;
                                 IQueryable<long> many = sons;
                                 // 查找属于给定部门子部门的员工
                                 foreach (var it in sons)
@@ -386,8 +380,8 @@ namespace Apps.BLL
 
                             // 所有部门
                             var departments = (from e in db.departmentList
-                                where e.id == departmentId
-                                select e.id).Concat(GetSonFun(departmentId));
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
 
                             elements = elements.Where(t => departments.Contains(t.departmentId));
                         }
@@ -461,16 +455,14 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                         data = data,
                     };
-
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
@@ -624,9 +616,9 @@ namespace Apps.BLL
 
         public OperateResult GetEmployeesByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
                     if (param == null || param.filters == null || !param.filters.Keys.Contains("month"))
                     {
@@ -641,7 +633,7 @@ namespace Apps.BLL
                                          where m.month == month
                                          select m;
                     var elements = from m in db.employeeList.Include("department")
-                                   where !(assessmnetList.Any(c => c.employeeId==m.id && c.month==month))
+                                   where !(assessmnetList.Any(c => c.employeeId == m.id && c.month == month))
                                    select new
                                    {
                                        employeeId = m.id,
@@ -746,16 +738,14 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                         data = data,
                     };
-
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
@@ -767,9 +757,9 @@ namespace Apps.BLL
         /// <returns></returns>
         public OperateResult ExportAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
                     var elements = from e in db.assessmentInfoList.Include("employee").Include("department")
                                    select new
@@ -888,16 +878,14 @@ namespace Apps.BLL
                         content = "导出成功",
                         data = dt,
                     };
-
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }

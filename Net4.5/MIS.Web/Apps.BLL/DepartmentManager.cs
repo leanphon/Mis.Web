@@ -9,10 +9,11 @@ namespace Apps.BLL
     {
         public OperateResult Add(Department model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var match = from m in db.departmentList
                                 where m.name.Equals(model.name)
                                 select m;
@@ -32,22 +33,23 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult Remove(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = db.departmentList.Find(id);
                     var elements = db.departmentList.ToList();
 
@@ -81,26 +83,27 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult Update(Department model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.departmentList
-                                    where e.id!=model.id && e.name==model.name
+                                    where e.id != model.id && e.name == model.name
                                     select e
                                     ).ToList();
                     if (elements.Count() >= 1)
@@ -110,11 +113,11 @@ namespace Apps.BLL
                             content = "已经存在同名的部门",
                         };
                     }
-                        
+
 
                     var matchs = (from e in db.departmentList
-                                    where e.id == model.parentId && e.parentId == model.id
-                                    select e
+                                  where e.id == model.parentId && e.parentId == model.id
+                                  select e
                                     ).ToList();
                     if (matchs.Count() >= 1)
                     {
@@ -130,29 +133,30 @@ namespace Apps.BLL
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
-                        content ="更新成功"
+                        content = "更新成功"
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.departmentList.Include("parent")
-                                 where id==m.id
-                                 select m
+                                   where id == m.id
+                                   select m
                                 ).FirstOrDefault();
 
                     if (element == null)
@@ -170,33 +174,36 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
-        public OperateResult GetAll(QueryParam param= null)
+        public OperateResult GetAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.departmentList
-                                  select new
-                                  {
-                                      e.id,
-                                      e.name,
-                                      e.code,
-                                      _parentId = e.parentId,
-                                      parentName = e.parent.name
-                                  }
+                                    let persons = db.employeeList.Count(x => x.departmentId == e.id)
+                                    select new
+                                    {
+                                        e.id,
+                                        e.name,
+                                        e.code,
+                                        _parentId = e.parentId,
+                                        parentName = e.parent.name,
+                                        persons = persons
+                                    }
                                   ).ToList();
 
                     return new OperateResult
@@ -206,32 +213,51 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
-        public OperateResult GetByPager(QueryParam param=null)
+        public OperateResult GetByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+                    Func<long, long> GetPersons = null;
+                    GetPersons = departmentId =>
+                    {
+                        long p = db.employeeList.Count(x => x.departmentId == departmentId);
+
+                        var sons = from e in db.departmentList
+                            where e.parentId == departmentId
+                            select e;
+                        foreach (var d in sons)
+                        {
+                            p += GetPersons(d.id);
+                        }
+
+                        return p;
+                    };
+
                     var elements = from e in db.departmentList
+                                   let persons = GetPersons(e.id)
                                    select new
                                    {
                                        e.id,
                                        e.name,
                                        e.code,
-                                       _parentId = e.parentId
-                                       //parentName = e.parent.name
+                                       _parentId = e.parentId,
+                                       parentName = e.parent.name,
+                                       persons = persons
                                    };
 
                     //不做分页
@@ -274,14 +300,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 

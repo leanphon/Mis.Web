@@ -36,29 +36,31 @@ body {
     </div>
     <div data-options="region:'west',split:true,title:'菜单'" style="width:250px;padding:10px;">
         <div class="easyui-accordion" data-options="multiple:true, fit:false,border:false">
-            <div title="薪酬管理" data-options="selected:true" style="padding:10px;">
-                <a href="#" onclick="redirectUrl(this, '/Assessment/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">考核录入</a>
-                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">工资录入</a>
-                <a href="#" onclick="redirectUrl(this, '/Assessment/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">考核记录</a>
-                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-chart',size:'large',iconAlign:'top'">工资记录</a>
-            </div>
+            
             <div title="员工管理" style="padding:10px">
                 <a href="#" onclick="redirectUrl(this, '/Employee/Entry')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">入职</a>
                 <a href="#" onclick="redirectUrl(this, '/Employee/ShowFormal')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">转正</a>
                 <a href="#" onclick="redirectUrl(this, '/Employee/ShowLeave')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">离职</a>
                 <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工列表</a>
             </div>
+            <div title="薪酬管理" data-options="selected:true" style="padding:10px;">
+                <a href="#" onclick="redirectUrl(this, '/Assessment/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">考核录入</a>
+                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">工资录入</a>
+                <a href="#" onclick="redirectUrl(this, '/Assessment/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">考核记录</a>
+                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-chart',size:'large',iconAlign:'top'">工资记录</a>
+            </div>
             <div title="数据分析" style="padding:10px">
                 <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeAge')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工年龄分析</a>
                 <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeGender')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工性别分析</a>
                 <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeWorkAge')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工司龄分析</a>
                 <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeSalary')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工薪酬分析</a>
-                <a href="#" onclick="redirectUrl(this, '/Analyse/LeaveWarning')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工离职预警</a>
-
+            </div>
+            <div title="智能预测" style="padding:10px">
+                <a href="#" onclick="redirectUrl(this, '/Predict/LeaveWarning')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工离职预警</a>
             </div>
             <div title="组织架构" style="padding:10px">
                 <a href="#" onclick="redirectUrl(this, '/Department/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">部门管理</a>
-                @*<a href="#" onclick="redirectUrl(this, '/Department/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">编制管理</a>*@
+                <a href="#" onclick="redirectUrl(this, '/Department/Strength')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">部门编制</a>
             </div>
             <div title="基础字典" style="padding:10px">
                 <a href="#" onclick="redirectUrl(this, '/Post/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">岗位管理</a>

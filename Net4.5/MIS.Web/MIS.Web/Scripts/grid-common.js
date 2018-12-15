@@ -247,7 +247,7 @@ function initTreegrid(gridEntity, url, callbackFuns) {
             });
         }
     });
-    if (gridEntity.pager)
+    if (gridEntity.pager == true)
     {
         console.log(gridEntity)
 

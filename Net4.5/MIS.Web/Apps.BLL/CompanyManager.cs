@@ -12,10 +12,11 @@ namespace Apps.BLL
 
         public OperateResult Add(Company model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var match = from m in db.companyList
                                 where m.name.Equals(model.name) || m.code.Equals(model.code)
                                 select m;
@@ -35,22 +36,22 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult Remove(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = db.companyList.Find(id);
                     var elements = db.companyList.ToList();
 
@@ -74,24 +75,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult Update(Company model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.companyList
                                     where e.id != model.id && e.name == model.name
                                     select e
@@ -116,22 +118,23 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetByCode(string code)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.companyList
                                    where code == m.code
                                    select m
@@ -152,23 +155,24 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.companyList
                                    where id == m.id
                                    select m
@@ -189,24 +193,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult GetFirst()
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from e in db.companyList
                                    select e).FirstOrDefault();
 
@@ -217,26 +222,28 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult GetAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.companyList
-                                    select e;
+                                   select e;
 
                     return new OperateResult
                     {
@@ -245,23 +252,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
         public OperateResult GetByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.companyList
                                    select e
                                    ;
@@ -301,14 +310,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 

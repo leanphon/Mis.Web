@@ -12,10 +12,11 @@ namespace Apps.BLL
     {
         public OperateResult Add(User model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var match = from m in db.userList
                                 where m.name.Equals(model.name)
                                 select m;
@@ -37,7 +38,7 @@ namespace Apps.BLL
                         userId = SessionHelper.GetUserId(),
                         time = DateTime.Now,
                         type = "Info",
-                        content = "添加用户:"+model.name
+                        content = "添加用户:" + model.name
                     });
 
                     return new OperateResult
@@ -45,22 +46,23 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult Remove(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = db.departmentList.Find(id);
                     var elements = db.departmentList.ToList();
 
@@ -102,27 +104,28 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult Update(User model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from e in db.userList
-                                    where e.id != model.id && e.name == model.name
-                                    select e
+                                   where e.id != model.id && e.name == model.name
+                                   select e
                                     ).FirstOrDefault();
                     if (element != null)
                     {
@@ -132,7 +135,7 @@ namespace Apps.BLL
                         };
                     }
                     element = (from e in db.userList
-                               where e.id == model.id 
+                               where e.id == model.id
                                select e
                                ).AsNoTracking().FirstOrDefault();
 
@@ -158,22 +161,23 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
-            }
 
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
         public OperateResult GetById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.userList
                                    where id == m.id
                                    select m
@@ -194,24 +198,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
 
         public OperateResult GetAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.userList
                                     select new
                                     {
@@ -227,24 +233,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult GetByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.userList.Include("role")
                                    select new
                                    {
@@ -290,22 +298,23 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
         public OperateResult Login(User model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
                     var passwd = MD5Encode.Encode16(model.passwd);
 
@@ -330,9 +339,10 @@ namespace Apps.BLL
                         {
                             element.status = "激活";
                         }
-
+                        
                         db.Entry(element).State = System.Data.Entity.EntityState.Modified;
                         db.SaveChanges();
+
 
                         LogManager.Add(new LogRecord
                         {
@@ -359,13 +369,14 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
@@ -382,6 +393,10 @@ namespace Apps.BLL
                 };
             }
 
+            using (SystemDB db = new SystemDB())
+            {
+            }
+
             return new OperateResult
             {
                 content = "用户名或密码不正确"
@@ -392,10 +407,11 @@ namespace Apps.BLL
 
         public OperateResult ResetPasswd(long id, string pwd)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.userList
                                    where id == m.id
                                    select m
@@ -431,24 +447,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
         public OperateResult Lock(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.userList
                                    where id == m.id
                                    select m
@@ -484,16 +501,16 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
     }

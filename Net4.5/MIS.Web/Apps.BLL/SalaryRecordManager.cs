@@ -14,10 +14,11 @@ namespace Apps.BLL
     {
         public OperateResult Add(SalaryRecord model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var match = (from m in db.salaryRecordList.Include("assessmentInfo")
                                  where m.assessmentInfoId == model.assessmentInfoId
                                  select m
@@ -40,13 +41,14 @@ namespace Apps.BLL
                         status = OperateStatus.Success,
                     };
                 }
-                catch (Exception ex)
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
@@ -76,10 +78,11 @@ namespace Apps.BLL
 
         public OperateResult Remove(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = db.salaryRecordList.Find(id);
 
                     if (element == null)
@@ -102,24 +105,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
 
         public OperateResult Update(SalaryRecord model)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
 
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
@@ -132,22 +137,24 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
                 {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }
         public OperateResult GetById(long id)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var element = (from m in db.salaryRecordList
                                    where id == m.id
                                    select m
@@ -168,25 +175,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
+
 
             }
-
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
 
 
         public OperateResult GetAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = (from e in db.salaryRecordList
                                     select new
                                     {
@@ -214,24 +222,26 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
 
         public OperateResult GetByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
                                    join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
                                    on e.assessmentInfo.employeeId equals salaryInfo.employeeId
@@ -362,23 +372,25 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
         public OperateResult GetAssessmentByPager(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     if (param == null || param.filters == null || !param.filters.Keys.Contains("month"))
                     {
                         return new OperateResult
@@ -400,7 +412,7 @@ namespace Apps.BLL
                                    let performanceRewards = CalPerformanceRewards(salaryInfo.performanceInfo.performanceRewards, e.performanceScore ?? 0)
                                    let benefitRewards = CalBenefitRewards(salaryInfo.benefitInfo.benefitRewards, e.benefitScore ?? 0)
                                    let seniorityRewards = CalSeniorityRewards(salaryInfo.levelInfo.seniorityRewardsBase, month, e.employee.entryDate ?? DateTime.Now)
-                                   let normalOvertimeRewards = CalNormalOvertimeRewards(salaryInfo.levelInfo.postSalary, e.normalOvertime??0)
+                                   let normalOvertimeRewards = CalNormalOvertimeRewards(salaryInfo.levelInfo.postSalary, e.normalOvertime ?? 0)
                                    let holidayOvertimeRewards = CalHolidayOvertimeRewards(salaryInfo.levelInfo.postSalary, e.holidayOvertime ?? 0)
                                    let shouldTotal = postSalary + fullAttendanceRewards + performanceRewards + benefitRewards + seniorityRewards + normalOvertimeRewards + holidayOvertimeRewards
 
@@ -524,14 +536,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
         }
 
@@ -639,10 +652,11 @@ namespace Apps.BLL
 
         public OperateResult ExportAll(QueryParam param = null)
         {
-            using (SystemDB db = new SystemDB())
+            try
             {
-                try
+                using (SystemDB db = new SystemDB())
                 {
+
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
                                    join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
                                    on e.assessmentInfo.employeeId equals salaryInfo.employeeId
@@ -738,29 +752,29 @@ namespace Apps.BLL
                     long rowIndex = 1;
 
                     var results = from e in elements.AsEnumerable()
-                                   select new SalaryRecordExport
-                                   {
-                                       index = rowIndex++,
-                                       billSerial = e.billSerial,
-                                       month = e.month,
-                                       employeeName = e.employeeName,
-                                       employeeNumber = e.employeeNumber,
-                                       departmentName = e.departmentName,
-                                       postSalary = e.postSalary,
-                                       fullAttendanceRewards = e.fullAttendanceRewards,
-                                       performanceRewards = e.performanceRewards,
-                                       benefitRewards = e.benefitRewards,
-                                       normalOvertimeRewards = e.normalOvertimeRewards,
-                                       holidayOvertimeRewards = e.holidayOvertimeRewards,
-                                       subsidy = e.subsidy,
-                                       reissue = e.reissue,
-                                       socialSecurity = e.socialSecurity,
-                                       publicFund = e.publicFund,
-                                       tax = e.tax,
-                                       shouldTotal = e.shouldTotal,
-                                       actualTotal = e.actualTotal,
-                                       inputDate = e.inputDate
-                                   };
+                                  select new SalaryRecordExport
+                                  {
+                                      index = rowIndex++,
+                                      billSerial = e.billSerial,
+                                      month = e.month,
+                                      employeeName = e.employeeName,
+                                      employeeNumber = e.employeeNumber,
+                                      departmentName = e.departmentName,
+                                      postSalary = e.postSalary,
+                                      fullAttendanceRewards = e.fullAttendanceRewards,
+                                      performanceRewards = e.performanceRewards,
+                                      benefitRewards = e.benefitRewards,
+                                      normalOvertimeRewards = e.normalOvertimeRewards,
+                                      holidayOvertimeRewards = e.holidayOvertimeRewards,
+                                      subsidy = e.subsidy,
+                                      reissue = e.reissue,
+                                      socialSecurity = e.socialSecurity,
+                                      publicFund = e.publicFund,
+                                      tax = e.tax,
+                                      shouldTotal = e.shouldTotal,
+                                      actualTotal = e.actualTotal,
+                                      inputDate = e.inputDate
+                                  };
 
 
 
@@ -775,14 +789,15 @@ namespace Apps.BLL
                     };
 
                 }
-                catch (Exception ex)
-                {
-                    return new OperateResult
-                    {
-                        content = Model.Utility.Utility.GetExceptionMsg(ex),
-                    };
-                }
 
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
 
         }

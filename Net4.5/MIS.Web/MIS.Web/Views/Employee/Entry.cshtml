@@ -326,6 +326,20 @@
             </tr>
             <tr>
                 <td class="cols_4_left">
+                    @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.entryDate, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.state, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    <input class="parm_control" readonly type="text" id="state" name="state" value="试用期" />
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_4_left">
                     @Html.LabelFor(model => model.contractSerial, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
