@@ -194,13 +194,15 @@ namespace Apps.BLL
                 {
 
                     var elements = (from e in db.departmentList
+                                    let persons = db.employeeList.Count(x => x.departmentId == e.id)
                                     select new
                                     {
                                         e.id,
                                         e.name,
                                         e.code,
                                         _parentId = e.parentId,
-                                        parentName = e.parent.name
+                                        parentName = e.parent.name,
+                                        persons = persons
                                     }
                                   ).ToList();
 
@@ -230,15 +232,32 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
+                    Func<long, long> GetPersons = null;
+                    GetPersons = departmentId =>
+                    {
+                        long p = db.employeeList.Count(x => x.departmentId == departmentId);
+
+                        var sons = from e in db.departmentList
+                            where e.parentId == departmentId
+                            select e;
+                        foreach (var d in sons)
+                        {
+                            p += GetPersons(d.id);
+                        }
+
+                        return p;
+                    };
 
                     var elements = from e in db.departmentList
+                                   let persons = GetPersons(e.id)
                                    select new
                                    {
                                        e.id,
                                        e.name,
                                        e.code,
-                                       _parentId = e.parentId
-                                       //parentName = e.parent.name
+                                       _parentId = e.parentId,
+                                       parentName = e.parent.name,
+                                       persons = persons
                                    };
 
                     //不做分页

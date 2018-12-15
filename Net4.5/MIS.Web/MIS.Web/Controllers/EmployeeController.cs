@@ -299,6 +299,34 @@ namespace MIS.Web.Controllers
 
         }
 
+        public ActionResult ShowDepartment(int? id)
+        {
+            return View();
+
+        }
+        public ActionResult SelectDepartment(long departmentId)
+        {
+            //if (!ModelState.IsValid)
+            //{
+            //    return Json(
+            //        new OperateResult
+            //        {
+            //            content = Model.Utility.GetModelStateErrors(ModelState),
+            //        },
+            //        JsonRequestBehavior.AllowGet
+            //    );
+            //}
+
+            EmployeeManager manager = new EmployeeManager();
+
+            OperateResult or = manager.UpdateSalary(null);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+
+
+
         public ActionResult ExportAll()
         {
             QueryParam queryParam = new QueryParam();

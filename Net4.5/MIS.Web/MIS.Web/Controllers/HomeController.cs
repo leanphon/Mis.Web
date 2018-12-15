@@ -28,23 +28,23 @@ namespace MIS.Web.Controllers
             }
 
 
-            QueryParam queryParam = new QueryParam {filters = new Dictionary<string, FilterModel>()};
+            //QueryParam queryParam = new QueryParam {filters = new Dictionary<string, FilterModel>()};
 
-            FilterModel m = new FilterModel
-            {
-                action = "==",
-                dataType = "bool",
-                key = "show",
-                value = Convert.ToString(true)
-            };
+            //FilterModel m = new FilterModel
+            //{
+            //    action = "==",
+            //    dataType = "bool",
+            //    key = "show",
+            //    value = Convert.ToString(true)
+            //};
 
-            queryParam.filters.Add("show", m);
-            FunctionRightManager manager = new FunctionRightManager();
-            OperateResult or = manager.GetAll(queryParam);
-            if (or.status == OperateStatus.Success)
-            {
-                return View(or.data);
-            }
+            //queryParam.filters.Add("show", m);
+            //FunctionRightManager manager = new FunctionRightManager();
+            //OperateResult or = manager.GetAll(queryParam);
+            //if (or.status == OperateStatus.Success)
+            //{
+            //    return View(or.data);
+            //}
 
 
             return View();
@@ -93,26 +93,43 @@ namespace MIS.Web.Controllers
             }
 
             UserManager manager = new UserManager();
-            var or = model.name == "root" ? manager.RootLogin(model) : manager.Login(model);
 
-            if (or.status == OperateStatus.Success
-                && or.data != null)
+            if (model.name == "root")
             {
-                Session["currentUser"] = or.data;
-
-                CompanyManager cm = new CompanyManager();
-                or = cm.GetFirst();
+                var or = manager.RootLogin(model);
                 if (or.status == OperateStatus.Success
                     && or.data != null)
                 {
-                    Session["company"] = or.data;
+                    Session["currentUser"] = or.data;
+                    or.data = null;
+                }
+                return Json( or, JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                var or =  manager.Login(model);
 
+                if (or.status == OperateStatus.Success
+                    && or.data != null)
+                {
+                    Session["currentUser"] = or.data;
+
+                    CompanyManager cm = new CompanyManager();
+                    or = cm.GetFirst();
+                    if (or.status == OperateStatus.Success
+                        && or.data != null)
+                    {
+                        Session["company"] = or.data;
+                    }
+
+                    or.data = null;
                 }
 
-                or.data = null;
+                return Json(or, JsonRequestBehavior.AllowGet);
+
             }
 
-            return Json(or, JsonRequestBehavior.AllowGet);
+
 
         }
 

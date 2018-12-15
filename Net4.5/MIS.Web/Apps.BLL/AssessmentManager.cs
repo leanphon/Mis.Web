@@ -31,6 +31,7 @@ namespace Apps.BLL
                         };
                     }
                     model.inputDate = DateTime.Now;
+                    model.status = "未审核";
 
                     db.assessmentInfoList.Add(model);
                     db.SaveChanges();
@@ -364,13 +365,13 @@ namespace Apps.BLL
                             Func<long, IQueryable<long>> GetSonFun = null;
                             GetSonFun = id =>
                             {
-                            // 查找属于给定部门的员工
-                            var sons = from e in db.departmentList
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
                                            where e.parentId == id
                                            select e.id;
                                 IQueryable<long> many = sons;
-                            // 查找属于给定部门子部门的员工
-                            foreach (var it in sons)
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
                                 {
                                     many = many.Concat(GetSonFun(it));
                                 }
@@ -657,13 +658,13 @@ namespace Apps.BLL
                             Func<long, IQueryable<long>> GetSonFun = null;
                             GetSonFun = id =>
                             {
-                            // 查找属于给定部门的员工
-                            var sons = from e in db.departmentList
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
                                            where e.parentId == id
                                            select e.id;
                                 IQueryable<long> many = sons;
-                            // 查找属于给定部门子部门的员工
-                            foreach (var it in sons)
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
                                 {
                                     many = many.Concat(GetSonFun(it));
                                 }
@@ -797,13 +798,13 @@ namespace Apps.BLL
                             Func<long, IQueryable<long>> GetSonFun = null;
                             GetSonFun = id =>
                             {
-                            // 查找属于给定部门的员工
-                            var sons = from e in db.departmentList
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
                                            where e.parentId == id
                                            select e.id;
                                 IQueryable<long> many = sons;
-                            // 查找属于给定部门子部门的员工
-                            foreach (var it in sons)
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
                                 {
                                     many = many.Concat(GetSonFun(it));
                                 }

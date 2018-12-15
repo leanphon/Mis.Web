@@ -72,6 +72,10 @@
       <HintPath>..\packages\LinqToExcel.1.11.0\lib\LinqToExcel.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="log4net, Version=2.0.8.0, Culture=neutral, PublicKeyToken=669e0ddf0bb1aa2a, processorArchitecture=MSIL">
+      <HintPath>..\packages\log4net.2.0.8\lib\net45-full\log4net.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.CodeDom.Providers.DotNetCompilerPlatform, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.1.0.0\lib\net45\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.dll</HintPath>
       <Private>True</Private>
@@ -223,6 +227,7 @@
     <Compile Include="Controllers\EmployeeController.cs" />
     <Compile Include="Controllers\FunctionRightController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PredictController.cs" />
     <Compile Include="Controllers\LevelController.cs" />
     <Compile Include="Controllers\LogController.cs" />
     <Compile Include="Controllers\LoginAuthorizeAttribute.cs" />
@@ -711,6 +716,9 @@
     <Content Include="App_Data\sqliteLeave.db" />
     <Content Include="Content\themes\material-teal\images\Thumbs.db" />
     <Content Include="Content\themes\material\images\Thumbs.db" />
+    <Content Include="log4net.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <None Include="Properties\PublishProfiles\MIS.Web.pubxml" />
     <None Include="Scripts\jquery-1.10.2.intellisense.js" />
     <Content Include="Scripts\common.js" />
@@ -857,6 +865,10 @@
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\User\ShowResetPasswd.cshtml" />
     <Content Include="Views\Assessment\ShowImport.cshtml" />
+    <Content Include="Views\Predict\LeaveWarning.cshtml" />
+    <Content Include="Views\Predict\Edit.cshtml" />
+    <Content Include="Views\Predict\Index.cshtml" />
+    <Content Include="Views\Employee\ShowDepartment.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Upload\" />

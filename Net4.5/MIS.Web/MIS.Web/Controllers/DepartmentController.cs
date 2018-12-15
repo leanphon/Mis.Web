@@ -134,6 +134,16 @@ namespace MIS.Web.Controllers
 
         }
 
+        /// <summary>
+        /// 编制
+        /// </summary>
+        /// <returns></returns>
+        public ActionResult Strength()
+        {
+            return View();
+
+        }
+
 
     }
 }

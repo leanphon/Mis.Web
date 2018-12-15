@@ -104,7 +104,11 @@
 			//{ text: '入职', iconCls: 'icon-add', handler: onAddEntity },
 			{ text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
 			{ text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
-			{ text: '薪资设定', iconCls: 'icon-money', handler: onShowSalary },
+			'-',
+	        { text: '薪资设定', iconCls: 'icon-money', handler: onShowSalary },
+	        { text: '调岗', iconCls: 'icon-edit', handler: onShowPost },
+	        { text: '调部门', iconCls: 'icon-edit', handler: onShowDepartment },
+	        '-',
             { text: '导入员工数据', iconCls: 'icon-upload', handler: onImportExcel },
 			{ text: '下载模板', iconCls: 'icon-export', handler: onDownloadTemplate },
             { text: '导出全部', iconCls: 'icon-export', handler: onExportAll },
@@ -251,6 +255,40 @@
             }
         });
     }
+	function onShowPost() {
+	    var row = $('#@(tabEntityList)').datagrid('getSelected');
+	    if (null == row) {
+	        showAlert("未选择")
+	        return;
+	    }
+
+	    $.ajax({
+	        url: '/@(controllerName)/ShowPost',
+	        type: 'GET',
+	        data: 'id=' + row.id,
+	        async: false,
+	        success: function (data) {
+	            $('#@(divContent)').append(data);
+	        }
+	    });
+	}
+	function onShowDepartment() {
+	    var row = $('#@(tabEntityList)').datagrid('getSelected');
+	    if (null == row) {
+	        showAlert("未选择")
+	        return;
+	    }
+
+	    $.ajax({
+	        url: '/@(controllerName)/ShowDepartment',
+	        type: 'GET',
+	        data: 'id=' + row.id,
+	        async: false,
+	        success: function (data) {
+	            $('#@(divContent)').append(data);
+	        }
+	    });
+	}
 
 </script>
 

@@ -316,7 +316,6 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
-
                     var passwd = MD5Encode.Encode16(model.passwd);
 
                     var element = (from e in db.userList.Include("role")
@@ -340,9 +339,10 @@ namespace Apps.BLL
                         {
                             element.status = "激活";
                         }
-
+                        
                         db.Entry(element).State = System.Data.Entity.EntityState.Modified;
                         db.SaveChanges();
+
 
                         LogManager.Add(new LogRecord
                         {
@@ -391,6 +391,10 @@ namespace Apps.BLL
                     content = "登录成功",
                     data = new User { name = "root", passwd = "" }
                 };
+            }
+
+            using (SystemDB db = new SystemDB())
+            {
             }
 
             return new OperateResult
