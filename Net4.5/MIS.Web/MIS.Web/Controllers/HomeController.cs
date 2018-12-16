@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -125,7 +126,7 @@ namespace MIS.Web.Controllers
                     or.data = null;
                 }
 
-                return Json(or, JsonRequestBehavior.AllowGet);
+                return Json(or, "text/html", Encoding.UTF8, JsonRequestBehavior.AllowGet);
 
             }
 

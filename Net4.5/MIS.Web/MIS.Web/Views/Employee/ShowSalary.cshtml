@@ -1,4 +1,4 @@
-﻿@model Apps.Model.SalaryInfo
+﻿@model Apps.Model.Employee
 @{
     Layout = null;
 
@@ -37,7 +37,7 @@
     function initDivDialog(titleName) {
         $('#@(divDialog)').dialog({
             width: 450,
-            height: 500,
+            height: 550,
             title: titleName,
             modal: true,
             closed: true,
@@ -81,14 +81,14 @@
                 }
             },
         });
-        //$('#postId').combobox({
-        //    width: '100%',
-        //    editable: false,
-        //    url: '/Post/GetAllEntities',
-        //    mode: 'remote',
-        //    valueField: 'id',
-        //    textField: 'name',
-        //});
+        $('#postId').combobox({
+            width: '100%',
+            editable: false,
+            url: '/Post/GetAllEntities',
+            mode: 'remote',
+            valueField: 'id',
+            textField: 'name',
+        });
         $('#levelId').combogrid({
             width: '100%',
             panelWidth: 370,
@@ -150,25 +150,31 @@
 
         @{
             var total = 0.0;
-            if (Model.levelInfo != null)
+            if (Model.salaryInfo.postInfo != null)
             {
                 <text>
-        postTotal = @(Model.levelInfo.postSalary + Model.levelInfo.fullAttendanceRewards)
-        $('#levelId').combogrid('setValue', '@(Model.levelId)')
+        $('#postId').combobox('setValue', '@(Model.salaryInfo.postId)')
                 </text>
             }
-            if (Model.performanceInfo != null)
+            if (Model.salaryInfo.levelInfo != null)
             {
                 <text>
-        performanceTotal = @(Model.performanceInfo.performanceRewards)
-        $('#performanceId').combogrid('setValue', '@(Model.performanceId)')
+                    postTotal = @(Model.salaryInfo.levelInfo.postSalary + Model.salaryInfo.levelInfo.fullAttendanceRewards)
+                    $('#levelId').combogrid('setValue', '@(Model.salaryInfo.levelId)')
                 </text>
             }
-            if (Model.benefitInfo != null)
+            if (Model.salaryInfo.performanceInfo != null)
             {
                 <text>
-        benefitTotal = @(Model.benefitInfo.benefitRewards)
-        $('#benefitId').combogrid('setValue', '@(Model.benefitId)')
+        performanceTotal = @(Model.salaryInfo.performanceInfo.performanceRewards)
+        $('#performanceId').combogrid('setValue', '@(Model.salaryInfo.performanceId)')
+                </text>
+            }
+            if (Model.salaryInfo.benefitInfo != null)
+            {
+                <text>
+        benefitTotal = @(Model.salaryInfo.benefitInfo.benefitRewards)
+        $('#benefitId').combogrid('setValue', '@(Model.salaryInfo.benefitId)')
                 </text>
             }
 
@@ -188,39 +194,47 @@
 <div id="@(divDialog)" class="easyui-dialog">
     <form id="@(formEntity)" action="" method="post">
         @Html.AntiForgeryToken()
-        @Html.HiddenFor(model => model.id)
-        @Html.HiddenFor(model => model.employeeId)
-
+        <input type="hidden" name="id" value="@(Model.salaryInfo.id)"/>
+        <input type="hidden" name="employeeId" value="@(Model.id)" />
 
         <table style="margin:auto;width:90%">
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.employee.number, new { @class = "lab" })
+                    @Html.LabelFor(model => model.number, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    @Html.EditorFor(model => model.employee.number, new { htmlAttributes = new { @class = "parm_control", @disabled="disabled" } })
+                    @Html.EditorFor(model => model.number, new { htmlAttributes = new { @class = "parm_control", @disabled="disabled" } })
                 </td>
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.employee.name, new { @class = "lab" })
+                    @Html.LabelFor(model => model.name, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    @Html.EditorFor(model => model.employee.name, new { htmlAttributes = new { @class = "parm_control", @disabled = "disabled" } })
+                    @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "parm_control", @disabled = "disabled" } })
                 </td>
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.levelId, new { @class = "lab" })
+                    @Html.LabelFor(model => model.salaryInfo.postId, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    <select class="parm_control" id="levelId" name="levelId" ></select>
+                    <select class="parm_control" id="postId" name="postId" ></select>
                     @*<input class="parm_control" type="text" id="postId" name="postId" />*@
                 </td>
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.performanceId, new { @class = "lab" })
+                    @Html.LabelFor(model => model.salaryInfo.levelId, new { @class = "lab" })
+                </td>
+                <td class="cols_2_right">
+                    <select class="parm_control" id="levelId" name="levelId"></select>
+                    @*<input class="parm_control" type="text" id="postId" name="postId" />*@
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
+                    @Html.LabelFor(model => model.salaryInfo.performanceId, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
                     <input class="parm_control" type="text" id="performanceId" name="performanceId" />
@@ -228,7 +242,7 @@
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.benefitId, new { @class = "lab" })
+                    @Html.LabelFor(model => model.salaryInfo.benefitId, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
                     <input class="parm_control" type="text" id="benefitId" name="benefitId" />

@@ -221,6 +221,23 @@ function DepartmentTreeGrid(gridId, toolbar) {
     this.toolbar = toolbar;
 }
 
+function DepartmentSelectTreeGrid(gridId, toolbar) {
+    this.id = gridId;
+    this.idField = 'id';
+    this.treeField = 'name';
+
+    this.forzenCols = [[
+    ]];
+
+    this.normalCols = [[
+        { field: 'id', hidden: true },
+        { field: 'name', title: '部门名称', width: 250 },
+        { field: 'code', title: '部门编码', width: 150 },
+    ]];
+
+    //this.toolbar = toolbar;
+}
+
 
 function EmployeeGrid(gridId, toolbar){
     this.id = gridId;
@@ -230,6 +247,7 @@ function EmployeeGrid(gridId, toolbar){
                 { field: 'number', title: '工号', width: 150 },
                 { field: 'name', title: '姓名', width: 150 },
                 { field: 'departmentName', title: '所在部门', width: 150, },
+	            { field: 'postName', title: '岗位', width: 150, },
             ]];
 
 	this.normalCols = [[
@@ -271,6 +289,23 @@ function EmployeeGrid(gridId, toolbar){
 	this.toolbar = toolbar;
 }
 
+function EmployeeCareerGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+                { field: 'id', hidden: true },
+    ]];
+
+    this.normalCols = [[
+                { field: 'type', title: '类型', width: 150 },
+                { field: 'time', title: '时间', width: 100 },
+                { field: 'description', title: '说明', width: 500 },
+
+    ]];
+
+
+    this.toolbar = toolbar;
+}
 
 
 function AssessmentInputGrid(gridId, toolbar) {

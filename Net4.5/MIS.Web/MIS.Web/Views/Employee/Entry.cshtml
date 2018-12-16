@@ -168,6 +168,61 @@
             ]
         });
 
+        $('#postId').combobox({
+            width: '100%',
+            editable: false,
+            url: '/Post/GetAllEntities',
+            mode: 'remote',
+            valueField: 'id',
+            textField: 'name',
+        });
+        $('#levelId').combogrid({
+            width: '100%',
+            panelWidth: 370,
+            panelHeight: 'auto',
+            editable: false,
+            idField: 'id',
+            textField: 'name',
+            url: '/Level/GetAllEntities',
+            columns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'name', title: '岗位名称', width: 120 },
+                { field: 'code', title: '岗位代码', width: 80 },
+                { field: 'postSalary', title: '岗位工资', width: 80 },
+                { field: 'fullAttendanceRewards', title: '全勤奖', width: 80 },
+            ]],
+        });
+
+        $('#performanceId').combogrid({
+            width: '100%',
+            panelWidth: 200,
+            panelHeight: 'auto',
+            editable: false,
+            idField: 'id',
+            textField: 'code',
+            url: '/Performance/GetAllEntities',
+            columns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'code', title: '绩效代码', width: 80 },
+                { field: 'performanceRewards', title: '绩效奖金', width: 80 },
+            ]],
+        });
+
+        $('#benefitId').combogrid({
+            width: '100%',
+            panelWidth: 200,
+            panelHeight: 'auto',
+            editable: false,
+            idField: 'id',
+            textField: 'code',
+            url: '/Benefit/GetAllEntities',
+            columns: [[
+                { field: 'id', title: 'id', width: 80, hidden: true },
+                { field: 'code', title: '绩效代码', width: 80 },
+                { field: 'benefitRewards', title: '效益奖金', width: 80 },
+            ]],
+        });
+
     }
 
     function submit() {
@@ -326,18 +381,33 @@
             </tr>
             <tr>
                 <td class="cols_4_left">
-                    @Html.LabelFor(model => model.entryDate, new { @class = "lab" })
+                    @Html.LabelFor(model => model.salaryInfo.postId, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    @Html.EditorFor(model => model.entryDate, new { htmlAttributes = new { @class = "parm_control" } })
+                    <input class="parm_control" type="text" id="postId" name="postId" />
+
                 </td>
                 <td class="cols_4_left">
-                    @Html.LabelFor(model => model.state, new { @class = "lab" })
+                    @Html.LabelFor(model => model.salaryInfo.levelId, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
-                    <input class="parm_control" readonly type="text" id="state" name="state" value="试用期" />
+                    <input class="parm_control" type="text" id="levelId" name="levelId" />
                 </td>
             </tr>
+        <tr>
+            <td class="cols_4_left">
+                @Html.LabelFor(model => model.salaryInfo.performanceId, new { @class = "lab" })
+            </td>
+            <td class="cols_4_right">
+                <input class="parm_control" type="text" id="performanceId" name="performanceId" />
+            </td>
+            <td class="cols_4_left">
+                @Html.LabelFor(model => model.salaryInfo.benefitId, new { @class = "lab" })
+            </td>
+            <td class="cols_4_right">
+                <input class="parm_control" type="text" id="benefitId" name="benefitId" />
+            </td>
+        </tr>
             <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.contractSerial, new { @class = "lab" })

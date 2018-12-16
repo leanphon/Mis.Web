@@ -79,6 +79,23 @@ namespace MIS.Web.Controllers
                 );
             }
 
+            SalaryInfo salary = new SalaryInfo();
+            try
+            {
+                salary.postId = Convert.ToInt64(Request.Params["postId"]);
+                salary.levelId = Convert.ToInt64(Request.Params["levelId"]);
+                salary.performanceId = Convert.ToInt64(Request.Params["performanceId"]);
+                salary.benefitId = Convert.ToInt64(Request.Params["benefitId"]);
+            }
+            catch (Exception)
+            {
+                return Json(new OperateResult
+                {
+                    content = "岗位、层级、绩效、效益,选择有误"
+                }, JsonRequestBehavior.AllowGet);
+            }
+
+            model.salaryInfo = salary;
 
             EmployeeManager manager = new EmployeeManager();
 
@@ -258,18 +275,16 @@ namespace MIS.Web.Controllers
             }
             EmployeeManager manager = new EmployeeManager();
 
-            OperateResult or = manager.GetSalaryInfoById(id.Value);
+            OperateResult or = manager.GetById(id.Value);
 
-            if (or.data == null) // 未经设定，则初始化一个
+            if (or.data != null) // 未经设定，则初始化一个
             {
-                OperateResult orEmployee = manager.GetById(id.Value);
-                if(orEmployee.data != null)
+                Employee e = or.data as Employee;
+                if (e.salaryInfo == null)
                 {
-                    or.data = new SalaryInfo
+                    e.salaryInfo = new SalaryInfo()
                     {
-                        id = 0,
-                        employee = orEmployee.data as Employee,
-                        employeeId = id.Value
+                        id = 0
                     };
                 }
 
@@ -290,12 +305,24 @@ namespace MIS.Web.Controllers
             //        JsonRequestBehavior.AllowGet
             //    );
             //}
+            try
+            {
+                long employeeId = Convert.ToInt64(Request.Params["employeeId"]);
 
-            EmployeeManager manager = new EmployeeManager();
+                EmployeeManager manager = new EmployeeManager();
+                OperateResult or = manager.UpdateSalary(employeeId, model);
 
-            OperateResult or = manager.UpdateSalary(model);
+                return Json(or, JsonRequestBehavior.AllowGet);
+            }
+            catch (Exception e)
+            {
+                return Json(new OperateResult()
+                {
+                    content = "访问错误"
+                }, JsonRequestBehavior.AllowGet);
+            }
 
-            return Json(or, JsonRequestBehavior.AllowGet);
+            
 
         }
 
@@ -304,7 +331,7 @@ namespace MIS.Web.Controllers
             return View();
 
         }
-        public ActionResult SelectDepartment(long departmentId)
+        public ActionResult SelectDepartment(long id ,long departmentId)
         {
             //if (!ModelState.IsValid)
             //{
@@ -319,12 +346,47 @@ namespace MIS.Web.Controllers
 
             EmployeeManager manager = new EmployeeManager();
 
-            OperateResult or = manager.UpdateSalary(null);
+            OperateResult or = manager.SelectDepartment(id, departmentId);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
         }
 
+        public ActionResult ShowCareer(long? id)
+        {
+            ViewBag.employeeId = id;
+            return View();
+        }
+        public ActionResult GetCareer(long? id)
+        {
+            var data = new
+            {
+                type = "入职",
+                time = "2016-10-09",
+                description = "员工入职"
+            };
+            var careers = new[]
+            {
+                new
+                {
+                    type = "入职",
+                    time = "2016-10-09",
+                    description = "员工入职，岗位主管"
+                },
+                new
+                {
+                    type = "岗位变动",
+                    time = "2016-12-09",
+                    description = "由主管晋升为部门经理"
+                },
+            };
+
+            OperateResult or = new OperateResult();
+            or.status = OperateStatus.Success;
+            or.data = careers;
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+        }
 
 
         public ActionResult ExportAll()
