@@ -76,6 +76,27 @@ namespace Apps.BLL
             return result;
         }
 
+        public OperateResult RefreshSalary(SalaryRecord model)
+        {
+
+            var shouldTotal = model.postSalary + model.fullAttendanceRewards + model.performanceRewards
+                              + model.benefitRewards + model.seniorityRewards + model.normalOvertimeRewards
+                              + model.holidayOvertimeRewards + model.subsidy + model.reissue;
+
+            var actualTotal =  shouldTotal - model.socialSecurity - model.publicFund - model.tax - model.chargeback;
+
+            model.shouldTotal = Math.Round(shouldTotal, 2);
+            model.actualTotal = Math.Round(actualTotal, 2); 
+
+            return new OperateResult
+            {
+                status = OperateStatus.Success,
+                data = model,
+            };
+
+        }
+
+
         public OperateResult Remove(long id)
         {
             try
@@ -243,8 +264,6 @@ namespace Apps.BLL
                 {
 
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
-                                   join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
-                                   on e.assessmentInfo.employeeId equals salaryInfo.employeeId
                                    join employee in db.employeeList.Include("department")
                                    on e.assessmentInfo.employeeId equals employee.id
 
@@ -402,8 +421,10 @@ namespace Apps.BLL
                     // 得到给定月份的已经存在考核数据的记录
                     string month = param.filters["month"].value ?? "";
                     var elements = from e in db.assessmentInfoList.Include("employee").AsEnumerable()
-                                   join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo")
-                                   on e.employeeId equals salaryInfo.employeeId
+                                   let salaryInfo = e.employee.salaryInfo
+
+                                   //join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo")
+                                   //on e.employeeId equals salaryInfo.employeeId
                                    join department in db.departmentList
                                    on e.employee.departmentId equals department.id
 
@@ -414,7 +435,7 @@ namespace Apps.BLL
                                    let seniorityRewards = CalSeniorityRewards(salaryInfo.levelInfo.seniorityRewardsBase, month, e.employee.entryDate ?? DateTime.Now)
                                    let normalOvertimeRewards = CalNormalOvertimeRewards(salaryInfo.levelInfo.postSalary, e.normalOvertime ?? 0)
                                    let holidayOvertimeRewards = CalHolidayOvertimeRewards(salaryInfo.levelInfo.postSalary, e.holidayOvertime ?? 0)
-                                   let shouldTotal = postSalary + fullAttendanceRewards + performanceRewards + benefitRewards + seniorityRewards + normalOvertimeRewards + holidayOvertimeRewards
+                                   let shouldTotal = Math.Round(postSalary + fullAttendanceRewards + performanceRewards + benefitRewards + seniorityRewards + normalOvertimeRewards + holidayOvertimeRewards, 2)
 
                                    where e.month == month && !(db.salaryRecordList.Any(c => c.assessmentInfoId == e.id))
                                    select new
@@ -446,6 +467,7 @@ namespace Apps.BLL
                                        socialSecurity = 0,
                                        publicFund = 0,
                                        tax = 0,
+                                       chargeback = 0,
                                        shouldTotal = shouldTotal,
                                        actualTotal = shouldTotal,
                                    };
@@ -658,8 +680,6 @@ namespace Apps.BLL
                 {
 
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
-                                   join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
-                                   on e.assessmentInfo.employeeId equals salaryInfo.employeeId
                                    join employee in db.employeeList.Include("department")
                                    on e.assessmentInfo.employeeId equals employee.id
 

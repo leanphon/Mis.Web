@@ -16,7 +16,7 @@ namespace Apps.Model.Privilege
 
         [Display(Name = "url地址")]
         [Required(ErrorMessage = "{0}必须填写！")]
-        [StringLength(30, ErrorMessage = "{0}的长度在{1}个字符之内")]
+        [StringLength(150, ErrorMessage = "{0}的长度在{1}个字符之内")]
 
         public string url { get; set; }
 

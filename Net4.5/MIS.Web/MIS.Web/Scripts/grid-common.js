@@ -118,8 +118,6 @@ function onDatagridRowContextMenu(e, rowIndex, rowData) { //右键时触发事�
 
 function onClickRow(index) {
     var editIndex = $(this).attr("editIndex")
-    console.log(editIndex);
-    console.log(index);
      
     if (editIndex != index) {
         if (endEditing($(this))) {
@@ -133,8 +131,6 @@ function onClickRow(index) {
 
 function onDblClickRow(index) {
     var editIndex = $(this).attr("editIndex");
-    console.log(editIndex);
-    console.log(index);
 
     if (editIndex != index) {
         if (endEditing($(this))) {
@@ -144,7 +140,6 @@ function onDblClickRow(index) {
 
             $.data(this, "lastRowData", row)
 
-            console.log("begin edit")
 
             if ($(this).datagrid('beginEdit', index)) {
                 $(this).attr("editIndex", index);
@@ -158,7 +153,6 @@ function onDblClickRow(index) {
 
 function endEditing(gridObj) {
     var editIndex = gridObj.attr("editIndex");
-    console.log(editIndex);
 
     if (editIndex == -1) {
         return true
@@ -321,4 +315,51 @@ function onTreegridonContextMenu(e, row) { //右键时触发事件
 
 /**************************************** end treegrid 相关  *************************/
 
+
+/**************************************** begin propertygrid 相关  *************************/
+function initPropertygrid(gridEntity, url, callbackFuns) {
+    var gridObj = $('#' + gridEntity.id)
+    gridObj.propertygrid({}); //初始化
+
+    if (callbackFuns) {
+        for (var i = 0; i < callbackFuns.length; i++) {
+            gridObj.propertygrid('options')[callbackFuns[i].name] = callbackFuns[i].fun;
+        }
+
+    }
+
+    gridObj.propertygrid({
+        width: '100%',
+        method: 'POST',
+        url: url,
+        pagination: true,
+        singleSelect: true,
+        rownumbers: true,
+        loadMsg: '正在加载中，请稍等... ',
+        nowrap: false,//允许换行
+        //fitColumns: true,//宽度自适应
+        frozenColumns: gridEntity.forzenCols,
+        columns: gridEntity.normalCols,
+        toolbar: gridEntity.toolbar,
+
+    });
+
+
+    var p = gridObj.propertygrid('getPager');
+    $(p).pagination({
+        pageSize: 10,
+        pageList: [10, 20, 50, 100],
+        beforePageText: '第',
+        afterPageText: '页 共{pages}页',
+        displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
+    });
+
+}
+
+
+function onPropertyridAdjust(gridId) {
+    $('#' + gridId).propertygrid('resize');
+}
+
+/**************************************** end propertygrid 相关  *************************/
 

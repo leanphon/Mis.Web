@@ -158,6 +158,9 @@ namespace Apps.Model
         [Display(Name = "合同结束日")]
         public DateTime? contractEnd { get; set; }
 
+        public long ?salaryInfoId { get; set; }
+        [ForeignKey("salaryInfoId")]
+        public virtual SalaryInfo salaryInfo { get; set; }
     }
 
     public class EmployeeExport

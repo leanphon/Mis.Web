@@ -257,7 +257,7 @@ function EmployeeGrid(gridId, toolbar){
                 { field: 'idCard', title: '身份证', width: 200 },
                 //{ field: 'email', title: '工作邮箱', width: 200 },
                 { field: 'birthday', title: '出生日期', width: 150, formatter: formatDate },
-                { field: 'state', title: '在职状态', width: 150 },
+                { field: 'state', title: '员工状态', width: 150 },
                 //{ field: 'shouldTotal', title: '标准应发月薪', width: 150 },
                 { field: 'bankCard', title: '工资卡', width: 200 },
 
@@ -299,13 +299,31 @@ function EmployeeCareerGrid(gridId, toolbar) {
     this.normalCols = [[
                 { field: 'type', title: '类型', width: 150 },
                 { field: 'time', title: '时间', width: 100 },
-                { field: 'description', title: '说明', width: 500 },
+                { field: 'description', title: '说明', width: 350 },
 
     ]];
 
 
     this.toolbar = toolbar;
 }
+
+function EmployeeCareerPropertyGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+        { field: 'id', hidden: true },
+    ]];
+
+    this.normalCols = [[
+        { field: 'type', title: '类型', width: 150 },
+        { field: 'time', title: '时间', width: 100 },
+        { field: 'description', title: '说明', width: 350 },
+
+    ]];
+
+    this.toolbar = toolbar;
+}
+
 
 
 function AssessmentInputGrid(gridId, toolbar) {
@@ -491,6 +509,10 @@ function SalaryInputGrid(gridId, toolbar) {
                 {
                     field: 'tax', title: '个人所得税', width: 150, styler: negativeStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+                },
+                {
+                    field: 'chargeback', title: '其他扣款', width: 150, styler: negativeStyler,
+                    editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
                 },
                 { field: 'shouldTotal', title: '应发工资', width: 150, styler: positiveStyler, },
                 { field: 'actualTotal', title: '实发工资', width: 150, styler: positiveStyler, },

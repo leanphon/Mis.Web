@@ -1,4 +1,6 @@
 ﻿@*@model IEnumerable<Apps.Model.Privilege.FunctionRight>*@
+@using System.Drawing
+@model  Dictionary<Apps.Model.Privilege.Module, IEnumerable<Apps.Model.Privilege.Module>> 
 @{
     ViewBag.Title = ViewBag.companyName + " 智能人力资源管理系统";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -9,23 +11,36 @@
 }
 
 <style>
-    
-body {
-    font-family:verdana,helvetica,arial,sans-serif;
-    padding:20px;
-    font-size:12px;
-    margin:0;
-}
 
-.iframe-content {
-    font-size:15px;
-}
+    body {
+        font-family:verdana,helvetica,arial,sans-serif;
+        padding:20px;
+        font-size:12px;
+        margin:0;
+    }
+
+    .iframe-content {
+        font-size:15px;
+        overflow: auto
+    }
+    .a-module {
+        width: 85%;
+    }
 </style>
+
+<script type="text/javascript">
+</script>
 
 <body class="easyui-layout" id="layout">
     <div data-options="region:'north',border:false" style="text-align:center; height:60px; background:#B3DFDA; padding:10px;" >
         <span style="text-align:center; font-size:30px; ">@(ViewBag.Title)</span>
-        <span style="float:right">
+        <span style="float: right">
+            <span style="color:brown">
+                当前用户：<text >@(ViewBag.username)</text>
+            </span>
+            <a class="easyui-linkbutton" href="#" onclick="modifyPasswd()">
+                修改密码
+            </a>
             <a class="easyui-linkbutton" href="#" onclick="logout()">
                 注销
             </a>
@@ -34,64 +49,29 @@ body {
             </a>
         </span>
     </div>
-    <div data-options="region:'west',split:true,title:'菜单'" style="width:250px;padding:10px;">
-        <div class="easyui-accordion" data-options="multiple:true, fit:false,border:false">
-            
-            <div title="员工管理" data-options="selected:true" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/Employee/Entry')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">入职</a>
-                <a href="#" onclick="redirectUrl(this, '/Employee/ShowFormal')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">转正</a>
-                <a href="#" onclick="redirectUrl(this, '/Employee/ShowLeave')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">离职</a>
-                <a href="#" onclick="redirectUrl(this, '/Employee/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工列表</a>
+<div data-options="region:'west',split:true,title:'菜单'" style="width: 250px; padding: 10px;">
+    <div class="easyui-accordion" data-options="multiple:true, fit:false,border:false">
+        @foreach (var parent in Model){
+            <div title="@(parent.Key.name)" data-options="selected:true" style="padding: 10px">
+                @foreach (var sun in parent.Value)
+                {
+                <a href="#" onclick="redirectUrl(this, '@(sun.baseUrl)')" class="easyui-linkbutton a-module"  data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">@(sun.name)</a>
+                }
+                
             </div>
-            <div title="薪酬管理"  style="padding:10px;">
-                <a href="#" onclick="redirectUrl(this, '/Assessment/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">考核录入</a>
-                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">工资录入</a>
-                <a href="#" onclick="redirectUrl(this, '/Assessment/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">考核记录</a>
-                <a href="#" onclick="redirectUrl(this, '/SalaryRecord/HistoryIndex')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-chart',size:'large',iconAlign:'top'">工资记录</a>
-            </div>
-            <div title="数据分析" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeAge')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工年龄分析</a>
-                <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeGender')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工性别分析</a>
-                <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeWorkAge')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工司龄分析</a>
-                <a href="#" onclick="redirectUrl(this, '/Analyse/EmployeeSalary')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">员工薪酬分析</a>
-            </div>
-            <div title="智能预测" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/Predict/LeaveWarning')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">智能预测</a>
-            </div>
-            <div title="组织架构" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/Department/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">部门管理</a>
-                <a href="#" onclick="redirectUrl(this, '/Department/Strength')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">部门编制</a>
-            </div>
-            <div title="基础字典" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/Post/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">岗位管理</a>
-                <a href="#" onclick="redirectUrl(this, '/Level/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">层级管理</a>
-                <a href="#" onclick="redirectUrl(this, '/Performance/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-shapes',size:'large',iconAlign:'top'">绩效管理</a>
-                <a href="#" onclick="redirectUrl(this, '/Benefit/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">效益管理</a>
-            </div>
-            <div title="系统设置" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/User/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">用户管理</a>
-                <a href="#" onclick="redirectUrl(this, '/Role/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">角色管理</a>
-                <a href="#" onclick="redirectUrl(this, '/Company/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-picture',size:'large',iconAlign:'top'">公司信息</a>
-                <a href="#" onclick="redirectUrl(this, '/Log/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">系统日志</a>
-            </div>
-            @*<div title="后台设置" style="padding:10px">
-                <a href="#" onclick="redirectUrl(this, '/CompanyRegister/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">公司注册管理</a>
-                <a href="#" onclick="redirectUrl(this, '/Module/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">模块管理</a>
-                <a href="#" onclick="redirectUrl(this, '/FunctionRight/Index')" class="easyui-linkbutton" style="width:85%" data-options="iconCls:'icon-large-smartart',size:'large',iconAlign:'top'">功能权限管理</a>
-            </div>*@
-        </div>
-
+        }
     </div>
-    @*<div data-options="region:'east',split:true,collapsed:true,title:'East'" style="width:100px;padding:10px;">
-        east region
-    </div>*@
-    <div data-options="region:'south',border:false" 
+
+</div>
+    <div data-options="region:'south',border:false"
          style="text-align:center; font-size:20px; height:50px; background:#A9FACD; padding:10px;">
          华夏互生 提供技术支持               服务电话 0771-8052091
     </div>
 <div id="center" data-options="region:'center',title:'默认',">
-    <iframe id="subPage" class="iframe-content" style="width: 100%; height: 99%"></iframe>
+    <iframe id="subPage" scrolling="yes" class="iframe-content" style="width: 100%; height: 99%"></iframe>
 </div>
+
+<div id ="dlg"></div>
 
 </body>
 
@@ -149,6 +129,18 @@ body {
             success: function (data) {
                 window.location.href = "about:blank";
                 window.close();
+            }
+        });
+    }
+
+    function modifyPasswd() {
+        $.ajax({
+            url: '/User/ShowModifyPasswd',
+            type: 'GET',
+            data: 'id=' + @(ViewBag.userId),
+            async: false,
+            success: function (data) {
+                $('#dlg').append(data);
             }
         });
     }

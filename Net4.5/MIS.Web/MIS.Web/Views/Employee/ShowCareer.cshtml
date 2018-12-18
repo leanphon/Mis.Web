@@ -1,150 +1,109 @@
-﻿@{
-    ViewBag.Title = "员工职业生涯";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+﻿@model Apps.Model.Employee
+@{
+    Layout = null;
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string divContent = controllerName + "_divContent";
-    string tabEntityList = controllerName + "_tabEntityList-Career";
+    string divDialog = controllerName + "_divDialog";
+    string divContent = controllerName + "_divContent-career";
+    string tabEntityList = controllerName + "_tabEntityList-career";
 }
-
-
-<div class="easyui-layout" fit="true" border="false">
-    <div>
-        @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
-        <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
-            <form id="searchForm">
-                <table>
-                    <tr>
-                        <th>起始时间：</th>
-                        <td>
-                            <input class="parm_control" type="text" id="beginTime" name="beginTime" />
-                        </td>
-                        <th>截止时间：</th>
-                        <td>
-                            <input class="parm_control" type="text" id="endTime" name="endTime" />
-                        </td>
-                        <th></th>
-                        <td>
-                            <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
-                        </td>
-                    </tr>
-                    <tr>
-                        <th>类型：</th>
-                        <td>
-                            <input class="parm_control" type="text" id="type-filter" name="typ" />
-                        </td>
-                    </tr>
-                </table>
-            </form>
-        </div>
-        <table class="tab_center" id="@(tabEntityList)"></table>
-    </div>
-</div>
-<div id="@(divContent)"></div>
-
-<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
-    <!--放置一个隐藏的菜单Div-->
-</div>
-
-
-<div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
-    <!--放置一个隐藏的菜单Div-->
-</div>
-
 <script>
-	$(function () {
-	    initPage();
+    function show() {
+        initDivDialog("员工职业生涯");
 
-		//初始加载，表格宽度自适应
-		$(document).ready(function(){
-			onDatagridAdjust();
-		});
-	　　//浏览器窗口大小变化后，表格宽度自适应
-		$(window).resize(function(){
-			onDatagridAdjust();
-		});
-    })
+        $('#@(divDialog)').dialog('open');
+        $('#@(divDialog)').dialog('center');
+    }
+    $(function () {
+        show();
+    });
 
-	function initPage() {
-	    $('#type-filter').combobox({
-	        width: '100%',
-	        //editable: false,
-	        //url: '/Department/GetAllEntities',
-	        //mode: 'remote',
-	        valueField: 'id',
-	        textField: 'name',
-	        data: [
-	            { id: "入职", name: "入职" },
-	            { id: "奖励", name: "奖励" },
-	            { id: "惩罚", name: "惩罚" },
-	            { id: "职位变动", name: "职位变动" },
-	            { id: "薪酬变动", name: "薪酬变动" },
+    function destroyDialog() {
+        $('#@(divDialog)').dialog('destroy');
+        $('#@(divContent)').empty();
+    }
 
-	        ]
-	    });
+    function initDivDialog(titleName) {
+        $('#@(divDialog)').dialog({
+            width: 650,
+            height: 500,
+            title: titleName,
+            modal: true,
+            closed: true,
+            collapsible: false,// 是否显示可折叠按钮
+            minimizable: false,// 是否显示最小化按钮
+            maximizable: false,// 是否显示最大化按钮
+            resizable: false,// 是否可以改变对话框窗口大小
+            onClose: destroyDialog,
+            // 对话框窗口底部按钮
+            buttons: [
+                {
+                    text: '关闭',
+                    iconCls: 'icon-cancel',
+                    handler: destroyDialog
+                }
+            ]
+        });
 
-	    var url = '/@(controllerName)/GetCareer?id=@(ViewBag.employeeId)';
-	    var callbackFuns = [
-	    ];
-
-	    var toolbar = [
-	    ];
-
-	    var gridObj = new EmployeeCareerGrid('@(tabEntityList)', toolbar);
-
-	    initDatagrid(gridObj, url, callbackFuns);
-	}
-
-
-    function getParamsJson() {
-        var filterList = new Array;
-        if ($('#type-filter').val().trim() != '') {
-            var p = {
-                "key": "type",
-                "action": "==",
-                "value": $('#type-filter').val().trim()
-            };
-            filterList.push(p)
-        }
-        if ($('#beginTime').val().trim() != '') {
-            var p = {
-                "key": "beginTime",
-                "action": "==",
-                "value": $('#beginTime').val().trim()
-            };
-            filterList.push(p)
-        }
-        if ($('#endTime').val().trim() != '') {
-            var p = {
-                "key": "endTime",
-                "action": "==",
-                "value": $('#endTime').val().trim()
-            };
-            filterList.push(p)
-        }
-        filterList.push(p)
-
-        return JSON.stringify(filterList);
+        initGrid();
     }
 
 
-    function onBeforeLoad(param) {
+    function initGrid() {
 
-        param.extendParams = getParamsJson();
+        var url = '/@(controllerName)/GetCareer?id=@(Model.id)';
+        var callbackFuns = [
+        ];
 
-        return true;
+        var toolbar = [
+        ];
+
+        var gridObj = new EmployeeCareerPropertyGrid('@(tabEntityList)', toolbar);
+
+        initPropertygrid(gridObj, url, callbackFuns);
+    }
+    function initGrid2() {
+
+        var url = '/@(controllerName)/GetCareer?id=@(Model.id)';
+        var callbackFuns = [
+        ];
+
+        var toolbar = [
+        ];
+
+        var gridObj = new EmployeeCareerGrid('@(tabEntityList)', toolbar);
+
+        initDatagrid(gridObj, url, callbackFuns);
     }
 
-    function filter() {
-        var queryParams = $('#@(tabEntityList)').datagrid('options').queryParams;
-
-        queryParams.extendParams = getParamsJson();
-
-        $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
-        $('#@(tabEntityList)').datagrid('load');
-    }
 
 
 </script>
+
+<div id="@(divDialog)" class="easyui-dialog">
+    <div class="easyui-layout" fit="true" border="false">
+        <div>
+            @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+            <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+                <table>
+                    <tr>
+                        <th>姓名：</th>
+                        <td>
+                            <input class="parm_control" type="text" readonly="" value="@(Model.name)" />
+                        </td>
+                        <th>工号：</th>
+                        <td>
+                            <input class="parm_control" type="text" readonly="" value="@(Model.number)" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <table class="tab_center" id="@(tabEntityList)"></table>
+        </div>
+    </div>
+
+</div>
+
+
 
 

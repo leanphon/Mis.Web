@@ -34,6 +34,14 @@ namespace Apps.BLL
                         };
                     }
 
+                    if (model.salaryInfo != null)
+                    {
+                        db.salaryInfoList.Add(model.salaryInfo);
+                        db.SaveChanges();
+
+                        model.salaryInfoId = model.salaryInfo.id;
+                    }
+                    
                     db.employeeList.Add(model);
 
                     {
@@ -156,7 +164,7 @@ namespace Apps.BLL
 
                     var element = (from m in db.salaryInfoList.Include("levelInfo").Include("employee")
                                    .Include("performanceInfo").Include("benefitInfo")
-                                   where m.employeeId == id
+                                   join e in db.employeeList on m.id equals e.salaryInfoId
                                    select m
                                 ).FirstOrDefault();
 
@@ -187,7 +195,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult UpdateSalary(SalaryInfo model)
+        public OperateResult UpdateSalary(long employeeId, SalaryInfo model)
         {
             try
             {
@@ -202,15 +210,30 @@ namespace Apps.BLL
                     if (elements.Count() == 1)
                     {
                         db.Entry(model).State = System.Data.Entity.EntityState.Modified;
+                        db.SaveChanges();
                     }
                     else
                     {
-                        db.salaryInfoList.Add(model);
+                        var employee = (from e in db.employeeList
+                            where e.id == employeeId
+                            select e).AsNoTracking().FirstOrDefault();
+                        if (employee == null)
+                        {
+                            return new OperateResult
+                            {
+                                content = "访问错误",
+                            };
+                        }
 
+                        db.salaryInfoList.Add(model);
+                        db.SaveChanges();
+
+                        employee.salaryInfo = model;
+                        employee.salaryInfoId = model.id;
+                        db.Entry(employee).State = EntityState.Modified;
+                        db.SaveChanges();
                     }
 
-
-                    db.SaveChanges();
 
                     return new OperateResult
                     {
@@ -322,7 +345,49 @@ namespace Apps.BLL
             }
         }
 
+        public OperateResult SelectDepartment(long id, long departmentId)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
 
+                    var element = (from m in db.employeeList
+                            where id == m.id
+                            select m
+                        ).AsNoTracking().FirstOrDefault();
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    element.departmentId = departmentId;
+
+                    db.Entry(element).State = EntityState.Modified;
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "修改成功"
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
 
         public OperateResult GetById(long id)
         {
@@ -331,7 +396,9 @@ namespace Apps.BLL
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var element = (from m in db.employeeList.Include("department")
+                    var element = (from m in db.employeeList.Include("department").Include("salaryInfo")
+                                .Include("salaryInfo.postInfo").Include("salaryInfo.levelInfo")
+                                .Include("salaryInfo.performanceInfo").Include("salaryInfo.benefitInfo")
                                    where id == m.id
                                    select m
                                 ).FirstOrDefault();
@@ -431,7 +498,7 @@ namespace Apps.BLL
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var elements = from e in db.employeeList
+                    var elements = from e in db.employeeList.Include("salaryInfo").Include("salaryInfo.postInfo")
                                    select new
                                    {
                                        e.id,
@@ -462,6 +529,8 @@ namespace Apps.BLL
                                        e.contractSerial,
                                        e.contractBegin,
                                        e.contractEnd,
+                                      postName = e.salaryInfo.postInfo.name
+
                                    };
 
                     // 先查询出部门及子部门，再过滤
@@ -786,6 +855,12 @@ namespace Apps.BLL
 
                 bool fail = false;
                 OperateResult result = new OperateResult();
+                if (elements.Count() == 0)
+                {
+                    result.content = "无数据或数据不完整，导入失败！";
+
+                    return result;
+                }
                 foreach (var model in elements)
                 {
                     OperateResult or = Add(model);
@@ -1128,7 +1203,7 @@ namespace Apps.BLL
 
                     var elements = from s in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo").AsEnumerable()
                                    join e in db.employeeList
-                                   on s.employeeId equals e.id
+                                   on s.id equals e.salaryInfoId
                                    let salary = s.GetSalaryTotal()
                                    select new
                                    {

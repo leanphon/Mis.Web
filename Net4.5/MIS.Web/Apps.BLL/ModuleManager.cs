@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
+using Remotion.Data.Linq.Clauses;
 
 namespace Apps.BLL
 {
@@ -291,5 +292,143 @@ namespace Apps.BLL
             }
         }
 
+        public OperateResult GetModuleTree(QueryParam param = null)
+        {
+            if (param == null || param.filters == null
+                              || !param.filters.Keys.Contains("roleId"))
+            {
+                return new OperateResult
+                {
+                    content = "没有权限"
+                };
+            }
+
+            var p = param.filters["roleId"];
+            long roleId = Convert.ToInt64(p.value ?? "0");
+
+            try
+            {
+                Dictionary<Module, IEnumerable<Module>> map = new Dictionary<Module, IEnumerable<Module>>();
+
+                var or = GetModulesByRoleId(roleId);
+                if (or.status != OperateStatus.Success)
+                {
+                    return or;
+                }
+
+                List<Module> elements = or.data as List<Module>;
+
+                using (SystemDB db = new SystemDB())
+                {
+                    var parents = from e in elements
+                                  where e.parentId == null
+                                  select e;
+                    foreach (var m in parents)
+                    {
+                        var suns = from s in elements
+                                   where s.parentId == m.id
+                                   select s;
+
+                        map.Add(m, suns);
+                    }
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = map,
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        public OperateResult GetModulesByRoleId(long roleId)
+        {
+            if (roleId == -1) // root 用户
+            {
+                try
+                {
+                    using (SystemDB db = new SystemDB())
+                    {
+                        var data = (from e in db.moduleList
+                                    orderby e.showIndex ascending
+                                    select e)
+                            .ToList();
+
+                        return new OperateResult
+                        {
+                            data = data,
+                            status = OperateStatus.Success
+                        };
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
+                    };
+                }
+            }
+            else
+            {
+                try
+                {
+                    using (SystemDB db = new SystemDB())
+                    {
+                        var role = (from e in db.roleList.Include("rightList")
+                                    where e.id == roleId
+                                    select e).FirstOrDefault();
+                        if (role == null)
+                        {
+                            return new OperateResult
+                            {
+                                content = "没有权限"
+                            };
+                        }
+
+                        if (role.type == RoleType.Admin)
+                        {
+                            var data = (from e in db.moduleList
+                                where e.onlyRoot != 1
+                                orderby e.showIndex ascending
+                                select e).ToList();
+
+                            return new OperateResult
+                            {
+                                data = data,
+                                status = OperateStatus.Success
+                            };
+                        }
+                        else
+                        {
+                            var data = (from e in role.rightList
+                                join m in db.moduleList on e.moduleId equals m.id
+                                orderby m.showIndex ascending
+                                select m).Distinct().ToList();
+
+                            return new OperateResult
+                            {
+                                data = data,
+                                status = OperateStatus.Success
+                            };
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return new OperateResult
+                    {
+                        content = Model.Utility.Utility.GetExceptionMsg(ex),
+                    };
+                }
+            }
+        }
     }
 }

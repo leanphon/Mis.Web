@@ -354,17 +354,18 @@ namespace MIS.Web.Controllers
 
         public ActionResult ShowCareer(long? id)
         {
-            ViewBag.employeeId = id;
-            return View();
+            EmployeeManager manager = new EmployeeManager();
+
+            OperateResult or = manager.GetById(id.Value);
+            if (or.status == OperateStatus.Error || or.data == null)
+            {
+                return Content("访问错误");
+            }
+
+            return View(or.data);
         }
         public ActionResult GetCareer(long? id)
         {
-            var data = new
-            {
-                type = "入职",
-                time = "2016-10-09",
-                description = "员工入职"
-            };
             var careers = new[]
             {
                 new
@@ -385,7 +386,7 @@ namespace MIS.Web.Controllers
             or.status = OperateStatus.Success;
             or.data = careers;
 
-            return Json(or, JsonRequestBehavior.AllowGet);
+            return Json(or.data, JsonRequestBehavior.AllowGet);
         }
 
 

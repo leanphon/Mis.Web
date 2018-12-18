@@ -3,7 +3,7 @@
 namespace MIS.Web.Controllers
 {
     [LoginAuthorize]
-    //[UserAuthorize]
+    [UserAuthorize]
     public class BaseController : Controller
     {
     }

@@ -93,9 +93,10 @@ namespace Apps.Model
     {
         public long id { get; set; }
 
-        public long employeeId { get; set; }
-        [ForeignKey("employeeId")]
-        public virtual Employee employee { get; set; }
+        [Display(Name = "岗位")]
+        public long postId { get; set; }
+        [ForeignKey("postId")]
+        public virtual PostInfo postInfo { get; set; }
 
 
         [Display(Name = "层级")]
@@ -118,9 +119,8 @@ namespace Apps.Model
         public double GetSalaryTotal()
         {
             double total = levelInfo.postSalary + levelInfo.fullAttendanceRewards;
-            int year = Utility.Utility.CalYears(employee.entryDate != null ? employee.entryDate.Value : DateTime.Now, DateTime.Now);
 
-            total += levelInfo.seniorityRewardsBase * year
+            total += levelInfo.seniorityRewardsBase
                 + performanceInfo.performanceRewards + benefitInfo.benefitRewards;
 
             return total;

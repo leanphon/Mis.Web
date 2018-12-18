@@ -33,7 +33,7 @@ namespace Apps.BLL
             modelBuilder.Entity<AssessmentInfo>().ToTable("AssessmentInfos");
             //modelBuilder.Entity<RoleRights>().ToTable("RoleRights");
             modelBuilder.Entity<Company>().ToTable("Companys");
-            modelBuilder.Entity<Company>().ToTable("Companys");
+
 
             modelBuilder.Entity<Role>()
             .HasMany(t => t.rightList)

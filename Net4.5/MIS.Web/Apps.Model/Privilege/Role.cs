@@ -18,7 +18,7 @@ namespace Apps.Model.Privilege
         Guest = 20
     }
 
-    public class Role
+    public class Role : IEquatable<Role>
     {
         [Key]
         public long id { get; set; }
@@ -28,6 +28,9 @@ namespace Apps.Model.Privilege
         [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
         public string name { get; set; }
 
+        [Display(Name = "角色名")]
+        public RoleType type { get; set; }
+
         [Display(Name = "描述")]
         public string description { get; set; }
 
@@ -35,6 +38,15 @@ namespace Apps.Model.Privilege
         [JsonIgnore]
         public List<FunctionRight> rightList { get; set; }
 
+        public bool Equals(Role other)
+        {
+            if (other == null || id != other.id)
+            {
+                return false;
+
+            }
+            return true;
+        }
     }
 
 

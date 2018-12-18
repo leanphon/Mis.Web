@@ -8,7 +8,7 @@ using System.Web.Mvc;
 
 namespace MIS.Web.Controllers
 {
-    public class CompanyController : Controller
+    public class CompanyController : BaseController
     {
         public ActionResult Index()
         {

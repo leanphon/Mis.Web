@@ -64,6 +64,9 @@ namespace Apps.Model
         // 缴税
         [Display(Name = "个人所得税")]
         public double tax { get; set; }
+
+        [Display(Name = "其他扣款")]
+        public double chargeback { get; set; }
         // 应发工资
         [Display(Name = "应发工资")]
         public double shouldTotal { get; set; }

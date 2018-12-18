@@ -192,6 +192,42 @@ namespace MIS.Web.Controllers
             return Json(or, JsonRequestBehavior.AllowGet);
         }
 
+        public ActionResult RefreshSalary()
+        {
+            
+            string data = Request.Params["salaryRecord"];
+            if (data == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            SalaryRecord model = js.Deserialize<SalaryRecord>(data);
+
+            if (model == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            SalaryRecordManager manager = new SalaryRecordManager();
+            OperateResult or = manager.RefreshSalary(model);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+        }
+
+
 
         public ActionResult Delete(int? id)
         {
