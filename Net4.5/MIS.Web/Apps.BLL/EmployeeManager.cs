@@ -44,17 +44,6 @@ namespace Apps.BLL
                     
                     db.employeeList.Add(model);
 
-                    {
-                        EmployeeDeed deed = new EmployeeDeed
-                        {
-                            type = EmployeeDeedType.Entry,
-                            time = DateTime.Now,
-                            employeeId = model.id,
-                        };
-
-                        db.employeeDeedList.Add(deed);
-                    }
-
                     db.SaveChanges();
 
                     return new OperateResult
@@ -1324,14 +1313,18 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult AddDeed(EmployeeDeed model)
+        public OperateResult AddCareerRecordBatch(List<EmployeeCareerRecord> lstData)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
-
-                    db.employeeDeedList.Add(model);
+                    foreach (var model in lstData)
+                    {
+                        model.status = "audit";
+                        db.employeeCareerList.Add(model);
+                    }
+                    
                     db.SaveChanges();
 
                     return new OperateResult
@@ -1349,14 +1342,14 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult RemoveDeed(long id)
+        public OperateResult RemoveCareerRecord(long id)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var element = db.employeeDeedList.Find(id);
+                    var element = db.employeeCareerList.Find(id);
 
                     if (element == null)
                     {
@@ -1366,7 +1359,7 @@ namespace Apps.BLL
                         };
                     }
 
-                    db.employeeDeedList.Remove(element);
+                    db.employeeCareerList.Remove(element);
 
                     db.Entry(element).State = System.Data.Entity.EntityState.Deleted;
                     db.SaveChanges();
@@ -1391,7 +1384,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult UpdateDeed(EmployeeDeed model)
+        public OperateResult UpdateCareerRecord(EmployeeCareerRecord model)
         {
             try
             {
@@ -1422,14 +1415,14 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetDeedById(long id)
+        public OperateResult GetCareerRecordById(long id)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var element = (from m in db.employeeDeedList.Include("employee")
+                    var element = (from m in db.employeeCareerList
                                    where id == m.id
                                    select m
                                 ).FirstOrDefault();
@@ -1460,29 +1453,27 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetEmploeeDeeds(long employeeId)
+        public OperateResult GetCareerRecordsById(long employeeId)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var element = from m in db.employeeDeedList.Include("employee")
-                                  where employeeId == m.employeeId
-                                  select m;
-
-                    if (element == null)
-                    {
-                        return new OperateResult
-                        {
-                            content = "访问错误",
-                        };
-                    }
+                    var elements = from e in db.employeeCareerList
+                                  where employeeId == e.employeeId
+                                  select new 
+                                  {
+                                      e.id,
+                                      e.type,
+                                      e.time,
+                                      e.description
+                                  };
 
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
-                        data = element,
+                        data = elements.ToList(),
                     };
 
                 }
@@ -1499,20 +1490,19 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetAllDeeds(QueryParam param = null)
+        public OperateResult GetAllCareerRecords(QueryParam param = null)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var elements = (from e in db.employeeDeedList.Include("employee")
+                    var elements = (from e in db.employeeCareerList.Include("employee")
                                     select new
                                     {
                                         e.id,
                                         e.type,
                                         e.time,
-                                        e.remark,
                                         e.employee.name,
                                     }
                                   ).ToList();
@@ -1537,21 +1527,21 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetDeedsByPager(QueryParam param = null)
+        public OperateResult GetAllCareerRecordByPager(QueryParam param = null)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var elements = from e in db.employeeDeedList.Include("employee")
+                    var elements = from e in db.employeeCareerList.Include("employee")
                                    orderby e.time descending
                                    select new
                                    {
                                        e.id,
                                        e.type,
                                        e.time,
-                                       e.remark,
+                                       e.description,
                                        e.employee.name,
                                        e.employee.departmentId
                                    };

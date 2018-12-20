@@ -366,27 +366,47 @@ namespace MIS.Web.Controllers
         }
         public ActionResult GetCareer(long? id)
         {
-            var careers = new[]
+            EmployeeManager manager = new EmployeeManager();
+            OperateResult or = manager.GetCareerRecordsById(id.Value);
+            if (or.status == OperateStatus.Success)
             {
-                new
-                {
-                    type = "入职",
-                    time = "2016-10-09",
-                    description = "员工入职，岗位主管"
-                },
-                new
-                {
-                    type = "岗位变动",
-                    time = "2016-12-09",
-                    description = "由主管晋升为部门经理"
-                },
-            };
+                return Json(or.data, JsonRequestBehavior.AllowGet);
+            }
 
-            OperateResult or = new OperateResult();
-            or.status = OperateStatus.Success;
-            or.data = careers;
+            return Json(or, JsonRequestBehavior.AllowGet);
+        }
+        public ActionResult AddCareerBatch(long id)
+        {
+            string data = Request.Params["requestData"];
+            if (data == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
 
-            return Json(or.data, JsonRequestBehavior.AllowGet);
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            List<EmployeeCareerRecord> lstData = js.Deserialize<List<EmployeeCareerRecord>>(data);
+
+            if (lstData.Count == 0)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无考核数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            EmployeeManager manager = new EmployeeManager();
+            OperateResult or = manager.AddCareerRecordBatch(lstData);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
         }
 
 

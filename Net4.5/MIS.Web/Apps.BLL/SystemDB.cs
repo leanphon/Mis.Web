@@ -33,6 +33,7 @@ namespace Apps.BLL
             modelBuilder.Entity<AssessmentInfo>().ToTable("AssessmentInfos");
             //modelBuilder.Entity<RoleRights>().ToTable("RoleRights");
             modelBuilder.Entity<Company>().ToTable("Companys");
+            modelBuilder.Entity<EmployeeCareerRecord>().ToTable("CareerRecords");
 
 
             modelBuilder.Entity<Role>()
@@ -67,7 +68,7 @@ namespace Apps.BLL
 
         public DbSet<Company> companyList { get; set; }
         public DbSet<Employee> employeeList { get; set; }
-        public DbSet<EmployeeDeed> employeeDeedList { get; set; }
+        public DbSet<EmployeeCareerRecord> employeeCareerList { get; set; }
         public DbSet<Department> departmentList { get; set; }
         public DbSet<Category> categoryList { get; set; }
         public DbSet<Product> productList { get; set; }

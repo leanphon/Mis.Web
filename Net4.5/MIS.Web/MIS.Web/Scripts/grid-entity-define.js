@@ -294,12 +294,64 @@ function EmployeeCareerGrid(gridId, toolbar) {
 
     this.forzenCols = [[
                 { field: 'id', hidden: true },
+                { field: 'employeeId', hidden: true },
+                { field: 'status', hidden: true },
     ]];
 
     this.normalCols = [[
-                { field: 'type', title: '类型', width: 150 },
-                { field: 'time', title: '时间', width: 100 },
-                { field: 'description', title: '说明', width: 350 },
+                {
+                    field: 'type', title: '类型', width: 150,
+                    formatter: function (value, row) {
+                        return row.type;
+                    },
+                    editor: {
+                        type: 'combobox',
+                        options: {
+                            valueField: 'value',
+                            textField: 'text',
+                            required: true,
+                            editable: false,
+                            data: [
+                                { value: '入职', text: '入职' },
+                                { value: '转正', text: '转正' },
+                                { value: '离职', text: '离职' },
+                                { value: '停薪留职', text: '停薪留职' },
+                                { value: '奖励', text: '奖励' },
+                                { value: '惩罚', text: '惩罚' },
+                                { value: '岗位变动', text: '岗位变动' },
+                                { value: '薪酬变动', text: '薪酬变动' },
+                            ]
+                        }
+                    }
+                },
+                {
+                    field: 'time', title: '时间', width: 150,
+                    formatter: function (date) {
+                        if (typeof date == "string") {
+                            if (date.indexOf("/Date") != -1) {
+                                return formatDate(date);
+                            } else {
+                                return date;
+                            }
+                        }
+                    },
+                    editor: {
+                        type: 'datebox',
+                        options: {
+                            required: true,
+                            editable: false,
+                        }
+                    }
+                },
+                {
+                    field: 'description', title: '说明', width: 350,
+                    editor: {
+                        type: 'textbox',
+                        options: {
+                            required: true
+                        }
+                    }
+                },
 
     ]];
 
@@ -312,11 +364,36 @@ function EmployeeCareerPropertyGrid(gridId, toolbar) {
 
     this.forzenCols = [[
         { field: 'id', hidden: true },
+        { field: 'newStatus', hidden: true },
     ]];
 
     this.normalCols = [[
-        { field: 'type', title: '类型', width: 150 },
-        { field: 'time', title: '时间', width: 100 },
+        {
+            field: 'type', title: '类型', width: 150,
+            editor: {
+                type: 'combobox',
+                options: {
+                    valueField: 'value',
+                    textField: 'text',
+                    required: true,
+                    data: [
+                        { value: '入职', text: '入职' },
+                        { value: '转正', text: '转正' },
+                        { value: '离职', text: '离职' },
+                        { value: '奖励', text: '奖励' },
+                        { value: '惩罚', text: '惩罚' },
+                        { value: '岗位变动', text: '岗位变动' },
+                        { value: '薪酬变动', text: '薪酬变动' },
+                    ]
+                }
+            }
+        },
+        {
+            field: 'time', title: '时间', width: 150,
+            //formatter: formatDate,
+            //editor: 'datebox'
+        },
+        //{ field: 'time', title: '时间', width: 100 },
         { field: 'description', title: '说明', width: 350 },
 
     ]];

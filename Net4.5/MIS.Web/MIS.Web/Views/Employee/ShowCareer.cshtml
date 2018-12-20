@@ -25,7 +25,7 @@
 
     function initDivDialog(titleName) {
         $('#@(divDialog)').dialog({
-            width: 650,
+            width: 720,
             height: 500,
             title: titleName,
             modal: true,
@@ -49,26 +49,33 @@
     }
 
 
-    function initGrid() {
+    function initGrid1() {
 
         var url = '/@(controllerName)/GetCareer?id=@(Model.id)';
         var callbackFuns = [
         ];
 
         var toolbar = [
+            { text: '添加事纪', iconCls: 'icon-add', handler: onCreate },
         ];
 
         var gridObj = new EmployeeCareerPropertyGrid('@(tabEntityList)', toolbar);
 
         initPropertygrid(gridObj, url, callbackFuns);
     }
-    function initGrid2() {
+    function initGrid() {
 
         var url = '/@(controllerName)/GetCareer?id=@(Model.id)';
         var callbackFuns = [
+            { "name": "onBeforeEdit", "fun": onBeforeEdit },
+            { "name": "onClickRow", "fun": onClickRow },
+            { "name": "onDblClickRow", "fun": onDblClickRow, },
         ];
 
         var toolbar = [
+            { text: '添加事纪', iconCls: 'icon-add', handler: onCreate },
+            { text: '取消添加', iconCls: 'icon-cancel', handler: onCancelEdit },
+            { text: '保存', iconCls: 'icon-save', handler: onSave },
         ];
 
         var gridObj = new EmployeeCareerGrid('@(tabEntityList)', toolbar);
@@ -76,6 +83,67 @@
         initDatagrid(gridObj, url, callbackFuns);
     }
 
+    function onBeforeEdit(rowIndex, rowData) {
+        if (rowData.status != 'new') {
+            return false;
+        }
+    }
+
+    function onCreate() {
+        if (endEditing($('#@(tabEntityList)'))) {
+            $('#@(tabEntityList)').datagrid('appendRow',
+                { status: 'new', description: '' }
+            );
+            var editIndex = $('#@(tabEntityList)').datagrid('getRows').length - 1;
+
+            openEdit($('#@(tabEntityList)'), editIndex);
+        }
+    }
+
+    function onCancelEdit() {
+        var editIndex = $('#@(tabEntityList)').datagrid('getRows').length - 1;
+
+        var row = $('#@(tabEntityList)').datagrid('getRows')[editIndex];
+        if (row.status == 'new') {
+            exitEdit($('#@(tabEntityList)'), editIndex);
+            $('#@(tabEntityList)').datagrid('deleteRow', editIndex);
+        }
+    }
+    function onSave() {
+        if (!endEditing($('#@(tabEntityList)'))) {
+            return;
+        }
+        var rows = $('#@(tabEntityList)').datagrid('getRows');
+        if (rows.length == 0) {
+            showAlert('无修改数据');
+            return;
+        }
+
+        var data = new Array();
+        for (var i = 0; i < rows.length; ++i) {
+            if (rows[i].status == 'new') {
+                rows[i].employeeId = @(Model.id);
+                data.push(rows[i]);
+            }
+        }
+
+        var param = {
+            "id":@(Model.id),
+            "requestData": JSON.stringify(data)
+        }
+        console.log(param);
+        $.post('/@(controllerName)/AddCareerBatch', param, function (result) {
+            if (result.status != 0) {
+                showAlert(result.content)
+            }
+            else {
+                showPrompt("保存成功")
+                $('#@(tabEntityList)').datagrid('reload');
+            }
+
+        }, "JSON").error(function (result) {
+        });
+    }
 
 
 </script>
@@ -101,7 +169,10 @@
             <table class="tab_center" id="@(tabEntityList)"></table>
         </div>
     </div>
-
+    <div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
+        <!--放置一个隐藏的菜单Div-->
+        <div data-options="iconCls:'icon-save'" onclick="onExitEdit()">退出编辑</div>
+    </div>
 </div>
 
 
