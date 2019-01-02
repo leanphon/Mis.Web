@@ -118,7 +118,6 @@ function onDatagridRowContextMenu(e, rowIndex, rowData) { //右键时触发事�
 
     $(this).datagrid("selectRow", rowIndex); //根据索引选中该行
     var obj = $("#" + $(this).attr('id') + "Menu")
-    console.log(obj);
     obj.menu('show', {
         //显示右键菜单
         left: e.pageX,//在鼠标点击处显示菜单

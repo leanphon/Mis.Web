@@ -118,8 +118,23 @@
 	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbar);
 
 	    initDatagrid(gridObj, url, callbackFuns);
+
+	    $('#@(tabEntityList)').datagrid('options').rowStyler = notifyStyler;
 	}
 
+    function notifyStyler(index, row) {
+        if (row.contractEnd != null) {
+            var d = convertToDate(row.contractEnd);
+            console.log(d);
+            var now = new Date(); 
+            now.setDate(now.getDate() + 10);
+            console.log(now);
+            if (compareDate(now, d) > 0) { //合同结束日小于10天提醒
+                return 'background-color:yellow;';
+            }
+        }
+        return '';
+	}
 
     function getParamsJson() {
         var filterList = new Array;

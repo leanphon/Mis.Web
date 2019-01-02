@@ -291,7 +291,6 @@ function EmployeeGrid(gridId, toolbar) {
                 { field: 'contractBegin', title: '合同起始日', width: 200, formatter: formatDate },
                 { field: 'contractEnd', title: '合同结束日', width: 200, formatter: formatDate },
 
-
                 { field: 'emergencyContact', title: '紧急联系人', width: 150 },
                 { field: 'emergencyPhone', title: '紧急联系人电话', width: 150 },
 
