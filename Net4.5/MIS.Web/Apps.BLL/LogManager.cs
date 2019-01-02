@@ -18,16 +18,6 @@ namespace Apps.BLL
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var match = from m in db.logRecordList
-                                select m;
-                    if (match.Count() > 0)
-                    {
-                        return new OperateResult
-                        {
-                            content = "用户已经存在",
-                        };
-                    }
-
                     db.logRecordList.Add(model);
                     db.SaveChanges();
 
@@ -194,6 +184,26 @@ namespace Apps.BLL
                                        e.user.name
                                    };
 
+                    // 过滤时间
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("timeBegin"))
+                        {
+                            var p = param.filters["timeBegin"];
+                            var t = Convert.ToDateTime(p.value);
+                            elements = elements.Where(m => m.time >= t);
+                        }
+
+                        if (param.filters.Keys.Contains("timeEnd"))
+                        {
+                            var p = param.filters["timeEnd"];
+                            var t = Convert.ToDateTime(p.value);
+                            elements = elements.Where(m => m.time <= t);
+                        }
+                    }
+                    #endregion
+
                     int total = elements.Count();
                     int pages = 0;
                     Pager pager = param.pager;
@@ -229,8 +239,6 @@ namespace Apps.BLL
                     };
 
                 }
-
-
             }
             catch (Exception ex)
             {
@@ -274,9 +282,6 @@ namespace Apps.BLL
                             var t = Convert.ToDateTime(p.value);
                             elements = elements.Where(m => m.time >= t);
                         }
-                    }
-                    if (param != null && param.filters != null)
-                    {
                         if (param.filters.Keys.Contains("timeEnd"))
                         {
                             var p = param.filters["timeEnd"];
@@ -285,7 +290,6 @@ namespace Apps.BLL
                         }
                     }
                     #endregion
-
 
                     long rowIndex = 1;
                     var results = from e in elements.AsEnumerable()
@@ -309,8 +313,6 @@ namespace Apps.BLL
                     };
 
                 }
-
-
             }
             catch (Exception ex)
             {

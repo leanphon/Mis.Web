@@ -3,6 +3,7 @@
     /*border:1px solid;*/
     margin:0px auto;
     padding:0px;
+    overflow-y:scroll 
 }
 
 caption.tab_caption{

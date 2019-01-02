@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Apps.BLL.Utility;
 
 namespace Apps.BLL
 {
@@ -30,6 +31,14 @@ namespace Apps.BLL
 
                     db.postInfoList.Add(model);
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加岗位：" + model.name
+                    });
 
                     return new OperateResult
                     {
@@ -67,6 +76,14 @@ namespace Apps.BLL
 
                     db.Entry(element).State = EntityState.Deleted;
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除岗位：" + element.name
+                    });
 
                     return new OperateResult
                     {
@@ -110,6 +127,14 @@ namespace Apps.BLL
                     db.Entry(model).State = EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改岗位：" + model.name
+                    });
 
                     return new OperateResult
                     {

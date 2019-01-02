@@ -61,6 +61,25 @@ function formatDate(value) {
     return dt.format("yyyy-MM-dd"); //扩展的Date的format方法(上述插件实现)
 }
 
+function convertToDate(jsonDate) {
+    if (jsonDate == undefined || jsonDate == null || jsonDate == '') {
+        return null;
+    }
+    var dateStr = jsonDate.replace(/\/Date\(/gi, '');
+    dateStr = dateStr.replace(/\)\//gi, '');
+
+    var dt = new Date(parseInt(dateStr, 10));
+
+    return dt;
+}
+
+function compareDate(d1, d2) {
+    var m1 = d1.getTime();
+    var m2 = d2.getTime();
+
+    return m1 - m2;
+}
+
 function databoxFormat(date) {
     var years = date.getFullYear();//获取年  
     var months = date.getMonth() + 1;//获取日  

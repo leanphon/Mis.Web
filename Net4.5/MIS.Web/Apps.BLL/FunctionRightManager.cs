@@ -1,4 +1,5 @@
-﻿using Apps.Model;
+﻿using Apps.BLL.Utility;
+using Apps.Model;
 using Apps.Model.Privilege;
 using System;
 using System.Collections.Generic;

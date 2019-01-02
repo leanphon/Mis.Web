@@ -404,7 +404,7 @@ namespace MIS.Web.Controllers
             }
 
             EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.AddCareerRecordBatch(lstData);
+            OperateResult or = manager.AddCareerRecordBatch(id, lstData);
 
             return Json(or, JsonRequestBehavior.AllowGet);
         }

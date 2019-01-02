@@ -118,8 +118,23 @@
 	    var gridObj = new EmployeeGrid('@(tabEntityList)', toolbar);
 
 	    initDatagrid(gridObj, url, callbackFuns);
+
+	    $('#@(tabEntityList)').datagrid('options').rowStyler = notifyStyler;
 	}
 
+    function notifyStyler(index, row) {
+        if (row.contractEnd != null) {
+            var d = convertToDate(row.contractEnd);
+            console.log(d);
+            var now = new Date(); 
+            now.setDate(now.getDate() + 10);
+            console.log(now);
+            if (compareDate(now, d) > 0) { //合同结束日小于10天提醒
+                return 'background-color:yellow;';
+            }
+        }
+        return '';
+	}
 
     function getParamsJson() {
         var filterList = new Array;
@@ -181,6 +196,10 @@
             type: 'GET',
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -192,6 +211,10 @@
             type: 'GET',
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -209,6 +232,10 @@
             data: 'id='+row.id,
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -252,6 +279,10 @@
             data: 'id=' + row.id,
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -269,6 +300,10 @@
 	        data: 'id=' + row.id,
 	        async: false,
 	        success: function (data) {
+	            if (data.indexOf("无权访问") >= 0) {
+	                showAlert(data);
+	                return;
+	            }
 	            $('#@(divContent)').append(data);
 	        }
 	    });
@@ -286,19 +321,21 @@
 	        data: 'id=' + row.id,
 	        async: false,
 	        success: function (data) {
+	            if (data.indexOf("无权访问") >= 0) {
+	                showAlert(data);
+	                return;
+	            }
 	            $('#@(divContent)').append(data);
 	        }
 	    });
 	}
 
 	function onShowCareer() {
-	    console.log("career")
 	    var row = $('#@(tabEntityList)').datagrid('getSelected');
 	    if (null == row) {
 	        showAlert("未选择")
 	        return;
 	    }
-        console.log("career2")
 
 	    $.ajax({
 	        url: '/@(controllerName)/ShowCareer',
@@ -306,6 +343,10 @@
 	        data: 'id=' + row.id,
 	        async: false,
 	        success: function (data) {
+	            if (data.indexOf("无权访问") >= 0) {
+	                showAlert(data);
+                    return;
+	            }
 	            $('#@(divContent)').append(data);
 	        }
 	    });

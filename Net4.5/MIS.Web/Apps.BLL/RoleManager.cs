@@ -1,4 +1,5 @@
-﻿using Apps.Model;
+﻿using Apps.BLL.Utility;
+using Apps.Model;
 using Apps.Model.Privilege;
 using System;
 using System.Collections.Generic;
@@ -31,6 +32,14 @@ namespace Apps.BLL
 
                     db.roleList.Add(model);
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加角色：" + model.name
+                    });
 
                     return new OperateResult
                     {
@@ -68,6 +77,15 @@ namespace Apps.BLL
 
                     db.Entry(element).State = EntityState.Deleted;
                     db.SaveChanges();
+
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除角色：" + element.name
+                    });
 
                     return new OperateResult
                     {
@@ -112,6 +130,14 @@ namespace Apps.BLL
                     db.Entry(model).State = EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改角色：" + model.name
+                    });
 
                     return new OperateResult
                     {
@@ -280,6 +306,7 @@ namespace Apps.BLL
 
                     var modules = (from e in db.moduleList
                                    where e.onlyRoot != 1
+                                   orderby e.showIndex ascending
                                    select new
                                    {
                                        id = e.id,
@@ -334,7 +361,12 @@ namespace Apps.BLL
             }
         }
 
-
+        /// <summary>
+        /// 先移除role所有的权限，然后重新加入
+        /// </summary>
+        /// <param name="roleId"></param>
+        /// <param name="idList"></param>
+        /// <returns></returns>
         public OperateResult AssignRight(long roleId, List<long> idList)
         {
             try
@@ -345,21 +377,20 @@ namespace Apps.BLL
                     var role = (from e in db.roleList.Include("rightList")
                                 where e.id == roleId
                                 select e).FirstOrDefault();
-                    if (role != null)
+                    if (role == null)
                     {
-                        foreach (var rid in idList)
+                        return new OperateResult
                         {
-                            var model = db.rightList.Find(rid);
+                            content = "找不到角色"
+                        };
+                    }
 
-                            var query = (from e in role.rightList
-                                         where e.id == rid
-                                         select e).FirstOrDefault();
+                    role.rightList.Clear();
 
-                            if (model != null && query == null)
-                            {
-                                role.rightList.Add(model);
-                            }
-                        }
+                    foreach (var rid in idList)
+                    {
+                        var model = db.rightList.Find(rid);
+                        role.rightList.Add(model);
                     }
 
                     db.Entry(role).State = EntityState.Modified;
@@ -367,6 +398,15 @@ namespace Apps.BLL
                     //db.Configuration.ValidateOnSaveEnabled = false;
                     db.SaveChanges();
                     //db.Configuration.ValidateOnSaveEnabled = true;
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "分配权限：" + role.name
+                    });
+
 
                     return new OperateResult
                     {

@@ -26,13 +26,24 @@ function initDatagrid(gridEntity, url, callbackFuns)
 		pagination: true,
 		singleSelect: true,
 		rownumbers: true,
-		loadMsg: '正在加载中，请稍等... ',
+		//emptyMsg:"无数据",
+	    loadMsg: '正在加载中，请稍等... ',
 		nowrap: false,//允许换行
+        //fit: true,
 		//fitColumns: true,//宽度自适应
 		frozenColumns: gridEntity.forzenCols,
 		columns: gridEntity.normalCols,
 		toolbar: gridEntity.toolbar,
-
+		onLoadSuccess: function (data) {
+		    var height = $(window).height();
+		    var colsFrozen = gridObj.datagrid('getColumnFields', true);
+		    if (colsFrozen.length > 0) {
+		        height = height - 55;
+		    }
+		    gridObj.datagrid("resize", {
+		        height: height
+		    });  
+		},
 		onHeaderContextMenu: function (e, field) {
 			e.preventDefault();
 
@@ -107,7 +118,6 @@ function onDatagridRowContextMenu(e, rowIndex, rowData) { //右键时触发事�
 
     $(this).datagrid("selectRow", rowIndex); //根据索引选中该行
     var obj = $("#" + $(this).attr('id') + "Menu")
-    console.log(obj);
     obj.menu('show', {
         //显示右键菜单
         left: e.pageX,//在鼠标点击处显示菜单
@@ -232,13 +242,24 @@ function initTreegrid(gridEntity, url, callbackFuns) {
         singleSelect: gridEntity.singleSelect,
         rownumbers: true,
         loadMsg: '正在加载中，请稍等... ',
-        nowrap: false,//允许换行
+        nowrap: false, //允许换行
+        checkbox: gridEntity.checkbox,
         //fitColumns: true,//宽度自适应
         idField: gridEntity.idField,
         treeField: gridEntity.treeField,
         frozenColumns: gridEntity.forzenCols,
         columns: gridEntity.normalCols,
         toolbar: gridEntity.toolbar,
+        onLoadSuccess: function (data) {
+            var height = $(window).height();
+            var colsFrozen = gridObj.treegrid('getColumnFields', true);
+            if (colsFrozen.length > 0) {
+                height = height - 55;
+            }
+            gridObj.treegrid("resize", {
+                height: height
+            });
+        },
         onHeaderContextMenu: function (e, field) {
             e.preventDefault();
 

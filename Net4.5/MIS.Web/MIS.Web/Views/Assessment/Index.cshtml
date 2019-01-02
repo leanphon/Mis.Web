@@ -118,7 +118,7 @@
 			//{ text: '退出编辑', iconCls: 'icon-save', handler: onExitEdit },
             { text: '保存当前', iconCls: 'icon-save', handler: onSaveSingle },
             { text: '保存全部', iconCls: 'icon-save', handler: onSaveAll },
-            
+
 	    ];
 
 	    var gridObj = new AssessmentInputGrid('@(tabEntityList)', toolbar);
@@ -199,15 +199,22 @@
             var data = JSON.stringify(updatedRows);
             var param = {
                 "month" : $('#month').val(),
-                "assessmentData" : data
+                "requestData" : data
             }
 
             $.post('/@(controllerName)/AddSingle', param, function (result) {
+                console.log(result);
+                if (result.indexOf("无权访问") >= 0) {
+                    showAlert(result);
+                    return;
+                }
+
                 if (result.status != 0) {
                     showAlert(result.content)
                 }
                 else {
                     showPrompt("保存成功")
+                    $('#@(tabEntityList)').datagrid('reload');
                 }
 
             }, "JSON").error(function (result) {
@@ -220,7 +227,7 @@
             return;
         }
 
-        if (endEditing()) {
+        if (endEditing($('#@(tabEntityList)'))) {
             var updatedRows = $('#@(tabEntityList)').datagrid('getChanges', 'updated');
             if (updatedRows.length == 0) {
                 showAlert('无修改数据');
@@ -230,7 +237,7 @@
             var data = JSON.stringify(updatedRows);
             var param = {
                 "month" : $('#month').val(),
-                "assessmentData" : data
+                "requestData" : data
             }
 
             $.post('/@(controllerName)/AddBatch', param, function (result) {
@@ -239,6 +246,7 @@
                 }
                 else {
                     showPrompt("保存成功")
+                    $('#@(tabEntityList)').datagrid('reload');
                 }
 
             }, "JSON").error(function (result) {

@@ -55,6 +55,7 @@ function RoleAssignRightTreeGrid(gridId, toolbar) {
     this.idField = 'id';
     this.treeField = 'name';
     this.singleSelect = false;
+    this.checkbox = true;
 
     this.forzenCols = [[
     ]];
@@ -62,7 +63,7 @@ function RoleAssignRightTreeGrid(gridId, toolbar) {
     this.normalCols = [[
                 { field: 'id', hidden: true },
                 { field: 'rightId', hidden: true },
-                { field: 'checked', title: '', checkbox: true, align: 'center', width: 100 },
+                //{field: 'checked', title: '', checkbox: true, align: 'center', width: 100},
                 { field: 'name', title: '功能名', width: 250 },
     ]];
 
@@ -95,9 +96,10 @@ function LogGrid(gridId, toolbar) {
     this.normalCols = [[
                 { field: 'id', hidden: true },
                 { field: 'time', title: '时间', width: 250, formatter: formatDateTime },
-                { field: 'content', title: '日志内容', width: 250 },
-                { field: 'type', title: '类型', width: 250 },
-                { field: 'name', title: '用户', width: 250},
+        { field: 'name', title: '用户', width: 150 },
+        { field: 'content', title: '日志内容', width: 400 },
+                //{ field: 'type', title: '类型', width: 250 },
+                
     ]];
 
     this.toolbar = toolbar;
@@ -127,12 +129,22 @@ function CompanyGrid(gridId, toolbar) {
 
     this.normalCols = [[
                 { field: 'id', hidden: true },
-                { field: 'logo', title: 'logo图片', width: 250 },
+                {
+                    field: 'logo', title: 'logo图片', width: 250,
+                    formatter: function (value) {
+                        return "<img src='/Upload/" + value + "' width='20px' height='20px'/>";
+                    }
+                },
                 { field: 'name', title: '公司名称', width: 250 },
                 { field: 'address', title: '公司地址', width: 250 },
                 { field: 'code', title: '公司简称', width: 250 },
-                { field: 'loginImg', title: '登录背景图片', width: 250 },
-                { field: 'mainImg', title: '主页面背景图片', width: 250 },
+                {
+                    field: 'loginImg', title: '登录背景图片', width: 250,
+                    formatter: function (value) {
+                        return "<img src='/Upload/" + value + "' width='20px' height='20px'/>";
+                    }
+                },
+                //{ field: 'mainImg', title: '主页面背景图片', width: 250 },
     ]];
 
     this.toolbar = toolbar;
@@ -239,18 +251,18 @@ function DepartmentSelectTreeGrid(gridId, toolbar) {
 }
 
 
-function EmployeeGrid(gridId, toolbar){
+function EmployeeGrid(gridId, toolbar) {
     this.id = gridId;
 
-	this.forzenCols = [[
+    this.forzenCols = [[
                 { field: 'id', hidden: true },
                 { field: 'number', title: '工号', width: 150 },
                 { field: 'name', title: '姓名', width: 150 },
                 { field: 'departmentName', title: '所在部门', width: 150, },
 	            { field: 'postName', title: '岗位', width: 150, },
-            ]];
+    ]];
 
-	this.normalCols = [[
+    this.normalCols = [[
                 { field: 'phone', title: '联系电话', width: 150 },
                 { field: 'sex', title: '性别', width: 100 },
                 { field: 'nation', title: '民族', width: 100 },
@@ -279,14 +291,13 @@ function EmployeeGrid(gridId, toolbar){
                 { field: 'contractBegin', title: '合同起始日', width: 200, formatter: formatDate },
                 { field: 'contractEnd', title: '合同结束日', width: 200, formatter: formatDate },
 
-
                 { field: 'emergencyContact', title: '紧急联系人', width: 150 },
                 { field: 'emergencyPhone', title: '紧急联系人电话', width: 150 },
 
-            ]];
+    ]];
 
 
-	this.toolbar = toolbar;
+    this.toolbar = toolbar;
 }
 
 function EmployeeCareerGrid(gridId, toolbar) {
@@ -312,10 +323,10 @@ function EmployeeCareerGrid(gridId, toolbar) {
                             required: true,
                             editable: false,
                             data: [
-                                { value: '入职', text: '入职' },
-                                { value: '转正', text: '转正' },
-                                { value: '离职', text: '离职' },
-                                { value: '停薪留职', text: '停薪留职' },
+                                //{ value: '入职', text: '入职' },
+                                //{ value: '转正', text: '转正' },
+                                //{ value: '离职', text: '离职' },
+                                //{ value: '停薪留职', text: '停薪留职' },
                                 { value: '奖励', text: '奖励' },
                                 { value: '惩罚', text: '惩罚' },
                                 { value: '岗位变动', text: '岗位变动' },
@@ -407,11 +418,12 @@ function AssessmentInputGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
-                { field: 'id', hidden: true },
-                { field: 'employeeId', hidden: true },
-                { field: 'employeeNumber', title: '工号', width: 150 },
-                { field: 'employeeName', title: '姓名', width: 150 },
-                { field: 'departmentName', title: '部门', width: 150 },
+        { field: 'id', hidden: true },
+        { field: 'employeeId', hidden: true },
+        { field: 'billSerial', title: '单号', width: 150 },
+        { field: 'employeeNumber', title: '工号', width: 150 },
+        { field: 'employeeName', title: '姓名', width: 150 },
+        { field: 'departmentName', title: '部门', width: 150 },
     ]];
 
     this.normalCols = [[
@@ -463,7 +475,7 @@ function AssessmentInputGrid(gridId, toolbar) {
                     field: 'annualVacationTime', title: '使用年假', width: 150,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2 } }
                 },
-                
+
     ]];
 
     this.toolbar = toolbar;
@@ -475,6 +487,7 @@ function AssessmentRecordGrid(gridId, toolbar) {
     this.forzenCols = [[
                 { field: 'id', hidden: true },
                 { field: 'employeeId', hidden: true },
+        { field: 'billSerial', title: '单号', width: 200 },
                 { field: 'employeeNumber', title: '工号', width: 150 },
                 { field: 'employeeName', title: '姓名', width: 150 },
                 { field: 'departmentName', title: '部门', width: 150 },
@@ -533,7 +546,7 @@ function AssessmentRecordGrid(gridId, toolbar) {
                 },
                 { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDateTime },
 
-                { field: 'status', title: '状态', width: 200,  },
+                { field: 'status', title: '状态', width: 200, },
     ]];
 
     this.toolbar = toolbar;
@@ -546,6 +559,7 @@ function SalaryInputGrid(gridId, toolbar) {
                 { field: 'id', hidden: true },
                 { field: 'assessmentInfoId', hidden: true },
                 { field: 'employeeId', hidden: true },
+        { field: 'billSerial', title: '单号', width: 200 },
                 { field: 'employeeNumber', title: '工号', width: 150 },
                 { field: 'employeeName', title: '姓名', width: 150 },
                 { field: 'departmentName', title: '部门', width: 150 },
@@ -603,18 +617,19 @@ function SalaryInputGrid(gridId, toolbar) {
 function SalaryRecordGrid(gridId, toolbar) {
     this.id = gridId;
 
-	this.forzenCols = [[
+    this.forzenCols = [[
                 { field: 'id', hidden: true },
                 { field: 'assessmentInfoId', hidden: true },
-                { field: 'employeeId',  hidden: true },
+                { field: 'employeeId', hidden: true },
+        { field: 'billSerial', title: '单号', width: 200 },
                 { field: 'employeeNumber', title: '工号', width: 150 },
                 { field: 'employeeName', title: '姓名', width: 150 },
                 { field: 'departmentName', title: '部门', width: 150 },
                 { field: 'month', title: '月份', width: 150, },
 
-            ]];
+    ]];
 
-	this.normalCols = [[
+    this.normalCols = [[
                 { field: 'postSalary', title: '岗位工资', width: 150, },
                 { field: 'fullAttendanceRewards', title: '全勤奖', width: 150, styler: positiveStyler, },
                 { field: 'performanceRewards', title: '绩效奖金', width: 150, styler: positiveStyler, },
@@ -639,15 +654,19 @@ function SalaryRecordGrid(gridId, toolbar) {
                     field: 'tax', title: '个人所得税', width: 150, styler: negativeStyler,
                     editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
                 },
+	            {
+	                field: 'chargeback', title: '其他扣款', width: 150, styler: negativeStyler,
+	                editor: { type: 'numberbox', options: { min: 0, precision: 2, required: true } }
+	            },
                 { field: 'shouldTotal', title: '应发工资', width: 150, styler: positiveStyler, },
                 { field: 'actualTotal', title: '实发工资', width: 150, styler: positiveStyler, },
                 { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDate },
                 { field: 'status', title: '状态', width: 200 },
 
-            ]];
+    ]];
 
 
-	this.toolbar = toolbar;
+    this.toolbar = toolbar;
 }
 
 

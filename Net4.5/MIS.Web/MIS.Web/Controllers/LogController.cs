@@ -35,7 +35,20 @@ namespace MIS.Web.Controllers
         }
         public ActionResult GetEntities(Pager pager)
         {
-            OperateResult or = LogManager.GetByPager(new QueryParam { pager = pager });
+            QueryParam queryParam = new QueryParam();
+
+            var extendParams = Request.Params["extendParams"];
+            if (extendParams != null)
+            {
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+
+                queryParam.filters = filterSet;
+            }
+
+
+            OperateResult or = LogManager.GetByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

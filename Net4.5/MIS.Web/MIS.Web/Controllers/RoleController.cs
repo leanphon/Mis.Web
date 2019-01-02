@@ -178,7 +178,7 @@ namespace MIS.Web.Controllers
                 return Json(
                     new OperateResult
                     {
-                        content = "无考核数据",
+                        content = "无修改数据",
                     },
                     JsonRequestBehavior.AllowGet
                 );
@@ -192,7 +192,7 @@ namespace MIS.Web.Controllers
                 return Json(
                     new OperateResult
                     {
-                        content = "无考核数据",
+                        content = "无修改数据",
                     },
                     JsonRequestBehavior.AllowGet
                 );

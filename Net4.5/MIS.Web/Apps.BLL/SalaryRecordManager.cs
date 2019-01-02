@@ -7,6 +7,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Apps.BLL.Utility;
 
 namespace Apps.BLL
 {
@@ -31,10 +32,19 @@ namespace Apps.BLL
                         };
                     }
 
+                    model.status = "未审核";
                     model.inputDate = DateTime.Now;
 
                     db.salaryRecordList.Add(model);
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加工资单：" + model.billSerial
+                    });
 
                     return new OperateResult
                     {
@@ -119,6 +129,14 @@ namespace Apps.BLL
                     db.Entry(element).State = System.Data.Entity.EntityState.Deleted;
                     db.SaveChanges();
 
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除工资单：" + element.billSerial
+                    });
+
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
@@ -145,11 +163,17 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
-
-
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改工资单：" + model.billSerial
+                    });
 
                     return new OperateResult
                     {
@@ -169,6 +193,86 @@ namespace Apps.BLL
             }
 
         }
+
+        public OperateResult UpdateStatusBatch(List<long> listModel, string status)
+        {
+            bool fail = false;
+            OperateResult result = new OperateResult();
+
+            foreach (var id in listModel)
+            {
+                OperateResult or = UpdateStatus(id, status);
+                if (or.status != OperateStatus.Success)
+                {
+                    fail = true;
+
+                    result.content += "id(" + id + ") 考核数据保存失败, error（" + or.content + "） ;";
+                }
+
+            }
+            if (!fail)
+            {
+                result.status = OperateStatus.Success;
+                result.content = "批量考核数据保存成功";
+            }
+            return result;
+        }
+
+        public OperateResult UpdateStatus(long id, string status)
+        {
+            if (status != "未审核" && status != "审核")
+            {
+                return new OperateResult
+                {
+                    content = "数据错误",
+                };
+            }
+
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    var element = (from m in db.salaryRecordList
+                                   where id == m.id
+                                   select m
+                        ).AsNoTracking().FirstOrDefault();
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    element.status = status;
+                    db.Entry(element).State = EntityState.Modified;
+                    db.SaveChanges();
+
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改工资单状态：" + element.billSerial + "," + element.status
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
         public OperateResult GetById(long id)
         {
             try
@@ -269,6 +373,7 @@ namespace Apps.BLL
 
                                    select new
                                    {
+                                       e.id,
                                        e.billSerial,
                                        e.assessmentInfoId,
                                        e.assessmentInfo.month,
@@ -288,6 +393,7 @@ namespace Apps.BLL
                                        e.socialSecurity,
                                        e.publicFund,
                                        e.tax,
+                                       e.chargeback,
                                        e.shouldTotal,
                                        e.actualTotal,
                                        e.inputDate,
@@ -578,7 +684,7 @@ namespace Apps.BLL
 
             if (DateTime.TryParse(month, out dtMonth))
             {
-                string serial = string.Format("S-{0}-{1}{2}{3}{4}{5}", employeeNumber, dtMonth.Year,
+                string serial = string.Format("S-{0}-{1}{2:D2}{3:D2}{4:D2}{5:D2}", employeeNumber, dtMonth.Year,
                     dtMonth.Month, dtMonth.Day, dtNow.Hour, dtNow.Minute);
 
 
@@ -673,6 +779,156 @@ namespace Apps.BLL
 
 
         public OperateResult ExportAll(QueryParam param = null)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+                    var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
+                                   join employee in db.employeeList.Include("department")
+                                   on e.assessmentInfo.employeeId equals employee.id
+
+                                   select new
+                                   {
+                                       e.billSerial,
+                                       e.assessmentInfoId,
+                                       e.assessmentInfo.month,
+                                       employeeId = employee.id,
+                                       employeeName = employee.name,
+                                       employeeNumber = employee.number,
+                                       departmentId = employee.departmentId,
+                                       departmentName = employee.department.name,
+                                       e.postSalary,
+                                       e.fullAttendanceRewards,
+                                       e.performanceRewards,
+                                       e.benefitRewards,
+                                       e.normalOvertimeRewards,
+                                       e.holidayOvertimeRewards,
+                                       e.subsidy,
+                                       e.reissue,
+                                       e.socialSecurity,
+                                       e.publicFund,
+                                       e.tax,
+                                       e.shouldTotal,
+                                       e.actualTotal,
+                                       e.inputDate
+                                   };
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                    }
+                    #endregion
+
+                    // 过滤月份
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("month"))
+                        {
+                            var p = param.filters["month"];
+                            elements = elements.Where(t => t.month == p.value);
+                        }
+                    }
+                    #endregion
+
+                    // 模糊过滤名字
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.employeeName.Contains(p.value));
+                        }
+                    }
+                    #endregion
+
+                    long rowIndex = 1;
+
+                    var results = from e in elements.AsEnumerable()
+                                  select new SalaryRecordExport
+                                  {
+                                      index = rowIndex++,
+                                      billSerial = e.billSerial,
+                                      month = e.month,
+                                      employeeName = e.employeeName,
+                                      employeeNumber = e.employeeNumber,
+                                      departmentName = e.departmentName,
+                                      postSalary = e.postSalary,
+                                      fullAttendanceRewards = e.fullAttendanceRewards,
+                                      performanceRewards = e.performanceRewards,
+                                      benefitRewards = e.benefitRewards,
+                                      normalOvertimeRewards = e.normalOvertimeRewards,
+                                      holidayOvertimeRewards = e.holidayOvertimeRewards,
+                                      subsidy = e.subsidy,
+                                      reissue = e.reissue,
+                                      socialSecurity = e.socialSecurity,
+                                      publicFund = e.publicFund,
+                                      tax = e.tax,
+                                      shouldTotal = e.shouldTotal,
+                                      actualTotal = e.actualTotal,
+                                      inputDate = e.inputDate
+                                  };
+
+
+
+
+                    DataTable dt = DataTableHelper.ToDataTable<SalaryRecordExport>(results.ToList());
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "导出成功",
+                        data = dt,
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public OperateResult ExportBill(QueryParam param = null)
         {
             try
             {

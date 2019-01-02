@@ -93,6 +93,17 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
+                    var element = (from e in db.companyList
+                            where e.id == model.id
+                            select e
+                        ).AsNoTracking().FirstOrDefault();
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
 
                     var elements = (from e in db.companyList
                                     where e.id != model.id && e.name == model.name
@@ -105,7 +116,6 @@ namespace Apps.BLL
                             content = "已经存在同名的公司",
                         };
                     }
-
 
                     db.Entry(model).State = EntityState.Modified;
 

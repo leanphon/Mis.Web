@@ -243,6 +243,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\ExportExcelHelper.cs" />
     <Compile Include="Models\ExportExcelResult.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\ImportExcelHelper.cs" />
@@ -809,8 +810,6 @@
     <Content Include="Views\Analyse\EmployeeSalary.cshtml" />
     <Content Include="Views\Analyse\EmployeeWorkAge.cshtml" />
     <Content Include="Views\Analyse\LeaveWarning.cshtml" />
-    <Content Include="Views\Assessment\Create.cshtml" />
-    <Content Include="Views\Assessment\Edit.cshtml" />
     <Content Include="Views\Assessment\HistoryIndex.cshtml" />
     <Content Include="Views\Assessment\Index.cshtml" />
     <Content Include="Views\Benefit\Create.cshtml" />

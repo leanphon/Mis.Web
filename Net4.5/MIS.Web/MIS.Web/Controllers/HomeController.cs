@@ -28,6 +28,7 @@ namespace MIS.Web.Controllers
             if (c != null)
             {
                 ViewBag.companyName = c.name;
+                ViewBag.logo = c.logo;
             }
             if (user != null)
             {
@@ -82,6 +83,20 @@ namespace MIS.Web.Controllers
 
             //    Session["company"] = m;
             //}
+
+            CompanyManager manager = new CompanyManager();
+            OperateResult or = manager.GetFirst();
+            if (or.status != OperateStatus.Success)
+            {
+                return Content("不存在的公司");
+            }
+
+            Company m = or.data as Company;
+
+            ViewBag.companyName = m.name;
+            ViewBag.loginImg = m.loginImg;
+
+            Session["company"] = m;
 
             return View();
         }

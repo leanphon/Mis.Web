@@ -10,28 +10,34 @@
     //string tabEntityList = controllerName + "_tabEntityList";
 }
 
-<div id="@(divDialog)" class="easyui-dialog">
+<style type="text/css">
+    .login-table {
+        
+    }
+</style>
+
+<div id="@(divDialog)" class="easyui-dialog" style="background:url(@("/Upload/"+ ViewBag.loginImg))">
     <form id="@(formEntity)" action="" method="post">
         @Html.AntiForgeryToken()
-        <input type="hidden" name="company" value="@(ViewBag.company)" />
+        <input type="hidden" name="company" value="@(ViewBag.company)"/>
 
-        <table style="margin:auto;width:90%">
+        <table id="login-table" style="margin: auto; width: 90%;">
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.name, new { @class = "lab" })
+                    @Html.LabelFor(model => model.name, new {@class = "lab"})
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    @Html.EditorFor(model => model.name, new { htmlAttributes = new { @class = "parm_control" } })
+                    @Html.EditorFor(model => model.name, new {htmlAttributes = new {@class = "parm_control"}})
                 </td>
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.passwd, new { @class = "lab" })
+                    @Html.LabelFor(model => model.passwd, new {@class = "lab"})
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    <input type="password" class="parm_control" name="passwd" onkeypress="submitForm(event)" />
+                    <input type="password" class="parm_control" name="passwd" onkeypress="submitForm(event)"/>
                 </td>
             </tr>
         </table>

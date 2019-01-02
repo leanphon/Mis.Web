@@ -15,6 +15,9 @@ namespace Apps.Model
     {
         [Key]
         public long id { get; set; }
+        // 单号
+        [Display(Name = "单号")]
+        public string billSerial { get; set; }
 
         [Display(Name = "员工")]
         public long employeeId { get; set; }
@@ -81,6 +84,9 @@ namespace Apps.Model
 
         [Display(Name = "月份")]
         public string month { get; set; }
+
+        [Display(Name = "单号")]
+        public string billSerial { get; set; }
 
         [Display(Name = "工号")]
         public string employeeNumber { get; set; }
