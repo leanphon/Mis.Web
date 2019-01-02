@@ -9,7 +9,7 @@
 }
 
 <div class="easyui-layout" fit="true" border="false">
-    <div>
+    <div  style="height: 100%">
         @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
         <table class="tab_center" id="@(tabEntityList)"></table>
     </div>
@@ -66,6 +66,10 @@
             type: 'GET',
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -86,6 +90,10 @@
             data: 'id='+row.id,
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -106,7 +114,11 @@
             data: 'id=' + row.id,
             async: false,
             success: function (result) {
-                //var obj = JSON.parse(result);
+                if (result.indexOf("无权访问") >= 0) {
+                    showAlert(result);
+                    return;
+                }
+
                 if (result.status != 0) {
                     showAlert(result.content);
                 }

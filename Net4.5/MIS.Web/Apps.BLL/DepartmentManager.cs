@@ -1,4 +1,5 @@
-﻿using Apps.Model;
+﻿using Apps.BLL.Utility;
+using Apps.Model;
 using System;
 using System.Data.Entity;
 using System.Linq;
@@ -27,6 +28,14 @@ namespace Apps.BLL
 
                     db.departmentList.Add(model);
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加部门：" + model.name
+                    });
 
                     return new OperateResult
                     {
@@ -75,6 +84,14 @@ namespace Apps.BLL
 
                     db.Entry(element).State = EntityState.Deleted;
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除部门：" + element.name
+                    });
 
                     return new OperateResult
                     {
@@ -129,6 +146,14 @@ namespace Apps.BLL
                     db.Entry(model).State = EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改部门：" + model.name
+                    });
 
                     return new OperateResult
                     {

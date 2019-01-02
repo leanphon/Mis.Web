@@ -7,6 +7,7 @@ using System.Linq;
 using MIS.Web.Models;
 using System;
 using System.Data;
+using System.Web;
 
 namespace MIS.Web.Controllers
 {
@@ -113,9 +114,56 @@ namespace MIS.Web.Controllers
 
         }
 
+        public ActionResult EditEntity()
+        {
+            string data = Request.Params["requestData"];
+            if (data == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无考核数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            SalaryRecord model = js.Deserialize<SalaryRecord>(data);
+
+            if (model == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无考核数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = Model.Utility.GetModelStateErrors(ModelState),
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            SalaryRecordManager manager = new SalaryRecordManager();
+
+            OperateResult or = manager.Update(model);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+
         public ActionResult SaveBatch()
         {
-            string data = Request.Params["salaryRecord"];
+            string data = Request.Params["requestData"];
             if (data == null)
             {
                 return Json(
@@ -160,7 +208,7 @@ namespace MIS.Web.Controllers
                     JsonRequestBehavior.AllowGet
                 );
             }
-            string data = Request.Params["salaryRecord"];
+            string data = Request.Params["requestData"];
             if (data == null)
             {
                 return Json(
@@ -195,7 +243,7 @@ namespace MIS.Web.Controllers
         public ActionResult RefreshSalary()
         {
             
-            string data = Request.Params["salaryRecord"];
+            string data = Request.Params["requestData"];
             if (data == null)
             {
                 return Json(
@@ -280,6 +328,90 @@ namespace MIS.Web.Controllers
                     ExportData = (DataTable)or.data
                 };
 
+            }
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public ActionResult UpdateStatus(long id, string status)
+        {
+
+            SalaryRecordManager manager = new SalaryRecordManager();
+
+            OperateResult or = manager.UpdateStatus(id, status);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+        public ActionResult UpdateStatusBatch()
+        {
+            string data = Request.Params["salaryRecord"];
+            string status = Request.Params["status"];
+            if (data == null || status == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "数据异常",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            List<long> lstData = js.Deserialize<List<long>>(data);
+
+            if (lstData.Count == 0)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            SalaryRecordManager manager = new SalaryRecordManager();
+            OperateResult or = manager.UpdateStatusBatch(lstData, status);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+
+        public ActionResult ExportBill()
+        {
+            QueryParam queryParam = new QueryParam();
+
+            var extendParams = Request.Params["extendParams"];
+            if (extendParams != null)
+            {
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+
+                queryParam.filters = filterSet;
+            }
+
+            SalaryRecordManager manager = new SalaryRecordManager();
+            OperateResult or = manager.ExportBill(queryParam);
+
+            if (or.status == OperateStatus.Success
+                && or.data != null)
+            {
+                string exportFileName = string.Concat("工资条", DateTime.Now.ToString("yyyyMMddHHmmss"), ".xlsx");
+
+                var excelHelper = new ExportExcelHelper()
+                {
+                    SheetName = "工资条",
+                    FileName = exportFileName,
+                    ExportData = (DataTable)or.data
+                };
+
+                excelHelper.GenerateExcelEx(this.HttpContext);
+
+                return new EmptyResult();
             }
 
             return Json(or, JsonRequestBehavior.AllowGet);

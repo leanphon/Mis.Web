@@ -59,6 +59,47 @@
     }
 
     function initForm() {
+        $('#logo').filebox({
+            buttonText: '浏览',
+            buttonAlign: 'right',
+            accept: 'image/jpeg'
+        })
+        $('#loginImg').filebox({
+            buttonText: '浏览',
+            buttonAlign: 'right',
+            accept: 'image/jpeg'
+        })
+        $('#mainImg').filebox({
+            buttonText: '浏览',
+            buttonAlign: 'right',
+            accept: 'image/jpeg'
+        })
+
+        @{
+            if (Model.logo != null)
+            {
+                <text>
+        $('#logo').filebox('setValue', '@(Model.logo)');
+        $('#logo').filebox('setText', '@(Model.logo)');
+        </text>
+            }
+            if (Model.mainImg != null)
+            {
+                <text>
+        $('#mainImg').filebox('setValue', '@(Model.mainImg)');
+        $('#mainImg').filebox('setText', '@(Model.mainImg)');
+        </text>
+            }
+            if (Model.loginImg != null)
+            {
+                <text>
+        $('#loginImg').filebox('setValue', '@(Model.loginImg)');
+        $('#loginImg').filebox('setText', '@(Model.loginImg)');
+
+                </text>
+            }
+        }
+
         $('#@(formEntity)').form({
             url: '/@(controllerName)/EditEntity',
             method: 'post',
@@ -89,7 +130,7 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    @Html.EditorFor(model => model.name, new { htmlAttributes = new { @disabled= "disabled", @class = "parm_control" } })
+                    @Html.EditorFor(model => model.name, new { htmlAttributes = new { @readonly= "readonly", @class = "parm_control" } })
                 </td>
             </tr>
             <tr>
@@ -98,7 +139,7 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    @Html.EditorFor(model => model.code, new { htmlAttributes = new { @disabled = "disabled", @class = "parm_control" } })
+                    @Html.EditorFor(model => model.code, new { htmlAttributes = new { @readonly = "readonly", @class = "parm_control" } })
                 </td>
             </tr>
             <tr>
@@ -115,8 +156,7 @@
                     @Html.LabelFor(model => model.logo, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    <input class="parm_control" name="logo" id="logo" type="file"
-                           accept="" />
+                    <input id="logo" name="logo" type="text" style="width: 100%">
                 </td>
             </tr>
             <tr>
@@ -124,19 +164,17 @@
                     @Html.LabelFor(model => model.loginImg, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    <input class="parm_control" name="loginImg" id="loginImg" type="file"
-                           accept="" />
+                    <input id="loginImg" name="loginImg" type="text" style="width: 100%">
                 </td>
             </tr>
-            <tr>
+            @*<tr>
                 <td class="cols_2_left">
                     @Html.LabelFor(model => model.mainImg, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    <input class="parm_control" name="mainImg" id="mainImg" type="file"
-                           accept="" />
+                    <input id="mainImg" name="mainImg" type="text" style="width: 100%">
                 </td>
-            </tr>
+            </tr>*@
         </table>
     </form>
 </div>

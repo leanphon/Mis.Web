@@ -1,4 +1,5 @@
-﻿using Apps.Model;
+﻿using Apps.BLL.Utility;
+using Apps.Model;
 using Apps.Model.Utility;
 using LinqToExcel;
 using System;
@@ -46,6 +47,14 @@ namespace Apps.BLL
 
                     db.SaveChanges();
 
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加员工：" + model.number
+                    });
+
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
@@ -82,6 +91,14 @@ namespace Apps.BLL
 
                     db.Entry(element).State = System.Data.Entity.EntityState.Deleted;
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除员工：" + element.number
+                    });
 
                     return new OperateResult
                     {
@@ -125,6 +142,14 @@ namespace Apps.BLL
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改员工：" + model.number
+                    });
 
                     return new OperateResult
                     {
@@ -190,6 +215,16 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
+                    var employee = (from e in db.employeeList
+                        where e.id == employeeId
+                        select e).AsNoTracking().FirstOrDefault();
+                    if (employee == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
 
                     var elements = (from e in db.salaryInfoList
                                     where e.id == model.id
@@ -203,16 +238,6 @@ namespace Apps.BLL
                     }
                     else
                     {
-                        var employee = (from e in db.employeeList
-                            where e.id == employeeId
-                            select e).AsNoTracking().FirstOrDefault();
-                        if (employee == null)
-                        {
-                            return new OperateResult
-                            {
-                                content = "访问错误",
-                            };
-                        }
 
                         db.salaryInfoList.Add(model);
                         db.SaveChanges();
@@ -222,6 +247,14 @@ namespace Apps.BLL
                         db.Entry(employee).State = EntityState.Modified;
                         db.SaveChanges();
                     }
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改员工薪酬：" + employee.number
+                    });
 
 
                     return new OperateResult
@@ -269,6 +302,14 @@ namespace Apps.BLL
 
                     db.SaveChanges();
 
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "员工转正：" + m.number
+                    });
+
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
@@ -312,6 +353,14 @@ namespace Apps.BLL
                     db.Entry(m).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "员工离职：" + m.number
+                    });
 
                     LeaveManager.Leave(m);
 
@@ -358,6 +407,14 @@ namespace Apps.BLL
 
                     db.Entry(element).State = EntityState.Modified;
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "员工调部门：" + element.number
+                    });
 
                     return new OperateResult
                     {
@@ -764,6 +821,14 @@ namespace Apps.BLL
 
 
                     DataTable dt = DataTableHelper.ToDataTable<EmployeeExport>(results.ToList());
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "导出员工信息："
+                    });
 
                     return new OperateResult
                     {
@@ -1313,18 +1378,38 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult AddCareerRecordBatch(List<EmployeeCareerRecord> lstData)
+        public OperateResult AddCareerRecordBatch(long employeeId, List<EmployeeCareerRecord> lstData)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
+                    var employee = (from e in db.employeeList
+                        where e.id == employeeId
+                        select e).FirstOrDefault();
+                    if (employee == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
                     foreach (var model in lstData)
                     {
                         model.status = "audit";
                         db.employeeCareerList.Add(model);
+
+                        LogManager.Add(new LogRecord
+                        {
+                            userId = SessionHelper.GetUserId(),
+                            time = DateTime.Now,
+                            type = "Info",
+                            content = "添加员工事纪：" + employee.number + "," + model.description
+                        });
+
                     }
-                    
+
                     db.SaveChanges();
 
                     return new OperateResult
@@ -1462,6 +1547,7 @@ namespace Apps.BLL
 
                     var elements = from e in db.employeeCareerList
                                   where employeeId == e.employeeId
+                                  orderby e.type
                                   select new 
                                   {
                                       e.id,

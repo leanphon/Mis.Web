@@ -2,9 +2,11 @@
 using Apps.Model;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using Microsoft.Ajax.Utilities;
 
 namespace MIS.Web.Controllers
 {
@@ -77,6 +79,77 @@ namespace MIS.Web.Controllers
                 );
             }
 
+            if (Request.Files.Count > 0)
+            {
+                HttpPostedFileBase loginImg = Request.Files["loginImg"];
+                if (loginImg != null && !string.IsNullOrWhiteSpace(loginImg.FileName))
+                {
+                    switch (Path.GetExtension(loginImg.FileName))
+                    {
+                        case ".jpg":
+                            break;
+                        default:
+                            return Json(
+                                new OperateResult
+                                {
+                                    content = "上传的文件不是jpg文件",
+                                },
+                                JsonRequestBehavior.AllowGet
+                            );
+                    }
+
+                    model.loginImg = model.code + "-loginImg.jpg";
+                    string file = Server.MapPath("/") + ("/Upload/") + model.loginImg;
+
+                    loginImg.SaveAs(file);
+                }
+                HttpPostedFileBase mainImg = Request.Files["mainImg"];
+                if (mainImg != null && !string.IsNullOrWhiteSpace(mainImg.FileName))
+                {
+                    switch (Path.GetExtension(mainImg.FileName))
+                    {
+                        case ".jpg":
+                            break;
+                        default:
+                            return Json(
+                                new OperateResult
+                                {
+                                    content = "上传的文件不是jpg文件",
+                                },
+                                JsonRequestBehavior.AllowGet
+                            );
+                    }
+
+                    model.mainImg = model.code + "-mainImg.jpg";
+                    string file = Server.MapPath("/") + ("/Upload/") + model.mainImg;
+
+                    mainImg.SaveAs(file);
+                }
+                HttpPostedFileBase logo = Request.Files["logo"];
+                if (logo != null && !string.IsNullOrWhiteSpace(logo.FileName))
+                {
+                    switch (Path.GetExtension(logo.FileName))
+                    {
+                        case ".jpg":
+                            break;
+                        default:
+                            return Json(
+                                new OperateResult
+                                {
+                                    content = "上传的文件不是jpg文件",
+                                },
+                                JsonRequestBehavior.AllowGet
+                            );
+                    }
+
+                    model.logo = model.code + "-logo.jpg";
+                    string file = Server.MapPath("/") + ("/Upload/") + model.logo;
+
+                    logo.SaveAs(file);
+                }
+            }
+
+            
             CompanyManager manager = new CompanyManager();
 
             OperateResult or = manager.Update(model);

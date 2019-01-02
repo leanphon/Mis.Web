@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Apps.BLL.Utility;
 
 namespace Apps.BLL
 {
@@ -29,6 +30,14 @@ namespace Apps.BLL
 
                     db.benefitInfoList.Add(model);
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加效益代码：" + model.code
+                    });
 
                     return new OperateResult
                     {
@@ -66,6 +75,14 @@ namespace Apps.BLL
 
                     db.Entry(element).State = EntityState.Deleted;
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除效益代码：" + element.code
+                    });
 
                     return new OperateResult
                     {
@@ -107,6 +124,14 @@ namespace Apps.BLL
                     db.Entry(model).State = EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改效益代码：" + model.code
+                    });
 
                     return new OperateResult
                     {

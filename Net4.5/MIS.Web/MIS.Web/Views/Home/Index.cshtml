@@ -33,9 +33,12 @@
 
 <body class="easyui-layout" id="layout">
     <div data-options="region:'north',border:false" style="text-align:center; height:60px; background:#B3DFDA; padding:10px;" >
+        <span style="text-align: center;">
+            <img style="height: 40px;width: 40px" src="/Upload/@(ViewBag.logo)" />
+        </span>
         <span style="text-align:center; font-size:30px; ">@(ViewBag.Title)</span>
         <span style="float: right">
-            <span style="color:brown">
+            <span style="color: brown; margin-right: 5px">
                 当前用户：<text >@(ViewBag.username)</text>
             </span>
             <a class="easyui-linkbutton" href="#" onclick="modifyPasswd()">

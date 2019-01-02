@@ -10,7 +10,27 @@
 
 <div class="easyui-layout" fit="true" border="false">
     <div>
-        @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+            <form id="searchForm">
+                <table>
+                    <tr>
+                        <th>开始时间：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="timeBegin" name="timeBegin" />
+                        </td>
+                        <th>结束时间：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="timeEnd" name="timeEnd" />
+                        </td>
+                        <th></th>
+                        <td>
+                            <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
+                        </td>
+
+                    </tr>
+                </table>
+            </form>
+        </div>
         <table class="tab_center" id="@(tabEntityList)"></table>
     </div>
 </div>
@@ -40,6 +60,19 @@
     })
 
 	function initPage() {
+	    $('#timeBegin').datebox({
+	        width: '100%',
+	        formatter: databoxFormat,
+	        parser: databoxParser
+	    });
+	    $('#timeEnd').datebox({
+	        width: '100%',
+	        formatter: databoxFormat,
+	        parser: databoxParser
+	    });
+
+
+
 	    var url = '/@(controllerName)/GetEntities';
 	    var callbackFuns = [
 	    ];
@@ -52,16 +85,39 @@
 
     }
 
+	function getParamsJson() {
+	    var filterList = new Array;
+	    if ($('#timeBegin').val().trim() != '') {
+	        var p = {
+	            "key": "timeBegin",
+	            "action": "==",
+	            "value": $('#timeBegin').val().trim()
+	        };
+	        filterList.push(p)
+	    }
+	    if ($('#timeEnd').val().trim() != '') {
+	        var p = {
+	            "key": "timeEnd",
+	            "action": "==",
+	            "value": $('#timeEnd').val().trim()
+	        };
+	        filterList.push(p)
+	    }
+
+	    return JSON.stringify(filterList);
+	}
+
+	function filter() {
+	    var queryParams = $('#@(tabEntityList)').datagrid('options').queryParams;
+
+	    queryParams.extendParams = getParamsJson();
+
+	    $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
+	    $('#@(tabEntityList)').datagrid('load');
+	}
 
     function onExport() {
-        $.ajax({
-            url: '/@(controllerName)/Export',
-            type: 'GET',
-            async: false,
-            success: function (data) {
-                $('#@(divContent)').append(data);
-            }
-        });
+        window.location.href = '/@(controllerName)/ExportAll?extendParams='+getParamsJson();
     }
 
 </script>

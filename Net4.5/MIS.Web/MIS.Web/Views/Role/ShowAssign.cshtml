@@ -81,7 +81,7 @@
         var url = '/@(controllerName)/GetRights?id=@(ViewBag.id)';
         var callbackFuns = [{ "name": "onContextMenu", "fun": onTreegridonContextMenu }];
         var toolbar = [onAddEntity, onEditEntity, onRemoveEntity];
-        
+
         var gridObj = new RoleAssignRightTreeGrid('@(tabEntityList)', toolbar);
 
         initTreegrid(gridObj, url, callbackFuns);
@@ -90,22 +90,22 @@
     function saveAssin()
     {
         var rightArray = new Array();
-        var rows = $('#@(tabEntityList)').treegrid('getChecked');
+        var rows = $('#@(tabEntityList)').treegrid('getChildren');
         for (var i=0; i<rows.length; i++)
         {
-            if (rows[i].rightId != -1)
+            if (rows[i].rightId != -1 && rows[i].checked == true)
             {
                 rightArray.push(rows[i].rightId);
             }
         }
-
-        console.log(rows);
 
         var data = JSON.stringify(rightArray);
         var param = {
             "roleId" : @(ViewBag.id),
             "extendData": data
         }
+
+        console.log(param);
 
         $.post('/@(controllerName)/AssignRight', param, function (result) {
             if (result.status != 0) {

@@ -181,6 +181,10 @@
             type: 'GET',
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -192,6 +196,10 @@
             type: 'GET',
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -209,6 +217,10 @@
             data: 'id='+row.id,
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -252,6 +264,10 @@
             data: 'id=' + row.id,
             async: false,
             success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
                 $('#@(divContent)').append(data);
             }
         });
@@ -269,6 +285,10 @@
 	        data: 'id=' + row.id,
 	        async: false,
 	        success: function (data) {
+	            if (data.indexOf("无权访问") >= 0) {
+	                showAlert(data);
+	                return;
+	            }
 	            $('#@(divContent)').append(data);
 	        }
 	    });
@@ -286,19 +306,21 @@
 	        data: 'id=' + row.id,
 	        async: false,
 	        success: function (data) {
+	            if (data.indexOf("无权访问") >= 0) {
+	                showAlert(data);
+	                return;
+	            }
 	            $('#@(divContent)').append(data);
 	        }
 	    });
 	}
 
 	function onShowCareer() {
-	    console.log("career")
 	    var row = $('#@(tabEntityList)').datagrid('getSelected');
 	    if (null == row) {
 	        showAlert("未选择")
 	        return;
 	    }
-        console.log("career2")
 
 	    $.ajax({
 	        url: '/@(controllerName)/ShowCareer',
@@ -306,6 +328,10 @@
 	        data: 'id=' + row.id,
 	        async: false,
 	        success: function (data) {
+	            if (data.indexOf("无权访问") >= 0) {
+	                showAlert(data);
+                    return;
+	            }
 	            $('#@(divContent)').append(data);
 	        }
 	    });

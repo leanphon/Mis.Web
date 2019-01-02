@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 
 namespace Apps.Model
 {
-    public class LogRecord
+    public class LogRecord : IEquatable<LogRecord>
     {
         public long id { get; set; }
 
@@ -33,6 +34,23 @@ namespace Apps.Model
 
         [ForeignKey("userId")]
         public virtual User user { get; set; }
+
+        public bool Equals(LogRecord other)
+        {
+            if (other == null)
+            {
+                return false;
+            }
+
+            if (this.content == other.content && this.time == other.time
+                                              && this.type == other.type && this.userId == other.userId)
+            {
+                return true;
+            }
+
+
+            return false;
+        }
     }
 
 

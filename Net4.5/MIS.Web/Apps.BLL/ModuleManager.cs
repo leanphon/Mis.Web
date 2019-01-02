@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
+using Apps.BLL.Utility;
 using Remotion.Data.Linq.Clauses;
 
 namespace Apps.BLL
@@ -316,7 +317,7 @@ namespace Apps.BLL
                     return or;
                 }
 
-                List<Module> elements = or.data as List<Module>;
+                IEnumerable<Module> elements = or.data as IEnumerable<Module>;
 
                 using (SystemDB db = new SystemDB())
                 {
@@ -413,9 +414,13 @@ namespace Apps.BLL
                                 orderby m.showIndex ascending
                                 select m).Distinct().ToList();
 
+                            var parents = (from e in data
+                                join m in db.moduleList on e.parentId equals m.id
+                                select m).Distinct().ToList();
+
                             return new OperateResult
                             {
-                                data = data,
+                                data = data.Concat(parents),
                                 status = OperateStatus.Success
                             };
                         }

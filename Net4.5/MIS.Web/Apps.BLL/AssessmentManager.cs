@@ -1,4 +1,5 @@
-﻿using Apps.Model;
+﻿using Apps.BLL.Utility;
+using Apps.Model;
 using Apps.Model.Utility;
 using LinqToExcel;
 using System;
@@ -35,6 +36,14 @@ namespace Apps.BLL
 
                     db.assessmentInfoList.Add(model);
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加考核:" + model.billSerial
+                    });
 
                     return new OperateResult
                     {
@@ -89,7 +98,7 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
-                    var element = db.benefitInfoList.Find(id);
+                    var element = db.assessmentInfoList.Find(id);
 
                     if (element == null)
                     {
@@ -99,10 +108,18 @@ namespace Apps.BLL
                         };
                     }
 
-                    db.benefitInfoList.Remove(element);
+                    db.assessmentInfoList.Remove(element);
 
                     db.Entry(element).State = System.Data.Entity.EntityState.Deleted;
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除考核:" + element.billSerial
+                    });
 
                     return new OperateResult
                     {
@@ -132,6 +149,14 @@ namespace Apps.BLL
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改考核:" + model.billSerial
+                    });
 
                     return new OperateResult
                     {
@@ -234,6 +259,14 @@ namespace Apps.BLL
                     db.Entry(element).State = EntityState.Modified;
                     db.SaveChanges();
 
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改状态:" + element.billSerial + ", " + element.status
+                    });
+
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
@@ -329,6 +362,7 @@ namespace Apps.BLL
                                    {
                                        e.id,
                                        e.month,
+                                       e.billSerial,
                                        employeeId = e.employee.id,
                                        employeeNumber = e.employee.number,
                                        employeeName = e.employee.name,
@@ -632,10 +666,11 @@ namespace Apps.BLL
                     var assessmnetList = from m in db.assessmentInfoList
                                          where m.month == month
                                          select m;
-                    var elements = from m in db.employeeList.Include("department")
+                    var elements = from m in db.employeeList.Include("department").AsEnumerable()
                                    where !(assessmnetList.Any(c => c.employeeId == m.id && c.month == month))
                                    select new
                                    {
+                                       billSerial = GenerateBillSerial(month, m.number),
                                        employeeId = m.id,
                                        employeeName = m.name,
                                        employeeNumber = m.number,
@@ -749,6 +784,23 @@ namespace Apps.BLL
             }
 
         }
+        private string GenerateBillSerial(string month, string employeeNumber)
+        {
+            DateTime dtMonth;
+            DateTime dtNow = DateTime.Now;
+
+
+            if (DateTime.TryParse(month, out dtMonth))
+            {
+                string serial = string.Format("S-{0}-{1}{2:D2}{3:D2}{4:D2}{5:D2}", employeeNumber, dtMonth.Year,
+                    dtMonth.Month, dtMonth.Day, dtNow.Hour, dtNow.Minute);
+
+
+                return serial;
+            }
+
+            return "";
+        }
 
         /// <summary>
         /// 返回值中的data是DataTable
@@ -765,6 +817,7 @@ namespace Apps.BLL
                                    select new
                                    {
                                        e.month,
+                                       e.billSerial,
                                        employeeNumber = e.employee.number,
                                        employeeName = e.employee.name,
                                        departmentId = e.employee.departmentId,
@@ -871,6 +924,16 @@ namespace Apps.BLL
                                   };
 
                     DataTable dt = DataTableHelper.ToDataTable<AssessmentInfoExport>(results.ToList());
+
+
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "导出考核"
+                    });
 
                     return new OperateResult
                     {

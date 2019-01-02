@@ -107,7 +107,7 @@ namespace MIS.Web.Controllers
                     JsonRequestBehavior.AllowGet
                 );
             }
-            string data = Request.Params["assessmentData"];
+            string data = Request.Params["requestData"];
             if (data == null)
             {
                 return Json(
@@ -152,7 +152,7 @@ namespace MIS.Web.Controllers
                     JsonRequestBehavior.AllowGet
                 );
             }
-            string data = Request.Params["assessmentData"];
+            string data = Request.Params["requestData"];
             if (data == null)
             {
                 return Json(
@@ -188,7 +188,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult SaveBatch()
         {
-            string data = Request.Params["assessmentData"];
+            string data = Request.Params["requestData"];
             if (data == null)
             {
                 return Json(
@@ -222,7 +222,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult SaveSingle()
         {
-            string data = Request.Params["assessmentData"];
+            string data = Request.Params["requestData"];
             if (data == null)
             {
                 return Json(
@@ -276,7 +276,7 @@ namespace MIS.Web.Controllers
         }
         public ActionResult EditEntity()
         {
-            string data = Request.Params["assessmentData"];
+            string data = Request.Params["requestData"];
             if (data == null)
             {
                 return Json(
@@ -370,7 +370,7 @@ namespace MIS.Web.Controllers
         }
         public ActionResult UpdateStatusBatch()
         {
-            string data = Request.Params["assessmentData"];
+            string data = Request.Params["requestData"];
             string status = Request.Params["status"];
             if (data == null || status == null)
             {

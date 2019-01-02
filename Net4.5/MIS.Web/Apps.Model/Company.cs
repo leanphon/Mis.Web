@@ -16,7 +16,7 @@ namespace Apps.Model
 
         [Display(Name = "公司名称")]
         [Required(ErrorMessage = "{0}必须填写")]
-        [StringLength(30, ErrorMessage = "{0}的长度在{1}个字符之内")]
+        [StringLength(50, ErrorMessage = "{0}的长度在{1}个字符之内")]
         public string name { get; set; }
 
 
@@ -26,15 +26,12 @@ namespace Apps.Model
         public string code { get; set; }
 
         [Display(Name = "logo图片")]
-        [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
         public string logo { get; set; }
 
         [Display(Name = "登录时背景图片")]
-        [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
         public string loginImg { get; set; }
 
         [Display(Name = "主页面背景图片")]
-        [StringLength(20, ErrorMessage = "{0}的长度在{1}个字符之内")]
         public string mainImg { get; set; }
 
         [Display(Name = "公司地址")]

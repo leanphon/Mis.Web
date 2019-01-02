@@ -10,7 +10,7 @@
 
 
 <div class="easyui-layout" fit="true" border="false">
-    <div>
+    <div class="div-grid">
         @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
         <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
             <form id="searchForm">
@@ -215,6 +215,10 @@
 	        type: 'GET',
 	        async: false,
 	        success: function (data) {
+	            if (data.indexOf("无权访问") >= 0) {
+	                showAlert(data);
+	                return;
+	            }
 	            $('#@(divContent)').append(data);
 	        }
 	    });
@@ -245,7 +249,7 @@
             updatedRows.inputDate = formatDateTime(updatedRows.inputDate);
 
             var param = {
-                "assessmentData": JSON.stringify(updatedRows)
+                "requestData": JSON.stringify(updatedRows)
             }
 
             $.post('/@(controllerName)/EditEntity', param, function (result) {
@@ -305,7 +309,7 @@
 
 	    var param = {
 	        "status": "审核",
-	        "assessmentData": JSON.stringify(idList)
+	        "requestData": JSON.stringify(idList)
 	    }
 	    console.log(param);
 
@@ -361,7 +365,7 @@
 
         var param = {
             "status": "未审核",
-            "assessmentData": JSON.stringify(idList)
+            "requestData": JSON.stringify(idList)
         }
         console.log(param);
 

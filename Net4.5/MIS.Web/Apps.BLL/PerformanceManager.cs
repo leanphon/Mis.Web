@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Apps.BLL.Utility;
 
 namespace Apps.BLL
 {
@@ -30,6 +31,14 @@ namespace Apps.BLL
 
                     db.performanceInfoList.Add(model);
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "添加绩效代码：" + model.code
+                    });
 
                     return new OperateResult
                     {
@@ -67,6 +76,14 @@ namespace Apps.BLL
 
                     db.Entry(element).State = EntityState.Deleted;
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除绩效代码：" + element.code
+                    });
 
                     return new OperateResult
                     {
@@ -110,6 +127,14 @@ namespace Apps.BLL
                     db.Entry(model).State = EntityState.Modified;
 
                     db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "修改绩效：" + model.code
+                    });
 
                     return new OperateResult
                     {
