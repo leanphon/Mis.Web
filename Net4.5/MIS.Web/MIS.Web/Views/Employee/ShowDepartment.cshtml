@@ -1,18 +1,18 @@
-﻿@model Apps.Model.Privilege.User
+﻿@model Apps.Model.Employee
 @{
     Layout = null;
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string divDialog = controllerName + "_divDialog";
-    string divContent = controllerName + "_divContent";
-    string formEntity = controllerName + "_formEntity";
-    string tabEntityList = controllerName + "_tabEntityList";
+    string divDialog = controllerName + "_divDialog-Department";
+    string divContent = controllerName + "_divContent-Department";
+    string formEntity = controllerName + "_formEntity-Department";
+    string tabEntityList = controllerName + "_tabEntityList-Department";
 }
-
 <script>
     function show() {
-        initDivDialog("重置密码");
+        initDivDialog("调部门");
         initForm();
+        initGrid();
 
         $('#@(divDialog)').dialog('open');
         $('#@(divDialog)').dialog('center');
@@ -23,12 +23,13 @@
 
     function destroyDialog() {
         $('#@(divDialog)').dialog('destroy');
+        $('#@(divContent)').empty();
     }
 
     function initDivDialog(titleName) {
         $('#@(divDialog)').dialog({
-            width: 450,
-            height: 350,
+            width: 500,
+            height: 500,
             title: titleName,
             modal: true,
             closed: true,
@@ -43,18 +44,21 @@
                     text: '保存',
                     iconCls: 'icon-ok',
                     handler: function () {
-                        if (confirmPwd())
-                        {
-                            $('#@(formEntity)').submit();
+                        var row = $('#@(tabEntityList)').treegrid('getSelected');
+                        if (null == row) {
+                            showAlert("未选择")
+                            return false;
                         }
+
+                        $('#departmentId').val(row.id);
+                        console.log($('#departmentId').val())
+                        $('#@(formEntity)').submit();
                     }
                 },
                 {
                     text: '取消',
                     iconCls: 'icon-cancel',
-                    handler: function () {
-                        destroyDialog();
-                    }
+                    handler: destroyDialog
                 }
             ]
         });
@@ -62,7 +66,7 @@
 
     function initForm() {
         $('#@(formEntity)').form({
-            url: '/@(controllerName)/ResetPasswd',
+            url: '/@(controllerName)/SelectDepartment',
             method: 'post',
             success: function (result) {
                 var obj = JSON.parse(result);
@@ -71,53 +75,34 @@
                 }
                 else {
                     destroyDialog();
-                    showPrompt("重置密码成功");
+                    $('#@(tabEntityList)').datagrid('reload');
                 }
             },
         });
+
     }
 
-    function confirmPwd()
-    {
-        var pwd = $('#passwd').val();
-        var repwd = $('#repasswd').val();
-        if (pwd != repwd)
-        {
-            showAlert("两次输入密码不一致")
-            return false
-        }
-        return true;
-    }
+    function initGrid( ) {
+        var url = '/Department/GetAllEntities';
+        var callbackFuns = [];
+        toolbar = [
+        ];
 
+        var gridObj = new DepartmentSelectTreeGrid('@(tabEntityList)', toolbar);
+
+        initTreegrid(gridObj, url, callbackFuns);
+    }
 </script>
+
 
 <div id="@(divDialog)" class="easyui-dialog">
     <form id="@(formEntity)" action="" method="post">
         @Html.AntiForgeryToken()
         @Html.HiddenFor(model => model.id)
 
-        <table style="margin:auto;width:90%">
-            <tr>
-                <td class="cols_2_left">
-                    @Html.LabelFor(model => model.passwd, new { @class = "lab" })
-                    <span class="spanInputDanger">*</span>
-                </td>
-                <td class="cols_2_right">
-                    @Html.PasswordFor(model => model.passwd, new { @class = "parm_control" })
-                </td>
-            </tr>
-            <tr>
-                <td class="cols_2_left">
-                    <label class="lab" >确认密码</label>
-                    <span class="spanInputDanger">*</span>
-                </td>
-                <td class="cols_2_right">
-                    <input class="parm_control" type="password" id="repasswd" name="repasswd" />
-                </td>
-            </tr>
-        </table>
+        <div>
+            <table class="tab_center" id="@(tabEntityList)"></table>
+        </div>
+        <input type="hidden" name="departmentId" id="departmentId"/>
     </form>
 </div>
-
-
-

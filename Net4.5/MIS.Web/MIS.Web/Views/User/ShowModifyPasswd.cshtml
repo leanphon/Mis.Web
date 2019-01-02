@@ -11,7 +11,7 @@
 
 <script>
     function show() {
-        initDivDialog("重置密码");
+        initDivDialog("修改个人密码");
         initForm();
 
         $('#@(divDialog)').dialog('open');
@@ -62,7 +62,7 @@
 
     function initForm() {
         $('#@(formEntity)').form({
-            url: '/@(controllerName)/ResetPasswd',
+            url: '/@(controllerName)/ModifyPasswd',
             method: 'post',
             success: function (result) {
                 var obj = JSON.parse(result);
@@ -71,7 +71,7 @@
                 }
                 else {
                     destroyDialog();
-                    showPrompt("重置密码成功");
+                    showPrompt("修改密码成功");
                 }
             },
         });
@@ -99,11 +99,20 @@
         <table style="margin:auto;width:90%">
             <tr>
                 <td class="cols_2_left">
+                    <label class="lab">原密码</label>
+                    <span class="spanInputDanger">*</span>
+                </td>
+                <td class="cols_2_right">
+                    <input class="parm_control" type="password" id="passwdOld" name="passwdOld" />
+                </td>
+            </tr>
+            <tr>
+                <td class="cols_2_left">
                     @Html.LabelFor(model => model.passwd, new { @class = "lab" })
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    @Html.PasswordFor(model => model.passwd, new { @class = "parm_control" })
+                    @Html.PasswordFor(model => model.passwd, new { @class = "parm_control" } )
                 </td>
             </tr>
             <tr>

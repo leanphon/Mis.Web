@@ -389,7 +389,7 @@ namespace Apps.BLL
                 {
                     status = OperateStatus.Success,
                     content = "登录成功",
-                    data = new User { name = "root", passwd = "" }
+                    data = new User { name = "root", passwd = "",roleId = -1}
                 };
             }
 
@@ -424,6 +424,69 @@ namespace Apps.BLL
                             content = "访问错误",
                         };
                     }
+
+                    element.passwd = MD5Encode.Encode16(pwd);
+
+                    db.Entry(element).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "重置密码:" + element.name
+                    });
+
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        public OperateResult ModifyPasswd(long id, string pwdOld, string pwd)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+                    var element = (from m in db.userList
+                            where id == m.id
+                            select m
+                        ).FirstOrDefault();
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    if (element.passwd != MD5Encode.Encode16(pwdOld))
+                    {
+                        return new OperateResult
+                        {
+                            content = "原密码错误",
+                        };
+                    }
+
 
                     element.passwd = MD5Encode.Encode16(pwd);
 

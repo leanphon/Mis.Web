@@ -43,7 +43,7 @@ namespace Apps.BLL
                     using (SystemDB dbBase = new SystemDB())
                     {
                         var salary = (from e in dbBase.salaryInfoList
-                                      where e.employeeId == model.id
+                                      where e.id == model.salaryInfoId
                                       select e).FirstOrDefault();
 
                         LeaveSalary m = new LeaveSalary
@@ -502,7 +502,7 @@ namespace Apps.BLL
                                select e).FirstOrDefault();
 
                 var elements = from e in db.employeeList.Include("department").AsEnumerable()
-                               join s in db.salaryInfoList on e.id equals s.employeeId
+                               join s in db.salaryInfoList on e.salaryInfoId equals s.id
                                let salary = s.GetSalaryTotal()
                                let age = Model.Utility.Utility.CalYears(e.birthday, DateTime.Now)
                                let distance = Model.Utility.MapHelper.GetTowPointDistance(company.address, e.address)

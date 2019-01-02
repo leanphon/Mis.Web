@@ -232,24 +232,9 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
-                    Func<long, long> GetPersons = null;
-                    GetPersons = departmentId =>
-                    {
-                        long p = db.employeeList.Count(x => x.departmentId == departmentId);
-
-                        var sons = from e in db.departmentList
-                            where e.parentId == departmentId
-                            select e;
-                        foreach (var d in sons)
-                        {
-                            p += GetPersons(d.id);
-                        }
-
-                        return p;
-                    };
-
                     var elements = from e in db.departmentList
-                                   let persons = GetPersons(e.id)
+                                       //let persons = GetPersons(e.id)
+                                       let persons = db.employeeList.Count(x => x.departmentId == e.id)
                                    select new
                                    {
                                        e.id,
@@ -312,6 +297,33 @@ namespace Apps.BLL
             }
         }
 
+        private long GetPersons(long departmentId)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    long p = db.employeeList.Count(x => x.departmentId == departmentId);
+
+                    var sons = from e in db.departmentList
+                        where e.parentId == departmentId
+                        select e;
+                    foreach (var d in sons)
+                    {
+                        p += GetPersons(d.id);
+                    }
+
+                    return p;
+                }
+                
+            }
+            catch (Exception ex)
+            {
+                return 0;
+                throw;
+            }
+
+        }
 
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -22,32 +23,36 @@ namespace MIS.Web.Controllers
                 return RedirectToAction("Login", "Home");
             }
             Company c = Session["company"] as Company;
+            User user = Session["currentUser"] as User;
+
             if (c != null)
             {
                 ViewBag.companyName = c.name;
             }
+            if (user != null)
+            {
+                ViewBag.username = user.name;
+                ViewBag.userId = user.id;
+            }
 
+            FilterModel m = new FilterModel
+            {
+                action = "==",
+                dataType = "bool",
+                key = "roleId",
+                value = Convert.ToString(user.roleId)
+            };
+            QueryParam queryParam = new QueryParam { filters = new Dictionary<string, FilterModel>() };
+            queryParam.filters.Add(m.key, m);
 
-            //QueryParam queryParam = new QueryParam {filters = new Dictionary<string, FilterModel>()};
+            ModuleManager manager = new ModuleManager();
+            OperateResult or = manager.GetModuleTree(queryParam);
+            if (or.status == OperateStatus.Success)
+            {
+                return View(or.data);
+            }
 
-            //FilterModel m = new FilterModel
-            //{
-            //    action = "==",
-            //    dataType = "bool",
-            //    key = "show",
-            //    value = Convert.ToString(true)
-            //};
-
-            //queryParam.filters.Add("show", m);
-            //FunctionRightManager manager = new FunctionRightManager();
-            //OperateResult or = manager.GetAll(queryParam);
-            //if (or.status == OperateStatus.Success)
-            //{
-            //    return View(or.data);
-            //}
-
-
-            return View();
+            return Content("访问错误");
         }
 
         /// <summary>
@@ -125,7 +130,7 @@ namespace MIS.Web.Controllers
                     or.data = null;
                 }
 
-                return Json(or, JsonRequestBehavior.AllowGet);
+                return Json(or, "text/html", Encoding.UTF8, JsonRequestBehavior.AllowGet);
 
             }
 

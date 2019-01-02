@@ -1,0 +1,180 @@
+﻿@model Apps.Model.Employee
+@{
+    Layout = null;
+
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+    string divDialog = controllerName + "_divDialog";
+    string divContent = controllerName + "_divContent-career";
+    string tabEntityList = controllerName + "_tabEntityList-career";
+}
+<script>
+    function show() {
+        initDivDialog("员工职业生涯");
+
+        $('#@(divDialog)').dialog('open');
+        $('#@(divDialog)').dialog('center');
+    }
+    $(function () {
+        show();
+    });
+
+    function destroyDialog() {
+        $('#@(divDialog)').dialog('destroy');
+        $('#@(divContent)').empty();
+    }
+
+    function initDivDialog(titleName) {
+        $('#@(divDialog)').dialog({
+            width: 720,
+            height: 500,
+            title: titleName,
+            modal: true,
+            closed: true,
+            collapsible: false,// 是否显示可折叠按钮
+            minimizable: false,// 是否显示最小化按钮
+            maximizable: false,// 是否显示最大化按钮
+            resizable: false,// 是否可以改变对话框窗口大小
+            onClose: destroyDialog,
+            // 对话框窗口底部按钮
+            buttons: [
+                {
+                    text: '关闭',
+                    iconCls: 'icon-cancel',
+                    handler: destroyDialog
+                }
+            ]
+        });
+
+        initGrid();
+    }
+
+
+    function initGrid1() {
+
+        var url = '/@(controllerName)/GetCareer?id=@(Model.id)';
+        var callbackFuns = [
+        ];
+
+        var toolbar = [
+            { text: '添加事纪', iconCls: 'icon-add', handler: onCreate },
+        ];
+
+        var gridObj = new EmployeeCareerPropertyGrid('@(tabEntityList)', toolbar);
+
+        initPropertygrid(gridObj, url, callbackFuns);
+    }
+    function initGrid() {
+
+        var url = '/@(controllerName)/GetCareer?id=@(Model.id)';
+        var callbackFuns = [
+            { "name": "onBeforeEdit", "fun": onBeforeEdit },
+            { "name": "onClickRow", "fun": onClickRow },
+            { "name": "onDblClickRow", "fun": onDblClickRow, },
+        ];
+
+        var toolbar = [
+            { text: '添加事纪', iconCls: 'icon-add', handler: onCreate },
+            { text: '取消添加', iconCls: 'icon-cancel', handler: onCancelEdit },
+            { text: '保存', iconCls: 'icon-save', handler: onSave },
+        ];
+
+        var gridObj = new EmployeeCareerGrid('@(tabEntityList)', toolbar);
+
+        initDatagrid(gridObj, url, callbackFuns);
+    }
+
+    function onBeforeEdit(rowIndex, rowData) {
+        if (rowData.status != 'new') {
+            return false;
+        }
+    }
+
+    function onCreate() {
+        if (endEditing($('#@(tabEntityList)'))) {
+            $('#@(tabEntityList)').datagrid('appendRow',
+                { status: 'new', description: '' }
+            );
+            var editIndex = $('#@(tabEntityList)').datagrid('getRows').length - 1;
+
+            openEdit($('#@(tabEntityList)'), editIndex);
+        }
+    }
+
+    function onCancelEdit() {
+        var editIndex = $('#@(tabEntityList)').datagrid('getRows').length - 1;
+
+        var row = $('#@(tabEntityList)').datagrid('getRows')[editIndex];
+        if (row.status == 'new') {
+            exitEdit($('#@(tabEntityList)'), editIndex);
+            $('#@(tabEntityList)').datagrid('deleteRow', editIndex);
+        }
+    }
+    function onSave() {
+        if (!endEditing($('#@(tabEntityList)'))) {
+            return;
+        }
+        var rows = $('#@(tabEntityList)').datagrid('getRows');
+        if (rows.length == 0) {
+            showAlert('无修改数据');
+            return;
+        }
+
+        var data = new Array();
+        for (var i = 0; i < rows.length; ++i) {
+            if (rows[i].status == 'new') {
+                rows[i].employeeId = @(Model.id);
+                data.push(rows[i]);
+            }
+        }
+
+        var param = {
+            "id":@(Model.id),
+            "requestData": JSON.stringify(data)
+        }
+        console.log(param);
+        $.post('/@(controllerName)/AddCareerBatch', param, function (result) {
+            if (result.status != 0) {
+                showAlert(result.content)
+            }
+            else {
+                showPrompt("保存成功")
+                $('#@(tabEntityList)').datagrid('reload');
+            }
+
+        }, "JSON").error(function (result) {
+        });
+    }
+
+
+</script>
+
+<div id="@(divDialog)" class="easyui-dialog">
+    <div class="easyui-layout" fit="true" border="false">
+        <div>
+            @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+            <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+                <table>
+                    <tr>
+                        <th>姓名：</th>
+                        <td>
+                            <input class="parm_control" type="text" readonly="" value="@(Model.name)" />
+                        </td>
+                        <th>工号：</th>
+                        <td>
+                            <input class="parm_control" type="text" readonly="" value="@(Model.number)" />
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <table class="tab_center" id="@(tabEntityList)"></table>
+        </div>
+    </div>
+    <div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
+        <!--放置一个隐藏的菜单Div-->
+        <div data-options="iconCls:'icon-save'" onclick="onExitEdit()">退出编辑</div>
+    </div>
+</div>
+
+
+
+

@@ -44,9 +44,9 @@ namespace MIS.Web.Controllers
                     }
 
                     var right = (from e in role.rightList
-                        where e.url == url
+                        where e.url.Contains(url) 
                         select e).FirstOrDefault();
-                    if (right == null)
+                    if (right == null || right.authorize == "否")
                     {
                         filterContext.RequestContext.HttpContext.Response.Write("无权访问");
                         filterContext.RequestContext.HttpContext.Response.End();

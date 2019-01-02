@@ -1,5 +1,5 @@
-﻿@model Apps.Model.Privilege.User
-@{
+﻿@{
+    //Layout = "~/Views/Shared/_Layout.cshtml";
     Layout = null;
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
@@ -8,10 +8,9 @@
     string formEntity = controllerName + "_formEntity";
     string tabEntityList = controllerName + "_tabEntityList";
 }
-
 <script>
     function show() {
-        initDivDialog("重置密码");
+        initDivDialog("导入考核数据");
         initForm();
 
         $('#@(divDialog)').dialog('open');
@@ -23,12 +22,13 @@
 
     function destroyDialog() {
         $('#@(divDialog)').dialog('destroy');
+        $('#@(divContent)').empty();
     }
 
     function initDivDialog(titleName) {
         $('#@(divDialog)').dialog({
-            width: 450,
-            height: 350,
+            width: 600,
+            height: 200,
             title: titleName,
             modal: true,
             closed: true,
@@ -43,18 +43,13 @@
                     text: '保存',
                     iconCls: 'icon-ok',
                     handler: function () {
-                        if (confirmPwd())
-                        {
-                            $('#@(formEntity)').submit();
-                        }
+                        $('#@(formEntity)').submit();
                     }
                 },
                 {
                     text: '取消',
                     iconCls: 'icon-cancel',
-                    handler: function () {
-                        destroyDialog();
-                    }
+                    handler: destroyDialog
                 }
             ]
         });
@@ -62,7 +57,7 @@
 
     function initForm() {
         $('#@(formEntity)').form({
-            url: '/@(controllerName)/ResetPasswd',
+            url: '/@(controllerName)/ImportExcel',
             method: 'post',
             success: function (result) {
                 var obj = JSON.parse(result);
@@ -71,53 +66,31 @@
                 }
                 else {
                     destroyDialog();
-                    showPrompt("重置密码成功");
+                    showPrompt("导入成功")
+                    $('#@(tabEntityList)').datagrid('reload');
                 }
             },
         });
+        
     }
-
-    function confirmPwd()
-    {
-        var pwd = $('#passwd').val();
-        var repwd = $('#repasswd').val();
-        if (pwd != repwd)
-        {
-            showAlert("两次输入密码不一致")
-            return false
-        }
-        return true;
-    }
-
 </script>
 
 <div id="@(divDialog)" class="easyui-dialog">
-    <form id="@(formEntity)" action="" method="post">
+    <form id="@(formEntity)" action="" enctype = "multipart/form-data" method="post">
         @Html.AntiForgeryToken()
-        @Html.HiddenFor(model => model.id)
-
         <table style="margin:auto;width:90%">
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.passwd, new { @class = "lab" })
+                    <label class = "lab">文件</label>
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    @Html.PasswordFor(model => model.passwd, new { @class = "parm_control" })
+                    <input class = "parm_control" name="fileName" id="fileName" type="file" 
+                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
                 </td>
             </tr>
-            <tr>
-                <td class="cols_2_left">
-                    <label class="lab" >确认密码</label>
-                    <span class="spanInputDanger">*</span>
-                </td>
-                <td class="cols_2_right">
-                    <input class="parm_control" type="password" id="repasswd" name="repasswd" />
-                </td>
-            </tr>
+            
         </table>
     </form>
 </div>
-
-
 

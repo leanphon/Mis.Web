@@ -72,6 +72,7 @@ function databoxFormat(date) {
     if (dates < 10) {//当日期不满10的时候前面补0，例如09  
         dates = '0' + dates;
     }
+
     return years + "-" + months + "-" + dates;
 }
 

@@ -149,6 +149,17 @@ namespace MIS.Web.Controllers
 
             }
 
+            var user = Session["currentUser"] as User;
+            if (user == null || user.role.type != RoleType.Admin && user.name != "root")
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无权限访问",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
             ViewBag.id = id.Value;
             return View();
 
@@ -167,6 +178,18 @@ namespace MIS.Web.Controllers
                 );
             }
 
+            var user = Session["currentUser"] as User;
+            if (user == null || user.role.type != RoleType.Admin && user.name != "root")
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无权限访问",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
             UserManager manager = new UserManager();
 
             OperateResult or = manager.ResetPasswd(id, passwd);
@@ -174,6 +197,48 @@ namespace MIS.Web.Controllers
             return Json(or, JsonRequestBehavior.AllowGet);
 
         }
+
+        public ActionResult ShowModifyPasswd(long? id)
+        {
+            if (id == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "访问错误",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+
+            }
+
+            ViewBag.id = id.Value;
+            return View();
+
+        }
+
+        public ActionResult ModifyPasswd(long id, string passwdOld, string passwd)
+        {
+            if (passwd == null || string.IsNullOrEmpty(passwdOld) || string.IsNullOrEmpty(passwd))
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "密码不能为空",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            UserManager manager = new UserManager();
+
+            OperateResult or = manager.ModifyPasswd(id, passwdOld, passwd);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+
+
 
         public ActionResult Lock(long? id)
         {

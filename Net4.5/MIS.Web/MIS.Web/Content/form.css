@@ -39,6 +39,7 @@ fieldset[disabled] .parm_control {
 
 textarea.parm_control {
   height: 150px;
+    width: 85%;
 }
 
 .textbox_text{

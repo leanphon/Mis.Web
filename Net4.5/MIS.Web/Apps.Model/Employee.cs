@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -8,7 +9,7 @@ using System.Web;
 
 namespace Apps.Model
 {
-    public enum EmployeeDeedType
+    public enum CareerType
     {
         [Description("入职")]
         Entry = 0,
@@ -22,25 +23,35 @@ namespace Apps.Model
         Award,
         [Description("处罚")]
         Punish,
+        [Description("岗位变动")]
+        PostChange,
+        [Description("薪酬变动")]
+        SalaryChange,
     }
 
-    public class EmployeeDeed
+    public class EmployeeCareerRecord
     {
         [Key]
         public long id { get; set; }
 
+        [Display(Name = "员工")]
+        public long employeeId { get; set; }
+        [JsonIgnore]
+        public virtual Employee employee { get; set; }
+
+        [Display(Name = "状态")]
+        public string status { get; set; }
+
         [Display(Name = "类别")]
-        public EmployeeDeedType type { get; set; }
+        //public CareerType type { get; set; }
+        public string type { get; set; }
 
         [Display(Name = "日期")]
         public DateTime time { get; set; }
 
-        [Display(Name = "备注")]
-        public string remark { get; set; }
-
-        [Display(Name = "员工")]
-        public long employeeId { get; set; }
-        public virtual Employee employee { get; set; }
+        
+        [Display(Name = "说明")]
+        public string description { get; set; }
 
 
     }
@@ -158,6 +169,9 @@ namespace Apps.Model
         [Display(Name = "合同结束日")]
         public DateTime? contractEnd { get; set; }
 
+        public long ?salaryInfoId { get; set; }
+        [ForeignKey("salaryInfoId")]
+        public virtual SalaryInfo salaryInfo { get; set; }
     }
 
     public class EmployeeExport

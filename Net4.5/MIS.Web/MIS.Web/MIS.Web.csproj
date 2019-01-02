@@ -869,6 +869,9 @@
     <Content Include="Views\Predict\Edit.cshtml" />
     <Content Include="Views\Predict\Index.cshtml" />
     <Content Include="Views\Employee\ShowDepartment.cshtml" />
+    <Content Include="Views\Department\Strength.cshtml" />
+    <Content Include="Views\Employee\ShowCareer.cshtml" />
+    <Content Include="Views\User\ShowModifyPasswd.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Upload\" />

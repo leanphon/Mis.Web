@@ -117,20 +117,35 @@
     }
 
     function refreshSalary(rowIndex, rowData, changes) {
-        if (changes.length == 0) {
-            return
+
+        var rows = $('#@(tabEntityList)').datagrid('getRows')[rowIndex];
+
+        var data = JSON.stringify(rows);
+        var param = {
+            "salaryRecord": data
         }
 
+        $.post('/@(controllerName)/RefreshSalary', param, function (result) {
+            if (result.status != 0) {
+                showAlert(result.content)
+            }
+            else {
+                console.log(result.data);
+
+                $('#@(tabEntityList)').datagrid('getRows')[rowIndex]['shouldTotal'] = result.data.shouldTotal;
+                $('#@(tabEntityList)').datagrid('getRows')[rowIndex]['actualTotal'] = result.data.actualTotal;
+
+               // row['shouldTotal'] = result.data.shouldTotal;
+               // row['actualTotal'] = result.data.actualTotal;
+
+                $('#@(tabEntityList)').datagrid('refreshRow', rowIndex);
+
+            }
+
+        }, "JSON").error(function (result) {
+        });
 
 
-        showAlert(changes.subsidy);
-        showAlert(rowData.subsidy);
-
-        var c = parseFloat(changes.subsidy) + parseFloat(changes.reissue)
-
-        //前后变化的值
-
-        rowData.subsidy = 400
     }
 
     function getParamsJson() {
