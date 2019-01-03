@@ -59,43 +59,35 @@
     }
 
     function initForm() {
-        $('#logo').filebox({
+        $('#logoFile').filebox({
             buttonText: '浏览',
             buttonAlign: 'right',
-            accept: 'image/jpeg'
+            accept: 'image/*',
+            onChange:function(newValue) {
+                $('#logo').val(newValue);
+            }
         })
-        $('#loginImg').filebox({
+        $('#loginFile').filebox({
             buttonText: '浏览',
             buttonAlign: 'right',
-            accept: 'image/jpeg'
+            accept: 'image/*',
+            onChange: function (newValue) {
+                $('#loginImg').val(newValue);
+            }
         })
-        $('#mainImg').filebox({
-            buttonText: '浏览',
-            buttonAlign: 'right',
-            accept: 'image/jpeg'
-        })
-
         @{
             if (Model.logo != null)
             {
                 <text>
-        $('#logo').filebox('setValue', '@(Model.logo)');
-        $('#logo').filebox('setText', '@(Model.logo)');
-        </text>
-            }
-            if (Model.mainImg != null)
-            {
-                <text>
-        $('#mainImg').filebox('setValue', '@(Model.mainImg)');
-        $('#mainImg').filebox('setText', '@(Model.mainImg)');
-        </text>
+                    $('#logo').val('@(Model.logo)');
+                    $('#logoFile').filebox('setText', '@(Model.logo)');
+                </text>
             }
             if (Model.loginImg != null)
             {
                 <text>
-        $('#loginImg').filebox('setValue', '@(Model.loginImg)');
-        $('#loginImg').filebox('setText', '@(Model.loginImg)');
-
+                    $('#loginImg').val('@(Model.loginImg)');
+                    $('#loginFile').filebox('setText', '@(Model.loginImg)');
                 </text>
             }
         }
@@ -156,7 +148,8 @@
                     @Html.LabelFor(model => model.logo, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    <input id="logo" name="logo" type="text" style="width: 100%">
+                    <input id="logo" name="logo" type="hidden" style="width: 100%">
+                    <input id="logoFile" name="logoFile" type="text" style="width: 100%">
                 </td>
             </tr>
             <tr>
@@ -164,7 +157,8 @@
                     @Html.LabelFor(model => model.loginImg, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
-                    <input id="loginImg" name="loginImg" type="text" style="width: 100%">
+                    <input id="loginImg" name="loginImg" type="hidden" style="width: 100%">
+                    <input id="loginFile" name="loginFile" type="text" style="width: 100%">
                 </td>
             </tr>
             @*<tr>
