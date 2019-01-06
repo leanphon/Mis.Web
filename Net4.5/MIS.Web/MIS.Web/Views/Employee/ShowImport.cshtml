@@ -70,7 +70,11 @@
                 }
             },
         });
-        
+        $('#fileName').filebox({
+            buttonText: '选择文件',
+            buttonAlign: 'right',
+            accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        })
     }
 </script>
 
@@ -84,8 +88,7 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    <input class = "parm_control" name="fileName" id="fileName" type="file" 
-                           accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" />
+                    <input name="fileName" id="fileName" type="text"  style="width: 100%" />
                 </td>
             </tr>
             

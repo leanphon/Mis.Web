@@ -11,6 +11,9 @@ function ModuleTreeGrid(gridId, toolbar) {
     this.normalCols = [[
                 { field: 'id', hidden: true },
                 { field: 'name', title: '模块名称', width: 250 },
+        { field: 'showIndex', title: '显示顺序', width: 100 },
+        { field: 'onlyRoot', title: '是否为root', width: 100 },
+        { field: 'baseUrl', title: 'url', width: 250 },
     ]];
 
     this.toolbar = toolbar;
@@ -176,7 +179,7 @@ function LevelGrid(gridId, toolbar) {
                 { field: 'id', hidden: true },
                 { field: 'name', title: '层级名称', width: 150 },
                 { field: 'code', title: '层级代码', width: 150 },
-                { field: 'postSalary', title: '岗位工资', width: 150 },
+                { field: 'levelSalary', title: '岗位工资', width: 150 },
                 { field: 'fullAttendanceRewards', title: '全勤奖', width: 150 },
                 { field: 'seniorityRewardsBase', title: '工龄奖基数', width: 150 },
     ]];
@@ -290,6 +293,10 @@ function EmployeeGrid(gridId, toolbar) {
                 { field: 'contractSerial', title: '合同编号', width: 200 },
                 { field: 'contractBegin', title: '合同起始日', width: 200, formatter: formatDate },
                 { field: 'contractEnd', title: '合同结束日', width: 200, formatter: formatDate },
+
+                { field: 'isSocialSecurity', title: '社保', width: 100 },
+                { field: 'isPension', title: '退休金', width: 100 },
+                { field: 'isUrbanRuralMedical', title: '城乡医疗', width: 100 },
 
                 { field: 'emergencyContact', title: '紧急联系人', width: 150 },
                 { field: 'emergencyPhone', title: '紧急联系人电话', width: 150 },
@@ -566,7 +573,7 @@ function SalaryInputGrid(gridId, toolbar) {
     ]];
 
     this.normalCols = [[
-                { field: 'postSalary', title: '岗位工资', width: 150, },
+                { field: 'levelSalary', title: '层级工资', width: 150, },
                 { field: 'shouldWorkTime', title: '应出勤', width: 150, },
                 { field: 'actualWorkTime', title: '实出勤', width: 150, },
                 { field: 'isFullAttendance', title: '是否全勤', width: 150, },
@@ -630,7 +637,7 @@ function SalaryRecordGrid(gridId, toolbar) {
     ]];
 
     this.normalCols = [[
-                { field: 'postSalary', title: '岗位工资', width: 150, },
+                { field: 'levelSalary', title: '层级工资', width: 150, },
                 { field: 'fullAttendanceRewards', title: '全勤奖', width: 150, styler: positiveStyler, },
                 { field: 'performanceRewards', title: '绩效奖金', width: 150, styler: positiveStyler, },
                 { field: 'benefitRewards', title: '效益奖金', width: 150, styler: positiveStyler, },
@@ -660,7 +667,7 @@ function SalaryRecordGrid(gridId, toolbar) {
 	            },
                 { field: 'shouldTotal', title: '应发工资', width: 150, styler: positiveStyler, },
                 { field: 'actualTotal', title: '实发工资', width: 150, styler: positiveStyler, },
-                { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDate },
+                { field: 'inputDate', title: '录入时间', width: 200, formatter: formatDateTime },
                 { field: 'status', title: '状态', width: 200 },
 
     ]];

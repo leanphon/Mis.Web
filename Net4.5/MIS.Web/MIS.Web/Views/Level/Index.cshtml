@@ -1,5 +1,5 @@
 ﻿@{
-    ViewBag.Title = "岗位管理";
+    ViewBag.Title = "层级管理";
     Layout = "~/Views/Shared/_Layout.cshtml";
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
@@ -48,8 +48,13 @@
             { "name": "onDblClickRow", "fun": onEditEntity },
             { "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
 	    ];
-	    var toolbarFun = [onAddEntity, onEditEntity, onRemoveEntity];
-	    var gridObj = new LevelGrid('@(tabEntityList)', toolbarFun);
+	    var toolbar = [
+	        { text: '增加', iconCls: 'icon-add', handler: onAddEntity },
+	        { text: '修改', iconCls: 'icon-edit', handler: onEditEntity },
+	        { text: '删除', iconCls: 'icon-remove', handler: onRemoveEntity },
+	    ];
+
+	    var gridObj = new LevelGrid('@(tabEntityList)', toolbar);
 	    initDatagrid(gridObj, url, callbackFuns);
 
     }

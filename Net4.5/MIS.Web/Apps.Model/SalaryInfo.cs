@@ -31,9 +31,9 @@ namespace Apps.Model
 
 
         // 级别工资
-        [Display(Name = "岗位工资")]
+        [Display(Name = "层级工资")]
         [Required(ErrorMessage = "{0}必须输入")]
-        public double postSalary { get; set; }
+        public double levelSalary { get; set; }
 
         // 全勤奖
         [Display(Name = "全勤奖")]
@@ -93,12 +93,6 @@ namespace Apps.Model
     {
         public long id { get; set; }
 
-        [Display(Name = "岗位")]
-        public long postId { get; set; }
-        [ForeignKey("postId")]
-        public virtual PostInfo postInfo { get; set; }
-
-
         [Display(Name = "层级")]
         public long levelId { get; set; }
         [ForeignKey("levelId")]
@@ -118,7 +112,7 @@ namespace Apps.Model
 
         public double GetSalaryTotal()
         {
-            double total = levelInfo.postSalary + levelInfo.fullAttendanceRewards;
+            double total = levelInfo.levelSalary + levelInfo.fullAttendanceRewards;
 
             total += levelInfo.seniorityRewardsBase
                 + performanceInfo.performanceRewards + benefitInfo.benefitRewards;

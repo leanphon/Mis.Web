@@ -62,7 +62,11 @@
             url: '/@(controllerName)/CreateEntity',
             method: 'post',
             success: function (result) {
-                console.log(result)
+                if (result.indexOf("无权访问") >= 0) {
+                    showAlert(result);
+                    return;
+                }
+
                 var obj = JSON.parse(result);
                 if (obj.status != 0) {
                     showAlert(obj.content);
@@ -120,6 +124,7 @@
         });
         $('#sex').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -131,6 +136,7 @@
 
         $('#education').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -147,6 +153,7 @@
         });
         $('#marriage').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -158,6 +165,7 @@
         });
         $('#political').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -170,7 +178,8 @@
 
         $('#postId').combobox({
             width: '100%',
-            editable: false,
+            panelWidth: 200,
+            panelHeight: 300,
             url: '/Post/GetAllEntities',
             mode: 'remote',
             valueField: 'id',
@@ -178,17 +187,17 @@
         });
         $('#levelId').combogrid({
             width: '100%',
-            panelWidth: 370,
-            panelHeight: 'auto',
-            editable: false,
+            panelWidth: 400,
+            panelHeight: 300,
+            //editable: false,
             idField: 'id',
             textField: 'name',
             url: '/Level/GetAllEntities',
             columns: [[
-                { field: 'id', title: 'id', width: 80, hidden: true },
-                { field: 'name', title: '岗位名称', width: 120 },
+                { field: 'id', title: 'id', hidden: true },
+                { field: 'name', title: '岗位名称', width: 150 },
                 { field: 'code', title: '岗位代码', width: 80 },
-                { field: 'postSalary', title: '岗位工资', width: 80 },
+                { field: 'levelSalary', title: '岗位工资', width: 80 },
                 { field: 'fullAttendanceRewards', title: '全勤奖', width: 80 },
             ]],
         });
@@ -196,8 +205,8 @@
         $('#performanceId').combogrid({
             width: '100%',
             panelWidth: 200,
-            panelHeight: 'auto',
-            editable: false,
+            panelHeight: 300,
+            //editable: false,
             idField: 'id',
             textField: 'code',
             url: '/Performance/GetAllEntities',
@@ -211,8 +220,8 @@
         $('#benefitId').combogrid({
             width: '100%',
             panelWidth: 200,
-            panelHeight: 'auto',
-            editable: false,
+            panelHeight: 300,
+            //editable: false,
             idField: 'id',
             textField: 'code',
             url: '/Benefit/GetAllEntities',
@@ -223,6 +232,40 @@
             ]],
         });
 
+        $('#isSocialSecurity').combobox({
+            width: '100%',
+            panelHeight: 'auto',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '是', text: '是' },
+                { value: '否', text: '否' },
+            ]
+        });
+        $('#isPension').combobox({
+            width: '100%',
+            panelHeight: 'auto',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '是', text: '是' },
+                { value: '否', text: '否' },
+            ]
+        });
+        $('#isUrbanRuralMedical').combobox({
+            width: '100%',
+            panelHeight:'auto',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '是', text: '是' },
+                { value: '否', text: '否' },
+            ]
+        });
+        
     }
 
     function submit() {
@@ -339,18 +382,18 @@
                 </td>
             </tr>
             <tr>
-            <td class="cols_4_left">
-                @Html.LabelFor(model => model.nativePlace, new { @class = "lab" })
-            </td>
-            <td class="cols_4_right">
-                @Html.EditorFor(model => model.nativePlace, new { htmlAttributes = new { @class = "parm_control" } })
-            </td>
-            <td class="cols_4_left">
-                @Html.LabelFor(model => model.residence, new { @class = "lab" })
-            </td>
-            <td class="cols_4_right">
-                @Html.EditorFor(model => model.residence, new { htmlAttributes = new { @class = "parm_control" } })
-            </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.nativePlace, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.nativePlace, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.residence, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.residence, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
             <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.address, new { @class = "lab" })
@@ -381,7 +424,7 @@
             </tr>
             <tr>
                 <td class="cols_4_left">
-                    @Html.LabelFor(model => model.salaryInfo.postId, new { @class = "lab" })
+                    @Html.LabelFor(model => model.postId, new { @class = "lab" })
                 </td>
                 <td class="cols_4_right">
                     <input class="parm_control" type="text" id="postId" name="postId" />
@@ -394,20 +437,20 @@
                     <input class="parm_control" type="text" id="levelId" name="levelId" />
                 </td>
             </tr>
-        <tr>
-            <td class="cols_4_left">
-                @Html.LabelFor(model => model.salaryInfo.performanceId, new { @class = "lab" })
-            </td>
-            <td class="cols_4_right">
-                <input class="parm_control" type="text" id="performanceId" name="performanceId" />
-            </td>
-            <td class="cols_4_left">
-                @Html.LabelFor(model => model.salaryInfo.benefitId, new { @class = "lab" })
-            </td>
-            <td class="cols_4_right">
-                <input class="parm_control" type="text" id="benefitId" name="benefitId" />
-            </td>
-        </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.salaryInfo.performanceId, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    <input class="parm_control" type="text" id="performanceId" name="performanceId" />
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.salaryInfo.benefitId, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    <input class="parm_control" type="text" id="benefitId" name="benefitId" />
+                </td>
+            </tr>
             <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.contractSerial, new { @class = "lab" })
@@ -436,7 +479,6 @@
                     @Html.EditorFor(model => model.contractEnd, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
-
             <tr>
                 <td class="cols_4_left">
                     @Html.LabelFor(model => model.emergencyContact, new { @class = "lab" })
@@ -451,9 +493,32 @@
                     @Html.EditorFor(model => model.emergencyPhone, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.isSocialSecurity, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.isSocialSecurity, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.isPension, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.isPension, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
 
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.isUrbanRuralMedical, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.isUrbanRuralMedical, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+
+            </tr>
         </table>
-        <a href="#" onclick="submit()" class="easyui-linkbutton a-button"  >入职</a>
+        <a href="#" onclick="submit()" class="easyui-linkbutton a-button">入职</a>
 
     </form>
 </div>

@@ -79,10 +79,11 @@ namespace MIS.Web.Controllers
                 );
             }
 
+            long postId;
             SalaryInfo salary = new SalaryInfo();
             try
             {
-                salary.postId = Convert.ToInt64(Request.Params["postId"]);
+                postId = Convert.ToInt64(Request.Params["postId"]);
                 salary.levelId = Convert.ToInt64(Request.Params["levelId"]);
                 salary.performanceId = Convert.ToInt64(Request.Params["performanceId"]);
                 salary.benefitId = Convert.ToInt64(Request.Params["benefitId"]);
@@ -96,6 +97,7 @@ namespace MIS.Web.Controllers
             }
 
             model.salaryInfo = salary;
+            model.postId = postId;
 
             EmployeeManager manager = new EmployeeManager();
 

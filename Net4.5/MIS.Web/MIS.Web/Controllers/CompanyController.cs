@@ -81,14 +81,14 @@ namespace MIS.Web.Controllers
 
             if (Request.Files.Count > 0)
             {
-                HttpPostedFileBase loginImg = Request.Files["loginImg"];
-                if (loginImg != null && !string.IsNullOrWhiteSpace(loginImg.FileName))
+                if (model.loginImg != null)
                 {
-                    switch (Path.GetExtension(loginImg.FileName))
+                    HttpPostedFileBase loginFile = Request.Files["loginFile"];
+                    if (loginFile != null && loginFile.FileName != "")
                     {
-                        case ".jpg":
-                            break;
-                        default:
+
+                        if (Path.GetExtension(loginFile.FileName) != ".jpg")
+                        {
                             return Json(
                                 new OperateResult
                                 {
@@ -96,21 +96,22 @@ namespace MIS.Web.Controllers
                                 },
                                 JsonRequestBehavior.AllowGet
                             );
+                        }
+
+                        model.loginImg = model.code + "-loginImg.jpg";
+                        string file = Server.MapPath("/") + ("/Upload/") + model.loginImg;
+
+                        loginFile.SaveAs(file);
                     }
-
-                    model.loginImg = model.code + "-loginImg.jpg";
-                    string file = Server.MapPath("/") + ("/Upload/") + model.loginImg;
-
-                    loginImg.SaveAs(file);
                 }
-                HttpPostedFileBase mainImg = Request.Files["mainImg"];
-                if (mainImg != null && !string.IsNullOrWhiteSpace(mainImg.FileName))
+                if (model.logo != null)
                 {
-                    switch (Path.GetExtension(mainImg.FileName))
+                    HttpPostedFileBase logoFile = Request.Files["logoFile"];
+                    if (logoFile != null && logoFile.FileName!="")
                     {
-                        case ".jpg":
-                            break;
-                        default:
+
+                        if (Path.GetExtension(logoFile.FileName) != ".jpg")
+                        {
                             return Json(
                                 new OperateResult
                                 {
@@ -118,34 +119,13 @@ namespace MIS.Web.Controllers
                                 },
                                 JsonRequestBehavior.AllowGet
                             );
+                        }
+
+                        model.logo = model.code + "-logo.jpg";
+                        string file = Server.MapPath("/") + ("/Upload/") + model.logo;
+
+                        logoFile.SaveAs(file);
                     }
-
-                    model.mainImg = model.code + "-mainImg.jpg";
-                    string file = Server.MapPath("/") + ("/Upload/") + model.mainImg;
-
-                    mainImg.SaveAs(file);
-                }
-                HttpPostedFileBase logo = Request.Files["logo"];
-                if (logo != null && !string.IsNullOrWhiteSpace(logo.FileName))
-                {
-                    switch (Path.GetExtension(logo.FileName))
-                    {
-                        case ".jpg":
-                            break;
-                        default:
-                            return Json(
-                                new OperateResult
-                                {
-                                    content = "上传的文件不是jpg文件",
-                                },
-                                JsonRequestBehavior.AllowGet
-                            );
-                    }
-
-                    model.logo = model.code + "-logo.jpg";
-                    string file = Server.MapPath("/") + ("/Upload/") + model.logo;
-
-                    logo.SaveAs(file);
                 }
             }
 

@@ -26,19 +26,20 @@ function initDatagrid(gridEntity, url, callbackFuns)
 		pagination: true,
 		singleSelect: true,
 		rownumbers: true,
-		//emptyMsg:"无数据",
+		emptyMsg:"无数据",
 	    loadMsg: '正在加载中，请稍等... ',
 		nowrap: false,//允许换行
         //fit: true,
 		//fitColumns: true,//宽度自适应
-		frozenColumns: gridEntity.forzenCols,
+		pageSize: 20,
+	    frozenColumns: gridEntity.forzenCols,
 		columns: gridEntity.normalCols,
 		toolbar: gridEntity.toolbar,
 		onLoadSuccess: function (data) {
 		    var height = $(window).height();
 		    var colsFrozen = gridObj.datagrid('getColumnFields', true);
 		    if (colsFrozen.length > 0) {
-		        height = height - 55;
+		        height = height - 75;
 		    }
 		    gridObj.datagrid("resize", {
 		        height: height
@@ -53,16 +54,16 @@ function initDatagrid(gridEntity, url, callbackFuns)
 			});
 		}
     });
-    
 
     var p = gridObj.datagrid('getPager');
-	$(p).pagination({
-		pageSize: 10,
-		pageList: [10, 20, 50, 100],
-		beforePageText: '第',
-		afterPageText: '页 共{pages}页',
-		displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
-	});
+    $(p).pagination({
+        pageSize: 20,
+        pageList: [20, 50, 100],
+        beforePageText: '第',
+        afterPageText: '页 共{pages}页',
+        displayMsg: '当前显示{from} - {to}条记录 共{total}条记录'
+    });
+
 	var contextMenu = $('#' + gridEntity.id + 'ContextMenu');
 	createDatagridHeaderMenu(gridEntity.id, contextMenu);
 

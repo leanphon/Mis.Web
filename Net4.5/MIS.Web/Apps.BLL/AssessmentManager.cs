@@ -28,9 +28,23 @@ namespace Apps.BLL
                     {
                         return new OperateResult
                         {
-                            content = "数据已经存在",
+                            content = "单号为（"+ model.billSerial +"）的员工数据已经存在;",
                         };
                     }
+
+                    var salary = (from s in db.employeeList
+                        where s.id == model.employeeId
+                              && s.salaryInfoId != null
+                        select s).FirstOrDefault();
+                    if (salary == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "单号为（" + model.billSerial + "）的员工还未设定薪酬;",
+                        };
+                    }
+
+
                     model.inputDate = DateTime.Now;
                     model.status = "未审核";
 
@@ -55,7 +69,8 @@ namespace Apps.BLL
             {
                 return new OperateResult
                 {
-                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                    content = "单号为（" + model.billSerial + "）的员工，保存发生错误：" 
+                              + Model.Utility.Utility.GetExceptionMsg(ex) + ";",
                 };
             }
 
@@ -74,13 +89,7 @@ namespace Apps.BLL
                 {
                     fail = true;
 
-                    EmployeeManager em = new EmployeeManager();
-                    OperateResult orEm = em.GetById(model.employeeId);
-                    Employee e = orEm.data as Employee;
-                    if (e != null)
-                    {
-                        result.content += "工号(" + e.number + ") 考核数据保存失败, error（" + or.content + "） ;";
-                    }
+                    result.content += or.content;
                 }
 
             }
@@ -358,6 +367,7 @@ namespace Apps.BLL
                 using (SystemDB db = new SystemDB())
                 {
                     var elements = from e in db.assessmentInfoList.Include("employee").Include("department")
+                                   orderby e.employee.number
                                    select new
                                    {
                                        e.id,
@@ -465,7 +475,7 @@ namespace Apps.BLL
                     }
                     else
                     {
-                        pages = total / (pager.rows == 0 ? 10 : pager.rows);
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {
@@ -507,147 +517,6 @@ namespace Apps.BLL
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        //public OperateResult GetEmployeesByPager(QueryParam param = null)
-        //{
-        //    using (SystemDB db = new SystemDB())
-        //    {
-        //        try
-        //        {
-        //            if (param == null || param.filters == null || !param.filters.Keys.Contains("month"))
-        //            {
-        //                return new OperateResult
-        //                {
-        //                    content = "需要月份查询条件",
-        //                };
-        //            }
-        //            // 得到给定月份的已经存在考核数据的记录
-        //            string month = param.filters["month"].value ?? "";
-        //            var assessmnetList = from m in db.assessmentInfoList
-        //                                 where m.month == month
-        //                                 select m;
-        //            var elements = from m in db.employeeList.Include("department")
-        //                           join t in assessmnetList
-        //                           on m.id equals t.employeeId
-        //                           into newTable
-        //                           from e in newTable.DefaultIfEmpty()
-        //                           select new
-        //                           {
-        //                               id = (e.id != null) ? e.id  : 0,
-        //                               employeeId = m.id,
-        //                               employeeName = m.name,
-        //                               employeeNumber = m.number,
-        //                               departmentId = m.departmentId,
-        //                               departmentName = m.department.name,
-        //                               shouldWorkTime = (e.shouldWorkTime != null) ? e.shouldWorkTime : 0,
-        //                               actualWorkTime = (e.actualWorkTime != null) ? e.actualWorkTime : 0,
-        //                               normalOvertime = e.normalOvertime ?? 0,
-        //                               holidayOvertime = e.holidayOvertime ?? 0,
-        //                               lateTime = e.lateTime ?? 0,
-        //                               earlyTime = e.earlyTime ?? 0,
-        //                               absenteeismTime = e.absenteeismTime ?? 0,
-        //                               personalLeaveTime = e.personalLeaveTime ?? 0,
-        //                               sickLeaveTime = e.sickLeaveTime ?? 0,
-        //                               annualVacationTime = e.annualVacationTime ?? 0,
-        //                               performanceScore = e.performanceScore ?? 0,
-        //                               benefitScore = e.benefitScore ?? 0,
-        //                           };
-
-        //            // 先查询出部门及子部门，再过滤
-        //            #region
-        //            if (param != null && param.filters != null)
-        //            {
-        //                if (param.filters.Keys.Contains("departmentId"))
-        //                {
-        //                    var p = param.filters["departmentId"];
-        //                    long departmentId = Convert.ToInt64(p.value ?? "0");
-
-
-        //                    Func<long, IQueryable<long>> GetSonFun = null;
-        //                    GetSonFun = id =>
-        //                    {
-        //                        // 查找属于给定部门的员工
-        //                        var sons = from e in db.departmentList
-        //                                   where e.parentId == id
-        //                                   select e.id;
-        //                        IQueryable<long> many = sons;
-        //                        // 查找属于给定部门子部门的员工
-        //                        foreach (var it in sons)
-        //                        {
-        //                            many = many.Concat(GetSonFun(it));
-        //                        }
-        //                        return many;
-        //                    };
-
-        //                    // 所有部门
-        //                    var departments = (from e in db.departmentList
-        //                                       where e.id == departmentId
-        //                                       select e.id).Concat(GetSonFun(departmentId));
-
-        //                    elements = elements.Where(t => departments.Contains(t.departmentId));
-        //                }
-        //            }
-        //            #endregion
-
-        //            // 模糊过滤名字
-        //            #region
-        //            if (param != null && param.filters != null)
-        //            {
-        //                if (param.filters.Keys.Contains("employeeName"))
-        //                {
-        //                    var p = param.filters["employeeName"];
-        //                    elements = elements.Where(t => t.employeeName.Contains(p.value));
-        //                }
-        //            }
-        //            #endregion
-
-
-
-        //            int total = elements.Count();
-        //            int pages = 0;
-        //            Pager pager = param.pager;
-        //            if (pager == null || pager.rows == 0)
-        //            {
-        //                pages = total > 0 ? 1 : 0;
-        //            }
-        //            else
-        //            {
-        //                pages = total / (pager.rows == 0 ? 10 : pager.rows);
-        //                pages = total % pager.rows == 0 ? pages : pages + 1;
-        //                if (pager.page <= 1)
-        //                {
-        //                    elements = elements.Take(pager.rows);
-        //                }
-        //                else
-        //                {
-        //                    elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
-        //                }
-        //            }
-
-        //            var data = new
-        //            {
-        //                pages,
-        //                total,
-        //                rows = elements.ToList()
-        //            };
-
-        //            return new OperateResult
-        //            {
-        //                status = OperateStatus.Success,
-        //                data = data,
-        //            };
-
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            return new OperateResult
-        //            {
-        //                content = Model.Utility.Utility.GetExceptionMsg(ex),
-        //            };
-        //        }
-
-        //    }
-        //}
-
         public OperateResult GetEmployeesByPager(QueryParam param = null)
         {
             try
@@ -749,7 +618,7 @@ namespace Apps.BLL
                     }
                     else
                     {
-                        pages = total / (pager.rows == 0 ? 10 : pager.rows);
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {
@@ -787,13 +656,11 @@ namespace Apps.BLL
         private string GenerateBillSerial(string month, string employeeNumber)
         {
             DateTime dtMonth;
-            DateTime dtNow = DateTime.Now;
-
 
             if (DateTime.TryParse(month, out dtMonth))
             {
-                string serial = string.Format("S-{0}-{1}{2:D2}{3:D2}{4:D2}{5:D2}", employeeNumber, dtMonth.Year,
-                    dtMonth.Month, dtMonth.Day, dtNow.Hour, dtNow.Minute);
+                string serial = string.Format("S-{0}-{1}{2:D2}{3:D2}", employeeNumber, dtMonth.Year,
+                    dtMonth.Month, dtMonth.Day);
 
 
                 return serial;
