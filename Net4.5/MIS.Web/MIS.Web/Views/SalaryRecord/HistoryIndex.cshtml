@@ -82,7 +82,9 @@
             formatter: databoxFormatMonth,
             parser: databoxParser
         });
-        $('#month').datebox('setValue', new Date);
+        var lastMonth = new Date();
+        lastMonth.setMonth(lastMonth.getMonth() - 1);
+        $('#month').datebox('setValue', lastMonth);
 
         var url = '/@(controllerName)/GetEntities';
         var callbackFuns = [

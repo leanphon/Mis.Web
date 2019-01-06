@@ -169,7 +169,22 @@ namespace Apps.Model
         [Display(Name = "合同结束日")]
         public DateTime? contractEnd { get; set; }
 
-        public long ?salaryInfoId { get; set; }
+        [Display(Name = "社保")]
+        public string isSocialSecurity { get; set; }
+
+        [Display(Name = "退休金")]
+        public string isPension { get; set; }
+
+        [Display(Name = "城乡医疗")]
+        public string isUrbanRuralMedical { get; set; }
+
+        [Display(Name = "岗位")]
+
+        public long ?postId { get; set; }
+        [ForeignKey("postId")]
+        public virtual PostInfo postInfo { get; set; }
+
+        public long? salaryInfoId { get; set; }
         [ForeignKey("salaryInfoId")]
         public virtual SalaryInfo salaryInfo { get; set; }
     }
@@ -197,6 +212,9 @@ namespace Apps.Model
 
         [Display(Name = "部门")]
         public string departmentName { get; set; }
+
+        [Display(Name = "岗位")]
+        public string postName { get; set; }
 
         [Display(Name = "性别")]
         [Required(ErrorMessage = "{0}必须输入")]
@@ -271,5 +289,14 @@ namespace Apps.Model
 
         [Display(Name = "合同结束日")]
         public DateTime? contractEnd { get; set; }
+        [Display(Name = "社保")]
+        public string isSocialSecurity { get; set; }
+
+        [Display(Name = "退休金")]
+        public string isPension { get; set; }
+
+        [Display(Name = "城乡医疗")]
+        public string isUrbanRuralMedical { get; set; }
+
     }
 }

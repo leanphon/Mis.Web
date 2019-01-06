@@ -28,7 +28,7 @@
                     <span class="spanInputDanger">*</span>
                 </td>
                 <td class="cols_2_right">
-                    @Html.EditorFor(model => model.name, new {htmlAttributes = new {@class = "parm_control"}})
+                    @Html.EditorFor(model => model.name, new {htmlAttributes = new {@class = "parm_control", onkeypress = "submitForm(event)" } })
                 </td>
             </tr>
             <tr>
@@ -55,6 +55,7 @@
     }
     $(function () {
         show();
+        $('#name').focus();
     });
 
     function destroyDialog() {

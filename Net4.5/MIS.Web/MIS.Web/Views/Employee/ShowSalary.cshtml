@@ -83,7 +83,7 @@
         });
         $('#postId').combobox({
             width: '100%',
-            editable: false,
+            //editable: false,
             url: '/Post/GetAllEntities',
             mode: 'remote',
             valueField: 'id',
@@ -92,29 +92,33 @@
         $('#levelId').combogrid({
             width: '100%',
             panelWidth: 370,
-            panelHeight: 'auto',
-            editable: false,
+            panelHeight: 400,
+            //editable: false,
             idField: 'id',
             textField: 'name',
             url: '/Level/GetAllEntities',
             columns: [[
                 { field: 'id', title: 'id', width: 80, hidden: true },
-                { field: 'name', title: '岗位名称', width: 120 },
-                { field: 'code', title: '岗位代码', width: 80 },
-                { field: 'postSalary', title: '岗位工资', width: 80 },
+                { field: 'name', title: '层级名称', width: 120 },
+                { field: 'code', title: '层级代码', width: 80 },
+                { field: 'levelSalary', title: '层级工资', width: 80 },
                 { field: 'fullAttendanceRewards', title: '全勤奖', width: 80 },
             ]],
             onSelect: function (index, record) {
-                postTotal = record.postSalary + record.fullAttendanceRewards;
+                postTotal = record.levelSalary + record.fullAttendanceRewards;
                 updateTotal();
-            }
+
+                var text = record.name + "  " + record.code;
+                $('#levelId').combogrid('setValue', { id: record.id, nameCode: text });
+            },
+            
         });
 
         $('#performanceId').combogrid({
             width: '100%',
             panelWidth: 200,
-            panelHeight: 'auto',
-            editable: false,
+            panelHeight: 400,
+            //editable: false,
             idField: 'id',
             textField: 'code',
             url: '/Performance/GetAllEntities',
@@ -132,8 +136,8 @@
         $('#benefitId').combogrid({
             width: '100%',
             panelWidth: 200,
-            panelHeight: 'auto',
-            editable: false,
+            panelHeight: 400,
+            //editable: false,
             idField: 'id',
             textField: 'code',
             url: '/Benefit/GetAllEntities',
@@ -150,16 +154,16 @@
 
         @{
             var total = 0.0;
-            if (Model.salaryInfo.postInfo != null)
+            if (Model.postInfo != null)
             {
                 <text>
-        $('#postId').combobox('setValue', '@(Model.salaryInfo.postId)')
+        $('#postId').combobox('setValue', '@(Model.postId)')
                 </text>
             }
             if (Model.salaryInfo.levelInfo != null)
             {
                 <text>
-                    postTotal = @(Model.salaryInfo.levelInfo.postSalary + Model.salaryInfo.levelInfo.fullAttendanceRewards)
+                    postTotal = @(Model.salaryInfo.levelInfo.levelSalary + Model.salaryInfo.levelInfo.fullAttendanceRewards)
                     $('#levelId').combogrid('setValue', '@(Model.salaryInfo.levelId)')
                 </text>
             }
@@ -216,7 +220,7 @@
             </tr>
             <tr>
                 <td class="cols_2_left">
-                    @Html.LabelFor(model => model.salaryInfo.postId, new { @class = "lab" })
+                    @Html.LabelFor(model => model.postId, new { @class = "lab" })
                 </td>
                 <td class="cols_2_right">
                     <select class="parm_control" id="postId" name="postId" ></select>

@@ -25,8 +25,8 @@ namespace Apps.Model
         public virtual AssessmentInfo assessmentInfo { get; set; }
 
         // 岗位工资
-        [Display(Name = "岗位工资")]
-        public double postSalary { get; set; }
+        [Display(Name = "层级工资")]
+        public double levelSalary { get; set; }
         // 全勤奖
         [Display(Name = "全勤奖")]
         public double fullAttendanceRewards { get; set; }
@@ -111,7 +111,7 @@ namespace Apps.Model
 
         // 岗位工资
         [Display(Name = "岗位工资")]
-        public double postSalary { get; set; }
+        public double levelSalary { get; set; }
         // 全勤奖
         [Display(Name = "全勤奖")]
         public double fullAttendanceRewards { get; set; }

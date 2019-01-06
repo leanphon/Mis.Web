@@ -443,7 +443,7 @@ namespace Apps.BLL
                 {
 
                     var element = (from m in db.employeeList.Include("department").Include("salaryInfo")
-                                .Include("salaryInfo.postInfo").Include("salaryInfo.levelInfo")
+                                .Include("postInfo").Include("salaryInfo.levelInfo")
                                 .Include("salaryInfo.performanceInfo").Include("salaryInfo.benefitInfo")
                                    where id == m.id
                                    select m
@@ -544,12 +544,16 @@ namespace Apps.BLL
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var elements = from e in db.employeeList.Include("salaryInfo").Include("salaryInfo.postInfo")
+                    var elements = from e in db.employeeList.Include("salaryInfo").Include("postInfo")
+                                   orderby e.number
                                    select new
                                    {
                                        e.id,
                                        e.name,
                                        e.number,
+                                       e.departmentId,
+                                       departmentName = e.department.name,
+                                       postName = e.postInfo.name,
                                        e.sex,
                                        e.phone,
                                        e.idCard,
@@ -561,8 +565,6 @@ namespace Apps.BLL
                                        e.leaveDate,
                                        e.emergencyContact,
                                        e.emergencyPhone,
-                                       e.departmentId,
-                                       departmentName = e.department.name,
                                        e.nation,
                                        e.nativePlace,
                                        e.residence,
@@ -575,8 +577,9 @@ namespace Apps.BLL
                                        e.contractSerial,
                                        e.contractBegin,
                                        e.contractEnd,
-                                      postName = e.salaryInfo.postInfo.name
-
+                                       e.isSocialSecurity,
+                                       e.isPension,
+                                       e.isUrbanRuralMedical,
                                    };
 
                     // 先查询出部门及子部门，再过滤
@@ -650,7 +653,7 @@ namespace Apps.BLL
                     }
                     else
                     {
-                        pages = total / (pager.rows == 0 ? 10 : pager.rows);
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {
@@ -701,12 +704,15 @@ namespace Apps.BLL
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var elements = from e in db.employeeList
+                    var elements = from e in db.employeeList.Include("salaryInfo").Include("postInfo")
                                    select new
                                    {
                                        e.id,
                                        e.name,
                                        e.number,
+                                       e.departmentId,
+                                       departmentName = e.department.name,
+                                       postName = e.postInfo.name,
                                        e.sex,
                                        e.phone,
                                        e.idCard,
@@ -718,8 +724,6 @@ namespace Apps.BLL
                                        e.leaveDate,
                                        e.emergencyContact,
                                        e.emergencyPhone,
-                                       e.departmentId,
-                                       departmentName = e.department.name,
                                        e.nation,
                                        e.nativePlace,
                                        e.residence,
@@ -732,6 +736,9 @@ namespace Apps.BLL
                                        e.contractSerial,
                                        e.contractBegin,
                                        e.contractEnd,
+                                       e.isSocialSecurity,
+                                       e.isPension,
+                                       e.isUrbanRuralMedical,
                                    };
 
                     // 先查询出部门及子部门，再过滤
@@ -792,6 +799,7 @@ namespace Apps.BLL
                                       number = e.number,
                                       name = e.name,
                                       departmentName = e.departmentName,
+                                      postName = e.postName,
                                       sex = e.sex,
                                       phone = e.phone,
                                       idCard = e.idCard,
@@ -816,7 +824,9 @@ namespace Apps.BLL
                                       contractSerial = e.contractSerial,
                                       contractBegin = e.contractBegin,
                                       contractEnd = e.contractEnd,
-
+                                      isSocialSecurity = e.isSocialSecurity,
+                                      isPension = e.isPension,
+                                      isUrbanRuralMedical = e.isUrbanRuralMedical,
                                   };
 
 
@@ -852,6 +862,7 @@ namespace Apps.BLL
 
         public OperateResult ImportExcel(string fileName)
         {
+            List<EmployeeExport> query = new List<EmployeeExport>();
             try
             {
                 var excelFile = new ExcelQueryFactory(fileName);
@@ -863,88 +874,125 @@ namespace Apps.BLL
                 }
 
                 var tsheet = excelFile.Worksheet<EmployeeExport>(0);
-                var query = (from e in tsheet
-                             select e).ToList();
+                var t = excelFile.Worksheet(0);
 
-                IEnumerable<Employee> elements;
-                using (SystemDB db = new SystemDB())
-                {
-                    elements = (from e in query
-                                join d in db.departmentList
-                                 on e.departmentName equals d.name
-                                select new Employee
-                                {
-                                    number = e.number,
-                                    name = e.name,
-                                    departmentId = d.id,
-                                    sex = e.sex,
-                                    phone = e.phone,
-                                    idCard = e.idCard,
-                                    birthday = e.birthday,
-                                    bankCard = e.bankCard,
-                                    state = e.state,
-                                    entryDate = e.formalDate,
-                                    formalDate = e.formalDate,
-                                    leaveDate = e.leaveDate,
-                                    emergencyContact = e.emergencyContact,
-                                    emergencyPhone = e.emergencyPhone,
-
-                                    nation = e.nation,
-                                    nativePlace = e.nativePlace,
-                                    residence = e.residence,
-                                    address = e.address,
-                                    political = e.political,
-                                    marriage = e.marriage,
-                                    education = e.education,
-                                    experience = e.experience,
-                                    source = e.source,
-                                    contractSerial = e.contractSerial,
-                                    contractBegin = e.contractBegin,
-                                    contractEnd = e.contractEnd,
-
-                                }).ToList();
-                }
-
-
-
-                bool fail = false;
-                OperateResult result = new OperateResult();
-                if (elements.Count() == 0)
-                {
-                    result.content = "无数据或数据不完整，导入失败！";
-
-                    return result;
-                }
-                foreach (var model in elements)
-                {
-                    OperateResult or = Add(model);
-                    if (or.status != OperateStatus.Success)
-                    {
-                        fail = true;
-
-                        result.content += "工号(" + model.number + ")数据保存失败, error（" + or.content + "） ;";
-                    }
-
-                }
-                if (!fail)
-                {
-                    result.status = OperateStatus.Success;
-                    result.content = "批量数据保存成功";
-                }
-                return result;
-
+                query = tsheet.ToList();
             }
             catch (Exception ex)
             {
-                throw (ex);
-            }
-            finally
-            {
-                if (File.Exists(fileName))
+                return new OperateResult
                 {
-                    File.Delete(fileName);
-                }
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
+
+            SystemDB db = new SystemDB();
+            bool fail = false;
+            OperateResult result = new OperateResult();
+
+            foreach (var e in query)
+            {
+                try
+                {
+                    // 查询是否已经存在该员工信息
+                    var es = (from d in db.employeeList
+                        where d.number == e.number || d.idCard==e.idCard
+                              || d.phone == e.phone
+                        select d).FirstOrDefault();
+
+                    if (es != null)
+                    {
+                        fail = true;
+                        result.content += "工号(" + e.number + ")，已存在同工号或电话或身份证员工;";
+                        continue;
+                    }
+
+                    var model = new Employee
+                    {
+                        number = e.number,
+                        name = e.name,
+                        sex = e.sex,
+                        phone = e.phone,
+                        idCard = e.idCard,
+                        birthday = e.birthday,
+                        bankCard = e.bankCard,
+                        state = e.state,
+                        entryDate = e.formalDate,
+                        formalDate = e.formalDate,
+                        leaveDate = e.leaveDate,
+                        emergencyContact = e.emergencyContact,
+                        emergencyPhone = e.emergencyPhone,
+
+                        nation = e.nation,
+                        nativePlace = e.nativePlace,
+                        residence = e.residence,
+                        address = e.address,
+                        political = e.political,
+                        marriage = e.marriage,
+                        education = e.education,
+                        experience = e.experience,
+                        source = e.source,
+                        contractSerial = e.contractSerial,
+                        contractBegin = e.contractBegin,
+                        contractEnd = e.contractEnd,
+                        isSocialSecurity = e.isSocialSecurity,
+                        isPension = e.isPension,
+                        isUrbanRuralMedical = e.isUrbanRuralMedical,
+                    };
+
+                    //查询部门是否已经存在
+                    var depart = (from d in db.departmentList
+                        where d.name == e.departmentName
+                        select d).FirstOrDefault();
+
+                    if (depart == null)
+                    {
+                        fail = true;
+                        result.content += "工号(" + e.number + ")，部门不存在;";
+                        continue;
+                    }
+
+                    model.departmentId = depart.id;
+
+                    //查询岗位是否已经存在
+                    if (!string.IsNullOrWhiteSpace(e.postName))
+                    {
+                        var post = (from d in db.postInfoList
+                            where d.name == e.postName
+                            select d).FirstOrDefault();
+
+                        if (post == null)
+                        {
+                            fail = true;
+                            result.content += "工号(" + e.number + ")，岗位不存在;";
+                            continue;
+                        }
+
+                        model.postId = post.id;
+                    }
+
+                    db.employeeList.Add(model);
+                    db.SaveChanges();
+                }
+                catch (Exception ex)
+                {
+                    result.content += "工号(" + e.number + ")数据保存失败, error（"
+                                      + Model.Utility.Utility.GetExceptionMsg(ex) + "） ;";
+                }
+            } // end for
+
+
+            if (File.Exists(fileName))
+            {
+                File.Delete(fileName);
+            }
+
+            if (!fail)
+            {
+                result.status = OperateStatus.Success;
+                result.content = "批量数据保存成功";
+            }
+            return result;
         }
 
         public OperateResult AnalyseByAge(QueryParam param = null)
@@ -1690,7 +1738,7 @@ namespace Apps.BLL
                     }
                     else
                     {
-                        pages = total / (pager.rows == 0 ? 10 : pager.rows);
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {

@@ -90,7 +90,9 @@
             formatter: databoxFormatMonth,
             parser: databoxParser
         });
-        $('#month').datebox('setValue', new Date);
+	    var lastMonth = new Date();
+	    lastMonth.setMonth(lastMonth.getMonth() - 1);
+	    $('#month').datebox('setValue', lastMonth);
 
         $('#status_filter').combobox({
 	        width: '100%',

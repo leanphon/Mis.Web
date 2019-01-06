@@ -28,7 +28,7 @@
     function initDivDialog(titleName) {
         $('#@(divDialog)').dialog({
             width: 800,
-            height: 700,
+            height: 750,
             title: titleName,
             modal: true,
             closed: true,
@@ -128,6 +128,7 @@
 
         $('#sex').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -138,6 +139,7 @@
         });
         $('#state').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -150,6 +152,7 @@
 
         $('#education').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -166,6 +169,7 @@
         });
         $('#marriage').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -177,6 +181,7 @@
         });
         $('#political').combobox({
             width: '100%',
+            panelHeight: 'auto',
             editable: false,
             valueField: 'value',
             textField: 'text',
@@ -184,6 +189,40 @@
                 { value: '群众', text: '群众' },
                 { value: '共青团', text: '共青团' },
                 { value: '党员', text: '党员' }
+            ]
+        });
+
+        $('#isSocialSecurity').combobox({
+            width: '100%',
+            panelHeight: 'auto',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '是', text: '是' },
+                { value: '否', text: '否' },
+            ]
+        });
+        $('#isPension').combobox({
+            width: '100%',
+            panelHeight: 'auto',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '是', text: '是' },
+                { value: '否', text: '否' },
+            ]
+        });
+        $('#isUrbanRuralMedical').combobox({
+            width: '100%',
+            panelHeight: 'auto',
+            editable: false,
+            valueField: 'value',
+            textField: 'text',
+            data: [
+                { value: '是', text: '是' },
+                { value: '否', text: '否' },
             ]
         });
 
@@ -371,7 +410,30 @@
                     @Html.EditorFor(model => model.emergencyPhone, new { htmlAttributes = new { @class = "parm_control" } })
                 </td>
             </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.isSocialSecurity, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.isSocialSecurity, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.isPension, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.isPension, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
 
+            </tr>
+            <tr>
+                <td class="cols_4_left">
+                    @Html.LabelFor(model => model.isUrbanRuralMedical, new { @class = "lab" })
+                </td>
+                <td class="cols_4_right">
+                    @Html.EditorFor(model => model.isUrbanRuralMedical, new { htmlAttributes = new { @class = "parm_control" } })
+                </td>
+
+            </tr>
         </table>
 </form>
 </div>

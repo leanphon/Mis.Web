@@ -294,7 +294,7 @@ namespace Apps.BLL
                     }
                     else
                     {
-                        pages = total / (pager.rows == 0 ? 10 : pager.rows);
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {

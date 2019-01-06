@@ -89,7 +89,7 @@ namespace Apps.BLL
         public OperateResult RefreshSalary(SalaryRecord model)
         {
 
-            var shouldTotal = model.postSalary + model.fullAttendanceRewards + model.performanceRewards
+            var shouldTotal = model.levelSalary + model.fullAttendanceRewards + model.performanceRewards
                               + model.benefitRewards + model.seniorityRewards + model.normalOvertimeRewards
                               + model.holidayOvertimeRewards + model.subsidy + model.reissue;
 
@@ -163,6 +163,8 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
+                    model.inputDate = DateTime.Now;
+
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
                     db.SaveChanges();
@@ -325,7 +327,7 @@ namespace Apps.BLL
                                     {
                                         e.id,
                                         e.billSerial,
-                                        e.postSalary,
+                                        e.levelSalary,
                                         e.fullAttendanceRewards,
                                         e.performanceRewards,
                                         e.benefitRewards,
@@ -370,7 +372,7 @@ namespace Apps.BLL
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
                                    join employee in db.employeeList.Include("department")
                                    on e.assessmentInfo.employeeId equals employee.id
-
+                                   orderby employee.number
                                    select new
                                    {
                                        e.id,
@@ -382,7 +384,7 @@ namespace Apps.BLL
                                        employeeNumber = employee.number,
                                        departmentId = employee.departmentId,
                                        departmentName = employee.department.name,
-                                       e.postSalary,
+                                       e.levelSalary,
                                        e.fullAttendanceRewards,
                                        e.performanceRewards,
                                        e.benefitRewards,
@@ -471,7 +473,7 @@ namespace Apps.BLL
                     }
                     else
                     {
-                        pages = total / (pager.rows == 0 ? 10 : pager.rows);
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {
@@ -534,14 +536,14 @@ namespace Apps.BLL
                                    join department in db.departmentList
                                    on e.employee.departmentId equals department.id
 
-                                   let postSalary = CalPostSalary(salaryInfo.levelInfo.postSalary, e.shouldWorkTime, e.actualWorkTime)
+                                   let levelSalary = CalPostSalary(salaryInfo.levelInfo.levelSalary, e.shouldWorkTime, e.actualWorkTime)
                                    let fullAttendanceRewards = CalFullAttendanceRewards(salaryInfo.levelInfo.fullAttendanceRewards, e.shouldWorkTime, e.actualWorkTime)
                                    let performanceRewards = CalPerformanceRewards(salaryInfo.performanceInfo.performanceRewards, e.performanceScore ?? 0)
                                    let benefitRewards = CalBenefitRewards(salaryInfo.benefitInfo.benefitRewards, e.benefitScore ?? 0)
                                    let seniorityRewards = CalSeniorityRewards(salaryInfo.levelInfo.seniorityRewardsBase, month, e.employee.entryDate ?? DateTime.Now)
-                                   let normalOvertimeRewards = CalNormalOvertimeRewards(salaryInfo.levelInfo.postSalary, e.normalOvertime ?? 0)
-                                   let holidayOvertimeRewards = CalHolidayOvertimeRewards(salaryInfo.levelInfo.postSalary, e.holidayOvertime ?? 0)
-                                   let shouldTotal = Math.Round(postSalary + fullAttendanceRewards + performanceRewards + benefitRewards + seniorityRewards + normalOvertimeRewards + holidayOvertimeRewards, 2)
+                                   let normalOvertimeRewards = CalNormalOvertimeRewards(salaryInfo.levelInfo.levelSalary, e.normalOvertime ?? 0)
+                                   let holidayOvertimeRewards = CalHolidayOvertimeRewards(salaryInfo.levelInfo.levelSalary, e.holidayOvertime ?? 0)
+                                   let shouldTotal = Math.Round(levelSalary + fullAttendanceRewards + performanceRewards + benefitRewards + seniorityRewards + normalOvertimeRewards + holidayOvertimeRewards, 2)
 
                                    where e.month == month && !(db.salaryRecordList.Any(c => c.assessmentInfoId == e.id))
                                    select new
@@ -553,7 +555,7 @@ namespace Apps.BLL
                                        employeeNumber = e.employee.number,
                                        departmentId = e.employee.departmentId,
                                        departmentName = department.name,
-                                       postSalary = postSalary,
+                                       levelSalary = levelSalary,
                                        shouldWorkTime = e.shouldWorkTime,
                                        actualWorkTime = e.actualWorkTime,
                                        isFullAttendance = isFullAttendanceRewards(e.shouldWorkTime, e.actualWorkTime) ? "是" : "否",
@@ -638,7 +640,7 @@ namespace Apps.BLL
                     }
                     else
                     {
-                        pages = total / (pager.rows == 0 ? 10 : pager.rows);
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {
@@ -679,13 +681,11 @@ namespace Apps.BLL
         private string GenerateBillSerial(string month, string employeeNumber)
         {
             DateTime dtMonth;
-            DateTime dtNow = DateTime.Now;
-
 
             if (DateTime.TryParse(month, out dtMonth))
             {
-                string serial = string.Format("S-{0}-{1}{2:D2}{3:D2}{4:D2}{5:D2}", employeeNumber, dtMonth.Year,
-                    dtMonth.Month, dtMonth.Day, dtNow.Hour, dtNow.Minute);
+                string serial = string.Format("S-{0}-{1}{2:D2}{3:D2}", employeeNumber, dtMonth.Year,
+                    dtMonth.Month, dtMonth.Day);
 
 
                 return serial;
@@ -758,23 +758,23 @@ namespace Apps.BLL
         /// <summary>
         /// 以一个月30天每天8小时为标准，用岗位工资来计算加班工资
         /// </summary>
-        /// <param name="postSalary"></param>
+        /// <param name="levelSalary"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        private double CalNormalOvertimeRewards(double postSalary, double time)
+        private double CalNormalOvertimeRewards(double levelSalary, double time)
         {
-            return Math.Round(postSalary / (30 * 8) * time, 2);
+            return Math.Round(levelSalary / (30 * 8) * time, 2);
         }
 
         /// <summary>
         /// 节假日加班按照工作日加班的2倍计算
         /// </summary>
-        /// <param name="postSalary"></param>
+        /// <param name="levelSalary"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        private double CalHolidayOvertimeRewards(double postSalary, double time)
+        private double CalHolidayOvertimeRewards(double levelSalary, double time)
         {
-            return 2 * CalNormalOvertimeRewards(postSalary, time);
+            return 2 * CalNormalOvertimeRewards(levelSalary, time);
         }
 
 
@@ -799,7 +799,7 @@ namespace Apps.BLL
                                        employeeNumber = employee.number,
                                        departmentId = employee.departmentId,
                                        departmentName = employee.department.name,
-                                       e.postSalary,
+                                       e.levelSalary,
                                        e.fullAttendanceRewards,
                                        e.performanceRewards,
                                        e.benefitRewards,
@@ -886,7 +886,7 @@ namespace Apps.BLL
                                       employeeName = e.employeeName,
                                       employeeNumber = e.employeeNumber,
                                       departmentName = e.departmentName,
-                                      postSalary = e.postSalary,
+                                      levelSalary = e.levelSalary,
                                       fullAttendanceRewards = e.fullAttendanceRewards,
                                       performanceRewards = e.performanceRewards,
                                       benefitRewards = e.benefitRewards,
@@ -949,7 +949,7 @@ namespace Apps.BLL
                                        employeeNumber = employee.number,
                                        departmentId = employee.departmentId,
                                        departmentName = employee.department.name,
-                                       e.postSalary,
+                                       e.levelSalary,
                                        e.fullAttendanceRewards,
                                        e.performanceRewards,
                                        e.benefitRewards,
@@ -1036,7 +1036,7 @@ namespace Apps.BLL
                                       employeeName = e.employeeName,
                                       employeeNumber = e.employeeNumber,
                                       departmentName = e.departmentName,
-                                      postSalary = e.postSalary,
+                                      levelSalary = e.levelSalary,
                                       fullAttendanceRewards = e.fullAttendanceRewards,
                                       performanceRewards = e.performanceRewards,
                                       benefitRewards = e.benefitRewards,
