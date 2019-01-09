@@ -230,6 +230,7 @@ namespace Apps.BLL
                 {
 
                     var elements = from e in db.benefitInfoList
+                        orderby e.id
                                    select new
                                    {
                                        e.id,

@@ -222,7 +222,7 @@ namespace Apps.BLL
 
         public OperateResult UpdateStatus(long id, string status)
         {
-            if (status != "未审核" && status != "审核")
+            if (status != "未审核" && status != "已审核")
             {
                 return new OperateResult
                 {
@@ -372,6 +372,7 @@ namespace Apps.BLL
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
                                    join employee in db.employeeList.Include("department")
                                    on e.assessmentInfo.employeeId equals employee.id
+                                   where e.assessmentInfo.status == "已审核"
                                    orderby employee.number
                                    select new
                                    {

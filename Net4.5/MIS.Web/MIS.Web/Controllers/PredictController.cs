@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using System.Web.Script.Serialization;
 
 namespace MIS.Web.Controllers
 {
@@ -15,120 +16,65 @@ namespace MIS.Web.Controllers
             return View();
         }
 
-        public ActionResult GetAllEntities()
-        {
-            LevelManager manager = new LevelManager();
-            OperateResult or = manager.GetAll();
-
-            if (or.status == OperateStatus.Success
-                && or.data != null)
-            {
-                return Json(or.data, JsonRequestBehavior.AllowGet);
-            }
-
-
-            return Json(or, JsonRequestBehavior.AllowGet);
-        }
-        public ActionResult GetEntities(Apps.Model.Pager pager)
-        {
-
-            LevelManager manager = new LevelManager();
-            OperateResult or = manager.GetByPager(new QueryParam { pager = pager });
-
-            if (or.status == OperateStatus.Success
-                && or.data != null)
-            {
-                return Json(or.data, JsonRequestBehavior.AllowGet);
-            }
-
-            return Json(or, JsonRequestBehavior.AllowGet);
-        }
-
-        public ActionResult Create()
+        public ActionResult EmployeeContract()
         {
             return View();
         }
-        public ActionResult CreateEntity(LevelInfo model)
+        public ActionResult GetEmployeeContractByPager(Apps.Model.Pager pager)
         {
-            if (!ModelState.IsValid)
+            QueryParam queryParam = new QueryParam { pager = pager };
+
+            var extendParams = Request.Params["extendParams"];
+            if (extendParams != null)
             {
-                return Json(
-                    new OperateResult
-                    {
-                        content = Model.Utility.GetModelStateErrors(ModelState),
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+
+                queryParam.filters = filterSet;
             }
 
-            LevelManager manager = new LevelManager();
+            EmployeeManager manager = new EmployeeManager();
+            OperateResult or = manager.GetEmployeeContractByPager(queryParam);
 
-            OperateResult or = manager.Add(model);
+            if (or.status == OperateStatus.Success
+                && or.data != null)
+            {
+                return Json(or.data, JsonRequestBehavior.AllowGet);
+            }
 
             return Json(or, JsonRequestBehavior.AllowGet);
-
         }
 
-        public ActionResult Edit(int? id)
+        public ActionResult EmployeeBirthday()
         {
-            if (id == null)
-            {
-                return Json(
-                    new OperateResult
-                    {
-                        content = "访问错误",
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
-
-            }
-            LevelManager manager = new LevelManager();
-
-            OperateResult or = manager.GetById(id.Value);
-
-            return View(or.data);
-
+            return View();
         }
-        public ActionResult EditEntity(LevelInfo model)
+        public ActionResult GetEmployeeBirthdayByPager(Apps.Model.Pager pager)
         {
-            if (!ModelState.IsValid)
+            QueryParam queryParam = new QueryParam { pager = pager };
+
+            var extendParams = Request.Params["extendParams"];
+            if (extendParams != null)
             {
-                return Json(
-                    new OperateResult
-                    {
-                        content = Model.Utility.GetModelStateErrors(ModelState),
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+
+                queryParam.filters = filterSet;
             }
 
-            LevelManager manager = new LevelManager();
+            EmployeeManager manager = new EmployeeManager();
+            OperateResult or = manager.GetEmployeeBirthdayByPager(queryParam);
 
-            OperateResult or = manager.Update(model);
+            if (or.status == OperateStatus.Success
+                && or.data != null)
+            {
+                return Json(or.data, JsonRequestBehavior.AllowGet);
+            }
 
             return Json(or, JsonRequestBehavior.AllowGet);
-
         }
 
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return Json(
-                    new OperateResult
-                    {
-                        content = "访问错误",
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
-
-            }
-            LevelManager manager = new LevelManager();
-
-            OperateResult or = manager.Remove(id.Value);
-
-            return Json(or, JsonRequestBehavior.AllowGet);
-
-        }
     }
 }

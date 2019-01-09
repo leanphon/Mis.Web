@@ -334,7 +334,7 @@ namespace MIS.Web.Controllers
 
         }
 
-        public ActionResult UpdateStatus(long id, string status)
+        public ActionResult LockStatus(long id, string status)
         {
 
             SalaryRecordManager manager = new SalaryRecordManager();
@@ -344,7 +344,52 @@ namespace MIS.Web.Controllers
             return Json(or, JsonRequestBehavior.AllowGet);
 
         }
-        public ActionResult UpdateStatusBatch()
+        public ActionResult LockStatusBatch()
+        {
+            string data = Request.Params["salaryRecord"];
+            string status = Request.Params["status"];
+            if (data == null || status == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "数据异常",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            JavaScriptSerializer js = new JavaScriptSerializer();
+            List<long> lstData = js.Deserialize<List<long>>(data);
+
+            if (lstData.Count == 0)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "无数据",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+            }
+
+            SalaryRecordManager manager = new SalaryRecordManager();
+            OperateResult or = manager.UpdateStatusBatch(lstData, status);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+        public ActionResult UnlockStatus(long id, string status)
+        {
+
+            SalaryRecordManager manager = new SalaryRecordManager();
+
+            OperateResult or = manager.UpdateStatus(id, status);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+        public ActionResult UnlockStatusBatch()
         {
             string data = Request.Params["salaryRecord"];
             string status = Request.Params["status"];

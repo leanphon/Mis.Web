@@ -49,20 +49,6 @@
     }
 
 
-    function initGrid1() {
-
-        var url = '/@(controllerName)/GetCareer?id=@(Model.id)';
-        var callbackFuns = [
-        ];
-
-        var toolbar = [
-            { text: '添加事纪', iconCls: 'icon-add', handler: onCreate },
-        ];
-
-        var gridObj = new EmployeeCareerPropertyGrid('@(tabEntityList)', toolbar);
-
-        initPropertygrid(gridObj, url, callbackFuns);
-    }
     function initGrid() {
 
         var url = '/@(controllerName)/GetCareer?id=@(Model.id)';

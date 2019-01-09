@@ -239,7 +239,7 @@ namespace Apps.BLL
 
         public OperateResult UpdateStatus(long id, string status)
         {
-            if (status != "未审核" && status != "审核")
+            if (status != "未审核" && status != "已审核")
             {
                 return new OperateResult
                 {
@@ -251,6 +251,18 @@ namespace Apps.BLL
             {
                 using (SystemDB db = new SystemDB())
                 {
+                    //如果工资记录已经锁定，则不能再修改状态
+                    var salary = (from s in db.salaryRecordList
+                        where s.assessmentInfoId == id && s.status == "已审核"
+                                  select s).FirstOrDefault();
+                    if (salary != null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "已经存在审核通过的工资记录，不能修改",
+                        };
+                    }
+
                     var element = (from m in db.assessmentInfoList
                                    where id == m.id
                                    select m

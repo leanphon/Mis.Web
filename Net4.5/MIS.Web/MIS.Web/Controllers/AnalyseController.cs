@@ -157,6 +157,41 @@ namespace MIS.Web.Controllers
 
         }
 
+        public ActionResult EmployeePost()
+        {
+            return View();
+        }
+        public ActionResult LoadEmployeePost()
+        {
+            QueryParam queryParam = new QueryParam();
+
+            var extendParams = Request.Params["extendParams"];
+            if (extendParams != null)
+            {
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+
+                queryParam.filters = filterSet;
+            }
+
+            EmployeeManager manager = new EmployeeManager();
+            OperateResult or = manager.AnalyseByPost(queryParam);
+
+            if (or.status != OperateStatus.Success
+                && or.content != null)
+            {
+                return Json(or, JsonRequestBehavior.AllowGet);
+            }
+            //JavaScriptSerializer js = new JavaScriptSerializer();
+            //ViewBag.data = js.Serialize(or.data);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
+        }
+
+
+
         public ActionResult LeaveWarning()
         {
             return View();

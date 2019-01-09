@@ -13,16 +13,20 @@
     <div>
         <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
             <form id="searchForm">
-                <table>
+                <table class="tab-filter">
                     <tr>
                         <th>部门：</th>
                         <td>
                             <input class="parm_control" type="text" id="departmentId" name="departmentId" />
                         </td>
+                        <th>员工状态：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="stateFilter" name="stateFilter" />
+                        </td>
+                        <th></th>
                         <td>
                             <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
                         </td>
-
                     </tr>
                 </table>
             </form>
@@ -89,6 +93,21 @@
 	        valueField: 'id',
 	        textField: 'name',
 	    });
+	    $('#stateFilter').combobox({
+	        width: '100%',
+	        multiple: 'true',
+	        editable: false,
+	        valueField: 'value',
+	        textField: 'text',
+	        data: [
+	            { value: '试用期', text: '试用期' },
+	            { value: '转正', text: '转正' },
+	            { value: '离职', text: '离职' },
+	        ]
+	    });
+	    var data = '试用期,转正';
+	    $('#stateFilter').combobox('setValues', data.split(','))
+
 
 	    loadReport();
 	}
@@ -100,6 +119,14 @@
 	            "key": "departmentId",
 	            "action": "==",
 	            "value": $('#departmentId').val().trim()
+	        };
+	        filterList.push(p)
+	    }
+	    if ($('#stateFilter').val().trim() != '') {
+	        var p = {
+	            "key": "state",
+	            "action": "==",
+	            "value": $('#stateFilter').val().trim()
 	        };
 	        filterList.push(p)
 	    }

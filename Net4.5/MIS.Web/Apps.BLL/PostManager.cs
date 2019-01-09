@@ -232,7 +232,8 @@ namespace Apps.BLL
                 {
 
                     var elements = from e in db.postInfoList
-                                   select e;
+                        orderby e.id 
+                        select e;
 
                     int total = elements.Count();
                     int pages = 0;
@@ -247,11 +248,11 @@ namespace Apps.BLL
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {
-                            elements = elements.Take(pager.rows);
+                            elements = elements.Take(pager.rows).OrderBy(m=>m.id);
                         }
                         else
                         {
-                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows).OrderBy(m => m.id); ;
                         }
                     }
 

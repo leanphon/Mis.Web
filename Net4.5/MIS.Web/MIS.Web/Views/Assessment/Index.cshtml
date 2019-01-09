@@ -14,7 +14,7 @@
     @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
         <div  style="padding-bottom:15px; height:auto; background: #F4F4F4;">
             <form id="searchForm">
-                <table>
+                <table class="tab-filter">
                     <tr>
                         <th>部门：</th>
                         <td>
@@ -32,13 +32,13 @@
                         <td>
                             <a data-options="iconCls:'icon-search'" style="margin-left:15px;padding-left:5px;padding-right:5px" class="easyui-linkbutton" href="javascript:filter();">查询</a>
                         </td>
-                    
+
                     </tr>
                     <tr>
                         <th>月份：</th>
                         <!--由于datebox框架上面的数据必须是时间格式的，所以我们用editable="false"来禁止用户手动输入，以免报错-->
                         <td>
-                            <input class="parm_control"  editable="false" name="month" id="month" />
+                            <input class="parm_control" editable="false" name="month" id="month" />
                         </td>
                     </tr>
                 </table>

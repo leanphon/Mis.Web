@@ -105,8 +105,6 @@ function showReportPie(viewEntity)
         series: series
     };
 
-    console.log(option);
-
     // 为echarts对象加载数据
     myChart.setOption(option);
 

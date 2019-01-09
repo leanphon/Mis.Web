@@ -95,6 +95,11 @@ namespace Apps.Model
         [ForeignKey("departmentId")]
         public virtual Department department { get; set; }
 
+        public long? postId { get; set; }
+        [ForeignKey("postId")]
+        public virtual PostInfo postInfo { get; set; }
+
+
         [Display(Name = "性别")]
         [Required(ErrorMessage = "{0}必须输入")]
         public string sex { get; set; }
@@ -179,10 +184,6 @@ namespace Apps.Model
         public string isUrbanRuralMedical { get; set; }
 
         [Display(Name = "岗位")]
-
-        public long ?postId { get; set; }
-        [ForeignKey("postId")]
-        public virtual PostInfo postInfo { get; set; }
 
         public long? salaryInfoId { get; set; }
         [ForeignKey("salaryInfoId")]

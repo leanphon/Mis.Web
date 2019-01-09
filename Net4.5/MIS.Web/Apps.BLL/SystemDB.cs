@@ -35,7 +35,6 @@ namespace Apps.BLL
             modelBuilder.Entity<Company>().ToTable("Companys");
             modelBuilder.Entity<EmployeeCareerRecord>().ToTable("CareerRecords");
 
-
             modelBuilder.Entity<Role>()
             .HasMany(t => t.rightList)
             .WithMany(t => t.roleList)
