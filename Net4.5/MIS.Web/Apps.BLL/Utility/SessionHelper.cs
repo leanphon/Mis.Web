@@ -12,17 +12,22 @@ namespace Apps.BLL.Utility
     {
         public static string GetDbName()
         {
-            HttpSessionState session = HttpContext.Current.Session;
-            string db = session["CompanyName"] as string;
-
-            return db ?? "null";
+            if (HttpContext.Current != null && HttpContext.Current.Session != null)
+            {
+                string db = HttpContext.Current.Session["CompanyName"] as string;
+                return db ?? "null";
+            }
+            return "null";
         }
         public static long GetUserId()
         {
-            HttpSessionState session = HttpContext.Current.Session;
-            User u = session["currentUser"] as User;
+            if (HttpContext.Current != null && HttpContext.Current.Session != null)
+            {
+                User u = HttpContext.Current.Session["currentUser"] as User;
+                return u?.id ?? -1;
+            }
 
-            return u != null ? u.id : -1;
+            return -1;
         }
     }
 }

@@ -307,7 +307,7 @@ function EmployeeGrid(gridId, toolbar) {
     this.toolbar = toolbar;
 }
 
-function EmployeeCareerGrid(gridId, toolbar) {
+function EmployeeCareerAddGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -377,48 +377,101 @@ function EmployeeCareerGrid(gridId, toolbar) {
     this.toolbar = toolbar;
 }
 
-function EmployeeCareerPropertyGrid(gridId, toolbar) {
+function EmployeeCareerGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
-        { field: 'id', hidden: true },
-        { field: 'newStatus', hidden: true },
+                { field: 'id', hidden: true },
+                { field: 'employeeId', hidden: true },
+                { field: 'status', hidden: true },
     ]];
 
     this.normalCols = [[
-        {
-            field: 'type', title: '类型', width: 150,
-            editor: {
-                type: 'combobox',
-                options: {
-                    valueField: 'value',
-                    textField: 'text',
-                    required: true,
-                    data: [
-                        { value: '入职', text: '入职' },
-                        { value: '转正', text: '转正' },
-                        { value: '离职', text: '离职' },
-                        { value: '奖励', text: '奖励' },
-                        { value: '惩罚', text: '惩罚' },
-                        { value: '岗位变动', text: '岗位变动' },
-                        { value: '薪酬变动', text: '薪酬变动' },
-                    ]
-                }
-            }
-        },
+        { field: 'employeeName', title: '姓名', width: 100 },
+        { field: 'employeeNumber', title: '工号', width: 100 },
+        { field: 'departmentName', title: '部门', width: 100 },
+        { field: 'type', title: '类型', width: 100 },
         {
             field: 'time', title: '时间', width: 150,
-            //formatter: formatDate,
-            //editor: 'datebox'
+            formatter: function (date) {
+                if (typeof date == "string") {
+                    if (date.indexOf("/Date") != -1) {
+                        return formatDate(date);
+                    } else {
+                        return date;
+                    }
+                }
+            },
         },
-        //{ field: 'time', title: '时间', width: 100 },
-        { field: 'description', title: '说明', width: 350 },
+        { field: 'description', title: '说明', width: 300 },
 
     ]];
+
 
     this.toolbar = toolbar;
 }
 
+
+function EmployeeBirthdayGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+                { field: 'id', hidden: true },
+                { field: 'number', title: '工号', width: 150 },
+                { field: 'name', title: '姓名', width: 150 },
+                { field: 'departmentName', title: '所在部门', width: 150, },
+    ]];
+
+    this.normalCols = [[
+                { field: 'phone', title: '联系电话', width: 150 },
+                { field: 'sex', title: '性别', width: 100 },
+                { field: 'nation', title: '民族', width: 100 },
+                { field: 'idCard', title: '身份证', width: 200 },
+                //{ field: 'email', title: '工作邮箱', width: 200 },
+                { field: 'birthday', title: '出生日期', width: 150, formatter: formatDate },
+                { field: 'state', title: '员工状态', width: 150 },
+
+                { field: 'entryDate', title: '入职日期', width: 200, formatter: formatDate },
+                { field: 'formalDate', title: '转正日期', width: 200, formatter: formatDate },
+                { field: 'leaveDate', title: '离职日期', width: 200, formatter: formatDate },
+
+    ]];
+
+
+    this.toolbar = toolbar;
+}
+function EmployeeContractGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+        { field: 'id', hidden: true },
+        { field: 'number', title: '工号', width: 150 },
+        { field: 'name', title: '姓名', width: 150 },
+        { field: 'departmentName', title: '所在部门', width: 150, },
+    ]];
+
+    this.normalCols = [[
+        { field: 'phone', title: '联系电话', width: 150 },
+        { field: 'sex', title: '性别', width: 100 },
+        { field: 'nation', title: '民族', width: 100 },
+        { field: 'idCard', title: '身份证', width: 200 },
+        //{ field: 'email', title: '工作邮箱', width: 200 },
+        { field: 'birthday', title: '出生日期', width: 150, formatter: formatDate },
+        { field: 'state', title: '员工状态', width: 150 },
+
+        { field: 'entryDate', title: '入职日期', width: 200, formatter: formatDate },
+        { field: 'formalDate', title: '转正日期', width: 200, formatter: formatDate },
+        { field: 'leaveDate', title: '离职日期', width: 200, formatter: formatDate },
+
+        { field: 'contractSerial', title: '合同编号', width: 200 },
+        { field: 'contractBegin', title: '合同起始日', width: 200, formatter: formatDate },
+        { field: 'contractEnd', title: '合同结束日', width: 200, formatter: formatDate },
+
+    ]];
+
+
+    this.toolbar = toolbar;
+}
 
 
 function AssessmentInputGrid(gridId, toolbar) {

@@ -19,8 +19,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            CompanyManager manager = new CompanyManager();
-            OperateResult or = manager.GetAll();
+            OperateResult or = CompanyManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -34,8 +33,7 @@ namespace MIS.Web.Controllers
         public ActionResult GetEntities(Pager pager)
         {
 
-            CompanyManager manager = new CompanyManager();
-            OperateResult or = manager.GetByPager(new QueryParam { pager = pager });
+            OperateResult or = CompanyManager.GetByPager(new QueryParam { pager = pager });
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -59,9 +57,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            CompanyManager manager = new CompanyManager();
 
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = CompanyManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -130,9 +127,7 @@ namespace MIS.Web.Controllers
             }
 
             
-            CompanyManager manager = new CompanyManager();
-
-            OperateResult or = manager.Update(model);
+            OperateResult or = CompanyManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

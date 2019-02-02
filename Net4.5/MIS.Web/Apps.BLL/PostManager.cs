@@ -11,7 +11,7 @@ namespace Apps.BLL
 {
     public class PostManager
     {
-        public OperateResult Add(PostInfo model)
+        public static OperateResult  Add(PostInfo model)
         {
             try
             {
@@ -55,7 +55,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult Remove(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -105,7 +105,43 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult Update(PostInfo model)
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.postInfoList.RemoveRange(db.postInfoList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有岗位信息"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult  Update(PostInfo model)
         {
             try
             {
@@ -153,7 +189,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -193,7 +229,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -224,7 +260,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {
@@ -232,7 +268,8 @@ namespace Apps.BLL
                 {
 
                     var elements = from e in db.postInfoList
-                                   select e;
+                        orderby e.id 
+                        select e;
 
                     int total = elements.Count();
                     int pages = 0;
@@ -247,11 +284,11 @@ namespace Apps.BLL
                         pages = total % pager.rows == 0 ? pages : pages + 1;
                         if (pager.page <= 1)
                         {
-                            elements = elements.Take(pager.rows);
+                            elements = elements.Take(pager.rows).OrderBy(m=>m.id);
                         }
                         else
                         {
-                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows).OrderBy(m => m.id); ;
                         }
                     }
 

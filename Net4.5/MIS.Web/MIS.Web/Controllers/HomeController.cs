@@ -46,14 +46,13 @@ namespace MIS.Web.Controllers
             QueryParam queryParam = new QueryParam { filters = new Dictionary<string, FilterModel>() };
             queryParam.filters.Add(m.key, m);
 
-            ModuleManager manager = new ModuleManager();
-            OperateResult or = manager.GetModuleTree(queryParam);
+            OperateResult or = ModuleManager.GetModuleTree(queryParam);
             if (or.status == OperateStatus.Success)
             {
                 return View(or.data);
             }
 
-            return Content("访问错误");
+            return Content(or.content);
         }
 
         /// <summary>
@@ -84,19 +83,6 @@ namespace MIS.Web.Controllers
             //    Session["company"] = m;
             //}
 
-            CompanyManager manager = new CompanyManager();
-            OperateResult or = manager.GetFirst();
-            if (or.status != OperateStatus.Success)
-            {
-                return Content("不存在的公司");
-            }
-
-            Company m = or.data as Company;
-
-            ViewBag.companyName = m.name;
-            ViewBag.loginImg = m.loginImg;
-
-            Session["company"] = m;
 
             return View();
         }
@@ -112,30 +98,28 @@ namespace MIS.Web.Controllers
                 JsonRequestBehavior.AllowGet);
             }
 
-            UserManager manager = new UserManager();
-
             if (model.name == "root")
             {
-                var or = manager.RootLogin(model);
+                var or = UserManager.RootLogin(model);
                 if (or.status == OperateStatus.Success
                     && or.data != null)
                 {
                     Session["currentUser"] = or.data;
                     or.data = null;
                 }
-                return Json( or, JsonRequestBehavior.AllowGet);
+                return Json(or, "text/html", Encoding.UTF8, JsonRequestBehavior.AllowGet);
+
             }
             else
             {
-                var or =  manager.Login(model);
+                var or = UserManager.Login(model);
 
                 if (or.status == OperateStatus.Success
                     && or.data != null)
                 {
                     Session["currentUser"] = or.data;
 
-                    CompanyManager cm = new CompanyManager();
-                    or = cm.GetFirst();
+                    or = CompanyManager.GetFirst();
                     if (or.status == OperateStatus.Success
                         && or.data != null)
                     {

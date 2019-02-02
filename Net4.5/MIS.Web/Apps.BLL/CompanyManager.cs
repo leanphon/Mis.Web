@@ -1,4 +1,5 @@
-﻿using Apps.Model;
+﻿using Apps.BLL.Utility;
+using Apps.Model;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
@@ -10,7 +11,7 @@ namespace Apps.BLL
     public class CompanyManager
     {
 
-        public OperateResult Add(Company model)
+        public static OperateResult  Add(Company model)
         {
             try
             {
@@ -45,7 +46,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult Remove(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -87,7 +88,44 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Update(Company model)
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.companyList.RemoveRange(db.companyList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有公司信息"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+
+        public static OperateResult  Update(Company model)
         {
             try
             {
@@ -138,7 +176,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetByCode(string code)
+        public static OperateResult  GetByCode(string code)
         {
             try
             {
@@ -176,7 +214,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -215,7 +253,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetFirst()
+        public static OperateResult  GetFirst()
         {
             try
             {
@@ -245,7 +283,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -274,7 +312,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {

@@ -12,7 +12,7 @@ namespace Apps.BLL
 {
     public class RoleManager
     {
-        public OperateResult Add(Role model)
+        public static OperateResult  Add(Role model)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult Remove(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -107,7 +107,43 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult Update(Role model)
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.roleList.RemoveRange(db.roleList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有角色"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult  Update(Role model)
         {
             try
             {
@@ -156,7 +192,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -195,7 +231,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -225,7 +261,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {
@@ -282,7 +318,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetRightById(long id)
+        public static OperateResult  GetRightById(long id)
         {
             try
             {
@@ -367,7 +403,7 @@ namespace Apps.BLL
         /// <param name="roleId"></param>
         /// <param name="idList"></param>
         /// <returns></returns>
-        public OperateResult AssignRight(long roleId, List<long> idList)
+        public static OperateResult  AssignRight(long roleId, List<long> idList)
         {
             try
             {

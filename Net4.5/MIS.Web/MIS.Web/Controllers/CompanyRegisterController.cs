@@ -17,8 +17,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            CompanyRegisterManager manager = new CompanyRegisterManager();
-            OperateResult or = manager.GetRegisterAll();
+            OperateResult or = CompanyRegisterManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -32,8 +31,7 @@ namespace MIS.Web.Controllers
         public ActionResult GetEntities(Pager pager)
         {
 
-            CompanyRegisterManager manager = new CompanyRegisterManager();
-            OperateResult or = manager.GetRegisterByPager(new QueryParam { pager = pager });
+            OperateResult or = CompanyRegisterManager.GetByPager(new QueryParam { pager = pager });
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -106,9 +104,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            CompanyManager manager = new CompanyManager();
-
-            OperateResult or = manager.Add(model);
+            OperateResult or = CompanyManager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -127,9 +123,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            CompanyRegisterManager manager = new CompanyRegisterManager();
 
-            OperateResult or = manager.GetRegisterById(id.Value);
+            OperateResult or = CompanyRegisterManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -147,9 +142,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            CompanyManager manager = new CompanyManager();
-
-            OperateResult or = manager.Update(model);
+            OperateResult or = CompanyManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -168,9 +161,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            CompanyRegisterManager manager = new CompanyRegisterManager();
 
-            OperateResult or = manager.RemoveRegister(id.Value);
+            OperateResult or = CompanyRegisterManager.Remove(id.Value);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

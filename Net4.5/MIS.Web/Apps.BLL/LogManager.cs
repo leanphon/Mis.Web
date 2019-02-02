@@ -63,6 +63,41 @@ namespace Apps.BLL
             }
 
         }
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.logRecordList.RemoveRange(db.logRecordList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有日志"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
 
         public static OperateResult Update(LogRecord model)
         {

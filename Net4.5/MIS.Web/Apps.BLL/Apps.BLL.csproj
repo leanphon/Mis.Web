@@ -95,6 +95,7 @@
     <Compile Include="LeaveManager.cs" />
     <Compile Include="LevelManager.cs" />
     <Compile Include="LogManager.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="ModuleManager.cs" />
     <Compile Include="PerformanceManager.cs" />
     <Compile Include="PostManager.cs" />

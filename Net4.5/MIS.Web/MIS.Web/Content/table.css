@@ -54,3 +54,8 @@ select.td_select{
 .spanInputDanger{
     color:red
 }
+
+.tab-filter {
+    margin: 5px;
+    font-size: 16px;
+}

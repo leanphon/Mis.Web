@@ -9,6 +9,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
+using Apps.Model.Utility;
 
 namespace MIS.Web.Controllers
 {
@@ -22,8 +23,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.GetAll();
+            OperateResult or = EmployeeManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -48,8 +48,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.GetByPager(queryParam);
+            OperateResult or = EmployeeManager.GetByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -99,9 +98,7 @@ namespace MIS.Web.Controllers
             model.salaryInfo = salary;
             model.postId = postId;
 
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.Add(model);
+            OperateResult or = EmployeeManager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -120,9 +117,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            EmployeeManager manager = new EmployeeManager();
 
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = EmployeeManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -140,9 +136,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.Update(model);
+            OperateResult or = EmployeeManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -169,9 +163,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            EmployeeManager manager = new EmployeeManager();
 
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = EmployeeManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -189,9 +182,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            EmployeeManager manager = new EmployeeManager();
 
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = EmployeeManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -212,9 +204,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.Formal(id.Value, state, formalDate);
+            OperateResult or = EmployeeManager.Formal(id.Value, state, formalDate);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -232,9 +222,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.Leave(id.Value, state, leaveDate);
+            OperateResult or = EmployeeManager.Leave(id.Value, state, leaveDate);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -254,9 +242,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            EmployeeManager manager = new EmployeeManager();
 
-            OperateResult or = manager.Remove(id.Value);
+            OperateResult or = EmployeeManager.Remove(id.Value);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -275,9 +262,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            EmployeeManager manager = new EmployeeManager();
 
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = EmployeeManager.GetById(id.Value);
 
             if (or.data != null) // 未经设定，则初始化一个
             {
@@ -297,22 +283,18 @@ namespace MIS.Web.Controllers
         }
         public ActionResult EditSalary(SalaryInfo model)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return Json(
-            //        new OperateResult
-            //        {
-            //            content = Model.Utility.GetModelStateErrors(ModelState),
-            //        },
-            //        JsonRequestBehavior.AllowGet
-            //    );
-            //}
             try
             {
                 long employeeId = Convert.ToInt64(Request.Params["employeeId"]);
+                long postId = Convert.ToInt64(Request.Params["postId"]);
+                
+                OperateResult or = EmployeeManager.UpdatePost(employeeId, postId);
+                if (or.status != OperateStatus.Success)
+                {
+                    return Json(or, JsonRequestBehavior.AllowGet);
+                }
 
-                EmployeeManager manager = new EmployeeManager();
-                OperateResult or = manager.UpdateSalary(employeeId, model);
+                or = EmployeeManager.UpdateSalary(employeeId, model);
 
                 return Json(or, JsonRequestBehavior.AllowGet);
             }
@@ -320,7 +302,7 @@ namespace MIS.Web.Controllers
             {
                 return Json(new OperateResult()
                 {
-                    content = "访问错误"
+                    content = Utility.GetExceptionMsg(e)
                 }, JsonRequestBehavior.AllowGet);
             }
 
@@ -346,19 +328,45 @@ namespace MIS.Web.Controllers
             //    );
             //}
 
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.SelectDepartment(id, departmentId);
+            OperateResult or = EmployeeManager.SelectDepartment(id, departmentId);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
         }
 
+        public ActionResult CareerIndex()
+        {
+            return View();
+        }
+
+        public ActionResult GetAllCareerByPager(Pager pager)
+        {
+            QueryParam queryParam = new QueryParam { pager = pager };
+
+            var extendParams = Request.Params["extendParams"];
+            if (extendParams != null)
+            {
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+
+                queryParam.filters = filterSet;
+            }
+
+            OperateResult or = EmployeeManager.GetAllCareerRecordByPager(queryParam);
+
+            if (or.status == OperateStatus.Success
+                && or.data != null)
+            {
+                return Json(or.data, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+        }
+
         public ActionResult ShowCareer(long? id)
         {
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = EmployeeManager.GetById(id.Value);
             if (or.status == OperateStatus.Error || or.data == null)
             {
                 return Content("访问错误");
@@ -368,8 +376,7 @@ namespace MIS.Web.Controllers
         }
         public ActionResult GetCareer(long? id)
         {
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.GetCareerRecordsById(id.Value);
+            OperateResult or = EmployeeManager.GetCareerRecordsById(id.Value);
             if (or.status == OperateStatus.Success)
             {
                 return Json(or.data, JsonRequestBehavior.AllowGet);
@@ -405,10 +412,29 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.AddCareerRecordBatch(id, lstData);
+            OperateResult or = EmployeeManager.AddCareerRecordBatch(id, lstData);
 
             return Json(or, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult DeleteCareer(int? id)
+        {
+            if (id == null)
+            {
+                return Json(
+                    new OperateResult
+                    {
+                        content = "访问错误",
+                    },
+                    JsonRequestBehavior.AllowGet
+                );
+
+            }
+
+            OperateResult or = EmployeeManager.RemoveCareerRecord(id.Value);
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
         }
 
 
@@ -427,8 +453,7 @@ namespace MIS.Web.Controllers
             }
 
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.ExportAll(queryParam);
+            OperateResult or = EmployeeManager.ExportAll(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -498,11 +523,45 @@ namespace MIS.Web.Controllers
             string path = target + filename;//获取存储的目标地址
             file.SaveAs(path);
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.ImportExcel(path);
+            OperateResult or = EmployeeManager.ImportExcel(path);
 
 
             return Json(or, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ExportCareerAll()
+        {
+            QueryParam queryParam = new QueryParam();
+
+            var extendParams = Request.Params["extendParams"];
+            if (extendParams != null)
+            {
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+
+                queryParam.filters = filterSet;
+            }
+
+
+            OperateResult or = EmployeeManager.ExportCareerAll(queryParam);
+
+            if (or.status == OperateStatus.Success
+                && or.data != null)
+            {
+                string exportFileName = string.Concat("导出", DateTime.Now.ToString("yyyyMMddHHmmss"), ".xlsx");
+
+                return new ExportExcelResult
+                {
+                    SheetName = "事纪列表",
+                    FileName = exportFileName,
+                    ExportData = (DataTable)or.data
+                };
+
+            }
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+
         }
 
     }

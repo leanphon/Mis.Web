@@ -39,6 +39,8 @@
         xAxis: [
             {
                 type: 'category',
+                interval:0,
+                rotate:40,
                 data: viewEntity.category,
                 axisLabel: {
                     formatter: '{value} ' + viewEntity.xAxisPostfix
@@ -104,8 +106,6 @@ function showReportPie(viewEntity)
         calculable: true,
         series: series
     };
-
-    console.log(option);
 
     // 为echarts对象加载数据
     myChart.setOption(option);

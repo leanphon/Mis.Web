@@ -24,7 +24,7 @@ namespace Apps.Model
         // 级别
         [Display(Name = "层级代码")]
         [Required(ErrorMessage = "{0}必须输入")]
-        [StringLength(10, ErrorMessage = "{0}长度不得超过10")]
+        [StringLength(20, ErrorMessage = "{0}长度不得超过10")]
         public string code { get; set; }
 
         
@@ -57,7 +57,7 @@ namespace Apps.Model
         // 级别
         [Display(Name = "绩效代码")]
         [Required(ErrorMessage = "{0}必须输入")]
-        [StringLength(10, ErrorMessage = "{0}长度不得超过10")]
+        [StringLength(20, ErrorMessage = "{0}长度不得超过10")]
         public string code { get; set; }
 
         // 级别工资
@@ -77,7 +77,7 @@ namespace Apps.Model
         // 级别
         [Display(Name = "效益代码")]
         [Required(ErrorMessage = "{0}必须输入")]
-        [StringLength(10, ErrorMessage = "{0}长度不得超过10")]
+        [StringLength(20, ErrorMessage = "{0}长度不得超过10")]
         public string code { get; set; }
 
         // 级别工资
@@ -94,28 +94,39 @@ namespace Apps.Model
         public long id { get; set; }
 
         [Display(Name = "层级")]
-        public long levelId { get; set; }
+        public long? levelId { get; set; }
         [ForeignKey("levelId")]
         public virtual LevelInfo levelInfo { get; set; }
 
         [Display(Name = "绩效")]
-        public long performanceId { get; set; }
+        public long? performanceId { get; set; }
         [ForeignKey("performanceId")]
         public virtual PerformanceInfo performanceInfo { get; set; }
 
 
         [Display(Name = "效益")]
-        public long benefitId { get; set; }
+        public long? benefitId { get; set; }
         [ForeignKey("benefitId")]
         public virtual BenefitInfo benefitInfo { get; set; }
 
 
         public double GetSalaryTotal()
         {
-            double total = levelInfo.levelSalary + levelInfo.fullAttendanceRewards;
+            double total = 0;
 
-            total += levelInfo.seniorityRewardsBase
-                + performanceInfo.performanceRewards + benefitInfo.benefitRewards;
+            if (levelInfo != null)
+            {
+                total = levelInfo.levelSalary + levelInfo.fullAttendanceRewards + levelInfo.seniorityRewardsBase;
+            }
+
+            if (performanceInfo != null)
+            {
+                total += performanceInfo.performanceRewards;
+            }
+            if (performanceInfo != null)
+            {
+                total += benefitInfo.benefitRewards;
+            }
 
             return total;
         }

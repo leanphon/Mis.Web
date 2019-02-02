@@ -9,15 +9,17 @@ using System.Data;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using LinqToExcel.Extensions;
 
 namespace Apps.BLL
 {
 
     public class EmployeeManager
     {
-        public OperateResult Add(Employee model)
+        public static OperateResult  Add(Employee model)
         {
             try
             {
@@ -70,7 +72,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult Remove(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -119,18 +121,60 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Update(Employee model)
+
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.employeeCareerList.RemoveRange(db.employeeCareerList.ToList());
+
+                    db.employeeList.RemoveRange(db.employeeList.ToList());
+
+                    db.salaryInfoList.RemoveRange(db.salaryInfoList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有员工"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+
+        public static OperateResult  Update(Employee model)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var elements = (from e in db.employeeList
+                    var element = (from e in db.employeeList
                                     where e.id != model.id && e.number == model.number
                                     select e
-                                    ).ToList();
-                    if (elements.Count() >= 1)
+                                    ).FirstOrDefault();
+                    if (element != null)
                     {
                         return new OperateResult
                         {
@@ -138,6 +182,20 @@ namespace Apps.BLL
                         };
                     }
 
+                    var employee = (from e in db.employeeList
+                            where e.id == model.id
+                            select e
+                        ).AsNoTracking().FirstOrDefault();
+                    if (employee == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "不存在的员工",
+                        };
+                    }
+
+                    model.postId = employee.postId;
+                    model.salaryInfoId = employee.salaryInfoId;
 
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
@@ -169,7 +227,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetSalaryInfoById(long id)
+        public static OperateResult  GetSalaryInfoById(long id)
         {
             try
             {
@@ -209,7 +267,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult UpdateSalary(long employeeId, SalaryInfo model)
+        public static OperateResult  UpdatePost(long employeeId, long postId)
         {
             try
             {
@@ -226,34 +284,16 @@ namespace Apps.BLL
                         };
                     }
 
-                    var elements = (from e in db.salaryInfoList
-                                    where e.id == model.id
-                                    select e
-                                    ).AsNoTracking().ToList();
-
-                    if (elements.Count() == 1)
-                    {
-                        db.Entry(model).State = System.Data.Entity.EntityState.Modified;
-                        db.SaveChanges();
-                    }
-                    else
-                    {
-
-                        db.salaryInfoList.Add(model);
-                        db.SaveChanges();
-
-                        employee.salaryInfo = model;
-                        employee.salaryInfoId = model.id;
-                        db.Entry(employee).State = EntityState.Modified;
-                        db.SaveChanges();
-                    }
+                    employee.postId = postId;
+                    db.Entry(employee).State = System.Data.Entity.EntityState.Modified;
+                    db.SaveChanges();
 
                     LogManager.Add(new LogRecord
                     {
                         userId = SessionHelper.GetUserId(),
                         time = DateTime.Now,
                         type = "Info",
-                        content = "修改员工薪酬：" + employee.number
+                        content = "修改员工岗位：" + employee.number
                     });
 
 
@@ -274,9 +314,85 @@ namespace Apps.BLL
                 };
             }
         }
+        public static OperateResult  UpdateSalary(long employeeId, SalaryInfo model)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    var employee = (from e in db.employeeList
+                                    where e.id == employeeId
+                                    select e).AsNoTracking().FirstOrDefault();
+                    if (employee == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
 
-        //public OperateResult UpdateState(long id, EmployeeState state)
-        public OperateResult Formal(long id, string state, DateTime time)
+                    var elements = (from e in db.salaryInfoList
+                                    where e.id == model.id
+                                    select e
+                                    ).AsNoTracking().ToList();
+
+                    if (elements.Count() == 1)
+                    {
+                        if (model.levelId != null || model.performanceId != null
+                                                  || model.benefitId != null)
+                        {
+                            db.Entry(model).State = System.Data.Entity.EntityState.Modified;
+                            db.SaveChanges();
+
+                            LogManager.Add(new LogRecord
+                            {
+                                userId = SessionHelper.GetUserId(),
+                                time = DateTime.Now,
+                                type = "Info",
+                                content = "修改员工薪酬：" + employee.number
+                            });
+                        }
+                    }
+                    else
+                    {
+
+                        db.salaryInfoList.Add(model);
+                        db.SaveChanges();
+
+                        employee.salaryInfo = model;
+                        employee.salaryInfoId = model.id;
+                        db.Entry(employee).State = EntityState.Modified;
+                        db.SaveChanges();
+
+                        LogManager.Add(new LogRecord
+                        {
+                            userId = SessionHelper.GetUserId(),
+                            time = DateTime.Now,
+                            type = "Info",
+                            content = "新建员工薪酬：" + employee.number
+                        });
+                    }
+
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        public static OperateResult  Formal(long id, string state, DateTime time)
         {
             try
             {
@@ -328,7 +444,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Leave(long id, string state, DateTime time)
+        public static OperateResult  Leave(long id, string state, DateTime time)
         {
             try
             {
@@ -383,7 +499,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult SelectDepartment(long id, long departmentId)
+        public static OperateResult  SelectDepartment(long id, long departmentId)
         {
             try
             {
@@ -435,7 +551,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -476,7 +592,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -536,15 +652,14 @@ namespace Apps.BLL
             }
         }
 
-
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var elements = from e in db.employeeList.Include("salaryInfo").Include("postInfo")
+                    var elements = from e in db.employeeList.Include("department").Include("postInfo")
                                    orderby e.number
                                    select new
                                    {
@@ -641,8 +756,148 @@ namespace Apps.BLL
                         }
                     }
                     #endregion
+                            
+                    int total = elements.Count();
+                    int pages = 0;
+                    Pager pager = param.pager;
+                    if (pager == null || pager.rows == 0)
+                    {
+                        pages = total > 0 ? 1 : 0;
+                    }
+                    else
+                    {
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
+                        pages = total % pager.rows == 0 ? pages : pages + 1;
+                        if (pager.page <= 1)
+                        {
+                            elements = elements.Take(pager.rows);
+                        }
+                        else
+                        {
+                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                        }
+                    }
+
+                    var data = new
+                    {
+                        pages,
+                        total,
+                        rows = elements.ToList()
+                    };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = data,
+                    };
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult  GetEmployeeContractByPager(QueryParam param = null)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    Func<DateTime?, bool> isNear = dt =>
+                    {
+                        if (dt == null)
+                        {
+                            return false;
+                        }
+                        DateTime now = DateTime.Now;
+                        now = now.AddDays(30);
+                        return now > dt;
+                    };
+                    var elements = from e in db.employeeList.Include("postInfo").AsEnumerable()
+                                   where isNear(e.contractEnd)
+                                   orderby e.number
+                                   select new
+                                   {
+                                       e.id,
+                                       e.name,
+                                       e.number,
+                                       e.departmentId,
+                                       departmentName = e.department.name,
+                                       postName = e.postInfo==null ? "" : e.postInfo.name,
+                                       e.sex,
+                                       e.phone,
+                                       e.idCard,
+                                       e.birthday,
+                                       e.bankCard,
+                                       e.state,
+                                       e.entryDate,
+                                       e.formalDate,
+                                       e.leaveDate,
+                                       e.contractSerial,
+                                       e.contractBegin,
+                                       e.contractEnd,
+                                   };
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
 
 
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                    where e.parentId == id
+                                    select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                where e.id == departmentId
+                                select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+
+                        // 模糊过滤名字
+                        #region
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.name.Contains(p.value));
+                        }
+                        #endregion
+                        // 过滤状态
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
+                        }
+                        #endregion
+
+                    }
+                    #endregion
 
                     int total = elements.Count();
                     int pages = 0;
@@ -691,13 +946,587 @@ namespace Apps.BLL
 
         }
 
+        public static OperateResult  GetEmployeeBirthdayByPager(QueryParam param = null)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    Func<DateTime?, bool> isNear = dt =>
+                    {
+                        DateTime t = dt.Value;
+                        DateTime now = DateTime.Now;
+                        DateTime yearBirth = new DateTime(now.Year, t.Month, t.Day);
+
+                        now = now.AddDays(30);
+                        return now > yearBirth;
+                    };
+
+                    var elements = from e in db.employeeList.AsEnumerable()
+                                   where isNear(e.birthday)
+                                   orderby e.number
+                                   select new
+                                   {
+                                       e.id,
+                                       e.name,
+                                       e.number,
+                                       e.departmentId,
+                                       departmentName = e.department.name,
+                                       //postName = e.postInfo == null ? "" : e.postInfo.name,
+                                       e.sex,
+                                       e.phone,
+                                       e.idCard,
+                                       e.birthday,
+                                       e.bankCard,
+                                       e.state,
+                                       e.entryDate,
+                                       e.formalDate,
+                                       e.leaveDate,
+                                       e.contractSerial,
+                                       e.contractBegin,
+                                       e.contractEnd,
+                                   };
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                    where e.parentId == id
+                                    select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                where e.id == departmentId
+                                select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                        // 模糊过滤名字
+                        #region
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.name.Contains(p.value));
+                        }
+                        #endregion
+                        // 过滤状态
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
+                        }
+                        #endregion
+
+                    }
+                    #endregion
+
+                    int total = elements.Count();
+                    int pages = 0;
+                    Pager pager = param.pager;
+                    if (pager == null || pager.rows == 0)
+                    {
+                        pages = total > 0 ? 1 : 0;
+                    }
+                    else
+                    {
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
+                        pages = total % pager.rows == 0 ? pages : pages + 1;
+                        if (pager.page <= 1)
+                        {
+                            elements = elements.Take(pager.rows);
+                        }
+                        else
+                        {
+                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                        }
+                    }
+
+                    var data = new
+                    {
+                        pages,
+                        total,
+                        rows = elements.ToList()
+                    };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = data,
+                    };
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult  AddCareerRecordBatch(long employeeId, List<EmployeeCareerRecord> lstData)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    var employee = (from e in db.employeeList
+                                    where e.id == employeeId
+                                    select e).FirstOrDefault();
+                    if (employee == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    foreach (var model in lstData)
+                    {
+                        model.status = "audit";
+                        db.employeeCareerList.Add(model);
+
+                        LogManager.Add(new LogRecord
+                        {
+                            userId = SessionHelper.GetUserId(),
+                            time = DateTime.Now,
+                            type = "Info",
+                            content = "添加员工事纪：" + employee.number + "," + model.description
+                        });
+
+                    }
+
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+        public static OperateResult  RemoveCareerRecord(long id)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+                    var element = db.employeeCareerList.Find(id);
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "不存在",
+                        };
+                    }
+
+                    db.employeeCareerList.Remove(element);
+
+                    db.Entry(element).State = System.Data.Entity.EntityState.Deleted;
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult  UpdateCareerRecord(EmployeeCareerRecord model)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+
+                    db.Entry(model).State = System.Data.Entity.EntityState.Modified;
+
+                    db.SaveChanges();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "更新成功"
+                    };
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+        public static OperateResult  GetCareerRecordById(long id)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+                    var element = (from m in db.employeeCareerList
+                                   where id == m.id
+                                   select m
+                                ).FirstOrDefault();
+
+                    if (element == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "访问错误",
+                        };
+                    }
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = element,
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+        public static OperateResult  GetCareerRecordsById(long employeeId)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+                    var elements = from e in db.employeeCareerList
+                                   where employeeId == e.employeeId
+                                   orderby e.type
+                                   select new
+                                   {
+                                       e.id,
+                                       e.type,
+                                       e.time,
+                                       e.description
+                                   };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = elements.ToList(),
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult  GetAllCareerRecords(QueryParam param = null)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+                    var elements = from e in db.employeeCareerList.Include("employee")
+                                   orderby e.time descending
+                                   select new
+                                   {
+                                       e.id,
+                                       e.type,
+                                       e.time,
+                                       e.description,
+                                       e.employee.name,
+                                       e.employee.state,
+                                       e.employee.departmentId
+                                   };
+
+
+                    if (param != null && param.filters != null)
+                    {
+                        // 先查询出部门及子部门，再过滤
+
+                        #region
+
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+
+                        #endregion
+
+                        // 模糊过滤名字
+
+                        #region
+
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.name.Contains(p.value));
+                        }
+
+                        #endregion
+
+                        // 过滤状态
+
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
+                        }
+                        #endregion
+                    }
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = elements.ToList(),
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+        public static OperateResult  GetAllCareerRecordByPager(QueryParam param = null)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+                    var elements = from e in db.employeeCareerList.Include("employee")
+                                   orderby e.time descending
+                                   select new
+                                   {
+                                       e.id,
+                                       e.type,
+                                       e.time,
+                                       e.description,
+                                       employeeName = e.employee.name,
+                                       employeeNumber = e.employee.number,
+                                       employeeState = e.employee.state,
+                                       e.employee.departmentId,
+                                       departmentName = e.employee.department.name
+                                   };
+
+
+                    if (param != null && param.filters != null)
+                    {
+                        // 先查询出部门及子部门，再过滤
+
+                        #region
+
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+
+                        #endregion
+
+                        // 模糊过滤名字
+
+                        #region
+
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.employeeName.Contains(p.value));
+                        }
+
+                        #endregion
+
+                        // 过滤状态
+
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.employeeState));
+                        }
+                        #endregion
+                    }
+
+                    int total = elements.Count();
+                    int pages = 0;
+                    Pager pager = param.pager;
+                    if (pager == null || pager.rows == 0)
+                    {
+                        pages = total > 0 ? 1 : 0;
+                    }
+                    else
+                    {
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
+                        pages = total % pager.rows == 0 ? pages : pages + 1;
+                        if (pager.page <= 1)
+                        {
+                            elements = elements.Take(pager.rows);
+                        }
+                        else
+                        {
+                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                        }
+                    }
+
+                    var data = new
+                    {
+                        pages,
+                        total,
+                        rows = elements.ToList()
+                    };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = data,
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+
 
         /// <summary>
         /// 返回值中的data是DataTable
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        public OperateResult ExportAll(QueryParam param = null)
+        public static OperateResult  ExportAll(QueryParam param = null)
         {
             try
             {
@@ -860,7 +1689,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult ImportExcel(string fileName)
+        public static OperateResult  ImportExcel(string fileName)
         {
             List<EmployeeExport> query = new List<EmployeeExport>();
             try
@@ -995,11 +1824,147 @@ namespace Apps.BLL
             return result;
         }
 
-        public OperateResult AnalyseByAge(QueryParam param = null)
+
+
+        /// <summary>
+        /// 返回值中的data是DataTable
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        public static OperateResult  ExportCareerAll(QueryParam param = null)
         {
             try
             {
+                using (SystemDB db = new SystemDB())
+                {
+                    var elements = from e in db.employeeCareerList.Include("employee")
+                        orderby e.time descending
+                        select new
+                        {
+                            e.id,
+                            e.type,
+                            e.time,
+                            e.description,
+                            employeeName = e.employee.name,
+                            employeeNumber = e.employee.number,
+                            employeeState = e.employee.state,
+                            e.employee.departmentId,
+                            departmentName = e.employee.department.name
+                        };
 
+                    if (param != null && param.filters != null)
+                    {
+                        // 先查询出部门及子部门，再过滤
+
+                        #region
+
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+
+                        #endregion
+
+                        // 模糊过滤名字
+
+                        #region
+
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.employeeName.Contains(p.value));
+                        }
+
+                        #endregion
+
+                        // 过滤状态
+
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.employeeState));
+                        }
+                        #endregion
+                    }
+
+                    long rowIndex = 1;
+                    var results = from e in elements.AsEnumerable()
+                                  let index = rowIndex++
+                                  select new EmployeeCareerRecordExport
+                                  {
+                                      index = index,
+                                      employeeName = e.employeeName,
+                                      employeeNumber = e.employeeNumber,
+                                      departmentName = e.departmentName,
+                                      type = e.type,
+                                      time = e.time,
+                                      description = e.description
+                                  };
+
+
+                    DataTable dt = DataTableHelper.ToDataTable<EmployeeCareerRecordExport>(results.ToList());
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "导出员工信息："
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "导出成功",
+                        data = dt,
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+
+        public static OperateResult  AnalyseByAge(QueryParam param = null)
+        {
+            try
+            {
                 using (SystemDB db = new SystemDB())
                 {
 
@@ -1010,12 +1975,15 @@ namespace Apps.BLL
                                        e.id,
                                        years = Model.Utility.Utility.CalYears(e.birthday, now),
                                        e.departmentId,
+                                       e.state
                                    };
 
-                    // 先查询出部门及子部门，再过滤
+                    // 过滤
                     #region
                     if (param != null && param.filters != null)
                     {
+                        // 先查询出部门及子部门，再过滤
+                        #region
                         if (param.filters.Keys.Contains("departmentId"))
                         {
                             var p = param.filters["departmentId"];
@@ -1045,6 +2013,16 @@ namespace Apps.BLL
 
                             elements = elements.Where(t => departments.Contains(t.departmentId));
                         }
+                        #endregion
+                        // 过滤状态
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
+                        }
+                        #endregion
+
                     }
                     #endregion
 
@@ -1093,7 +2071,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult AnalyseByGender(QueryParam param = null)
+        public static OperateResult  AnalyseByGender(QueryParam param = null)
         {
             try
             {
@@ -1106,12 +2084,15 @@ namespace Apps.BLL
                                        e.id,
                                        e.sex,
                                        e.departmentId,
+                                       e.state
                                    };
 
-                    // 先查询出部门及子部门，再过滤
+                    // 过滤
                     #region
                     if (param != null && param.filters != null)
                     {
+                        // 先查询出部门及子部门，再过滤
+                        #region
                         if (param.filters.Keys.Contains("departmentId"))
                         {
                             var p = param.filters["departmentId"];
@@ -1141,6 +2122,16 @@ namespace Apps.BLL
 
                             elements = elements.Where(t => departments.Contains(t.departmentId));
                         }
+                        #endregion
+                        // 过滤状态
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
+                        }
+                        #endregion
+
                     }
                     #endregion
 
@@ -1187,7 +2178,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult AnalyseByWorkAge(QueryParam param = null)
+        public static OperateResult  AnalyseByWorkAge(QueryParam param = null)
         {
             try
             {
@@ -1203,12 +2194,15 @@ namespace Apps.BLL
                                        e.id,
                                        workAge,
                                        e.departmentId,
+                                       e.state
                                    };
 
-                    // 先查询出部门及子部门，再过滤
+                    // 过滤
                     #region
                     if (param != null && param.filters != null)
                     {
+                        // 先查询出部门及子部门，再过滤
+                        #region
                         if (param.filters.Keys.Contains("departmentId"))
                         {
                             var p = param.filters["departmentId"];
@@ -1238,6 +2232,16 @@ namespace Apps.BLL
 
                             elements = elements.Where(t => departments.Contains(t.departmentId));
                         }
+                        #endregion
+                        // 过滤状态
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
+                        }
+                        #endregion
+
                     }
                     #endregion
 
@@ -1296,7 +2300,7 @@ namespace Apps.BLL
             public int count { get; set; }
 
         }
-        public OperateResult AnalyseBySalary(QueryParam param = null)
+        public static OperateResult  AnalyseBySalary(QueryParam param = null)
         {
             try
             {
@@ -1312,14 +2316,17 @@ namespace Apps.BLL
                                        e.id,
                                        salary,
                                        e.departmentId,
+                                       e.state
                                    };
 
 
 
-                    // 先查询出部门及子部门，再过滤
+                    // 过滤
                     #region
                     if (param != null && param.filters != null)
                     {
+                        // 先查询出部门及子部门，再过滤
+                        #region
                         if (param.filters.Keys.Contains("departmentId"))
                         {
                             var p = param.filters["departmentId"];
@@ -1349,6 +2356,16 @@ namespace Apps.BLL
 
                             elements = elements.Where(t => departments.Contains(t.departmentId));
                         }
+                        #endregion
+                        // 过滤状态
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
+                        }
+                        #endregion
+
                     }
                     #endregion
 
@@ -1368,9 +2385,9 @@ namespace Apps.BLL
                     var category = new List<object>();
                     var data = new List<object>();
 
-                    var ruslt = elements.ToList();
+                    var result = elements.ToList();
 
-                    foreach (var e in ruslt)
+                    foreach (var e in result)
                     {
                         foreach (var k in keyList)
                         {
@@ -1425,265 +2442,29 @@ namespace Apps.BLL
             }
         }
 
-
-        public OperateResult AddCareerRecordBatch(long employeeId, List<EmployeeCareerRecord> lstData)
-        {
-            try
-            {
-                using (SystemDB db = new SystemDB())
-                {
-                    var employee = (from e in db.employeeList
-                        where e.id == employeeId
-                        select e).FirstOrDefault();
-                    if (employee == null)
-                    {
-                        return new OperateResult
-                        {
-                            content = "访问错误",
-                        };
-                    }
-
-                    foreach (var model in lstData)
-                    {
-                        model.status = "audit";
-                        db.employeeCareerList.Add(model);
-
-                        LogManager.Add(new LogRecord
-                        {
-                            userId = SessionHelper.GetUserId(),
-                            time = DateTime.Now,
-                            type = "Info",
-                            content = "添加员工事纪：" + employee.number + "," + model.description
-                        });
-
-                    }
-
-                    db.SaveChanges();
-
-                    return new OperateResult
-                    {
-                        status = OperateStatus.Success,
-                    };
-                }
-
-            }
-            catch (Exception ex)
-            {
-                return new OperateResult
-                {
-                    content = Model.Utility.Utility.GetExceptionMsg(ex),
-                };
-            }
-        }
-        public OperateResult RemoveCareerRecord(long id)
+        public static OperateResult  AnalyseByPost(QueryParam param = null)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var element = db.employeeCareerList.Find(id);
-
-                    if (element == null)
-                    {
-                        return new OperateResult
-                        {
-                            content = "不存在",
-                        };
-                    }
-
-                    db.employeeCareerList.Remove(element);
-
-                    db.Entry(element).State = System.Data.Entity.EntityState.Deleted;
-                    db.SaveChanges();
-
-                    return new OperateResult
-                    {
-                        status = OperateStatus.Success,
-                        content = "删除成功"
-                    };
-
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                return new OperateResult
-                {
-                    content = Model.Utility.Utility.GetExceptionMsg(ex),
-                };
-            }
-
-        }
-
-        public OperateResult UpdateCareerRecord(EmployeeCareerRecord model)
-        {
-            try
-            {
-                using (SystemDB db = new SystemDB())
-                {
-
-
-                    db.Entry(model).State = System.Data.Entity.EntityState.Modified;
-
-                    db.SaveChanges();
-
-                    return new OperateResult
-                    {
-                        status = OperateStatus.Success,
-                        content = "更新成功"
-                    };
-
-                }
-
-            }
-            catch (Exception ex)
-            {
-                return new OperateResult
-                {
-                    content = Model.Utility.Utility.GetExceptionMsg(ex),
-                };
-            }
-        }
-
-
-        public OperateResult GetCareerRecordById(long id)
-        {
-            try
-            {
-                using (SystemDB db = new SystemDB())
-                {
-
-                    var element = (from m in db.employeeCareerList
-                                   where id == m.id
-                                   select m
-                                ).FirstOrDefault();
-
-                    if (element == null)
-                    {
-                        return new OperateResult
-                        {
-                            content = "访问错误",
-                        };
-                    }
-
-                    return new OperateResult
-                    {
-                        status = OperateStatus.Success,
-                        data = element,
-                    };
-
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                return new OperateResult
-                {
-                    content = Model.Utility.Utility.GetExceptionMsg(ex),
-                };
-            }
-        }
-        public OperateResult GetCareerRecordsById(long employeeId)
-        {
-            try
-            {
-                using (SystemDB db = new SystemDB())
-                {
-
-                    var elements = from e in db.employeeCareerList
-                                  where employeeId == e.employeeId
-                                  orderby e.type
-                                  select new 
-                                  {
-                                      e.id,
-                                      e.type,
-                                      e.time,
-                                      e.description
-                                  };
-
-                    return new OperateResult
-                    {
-                        status = OperateStatus.Success,
-                        data = elements.ToList(),
-                    };
-
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                return new OperateResult
-                {
-                    content = Model.Utility.Utility.GetExceptionMsg(ex),
-                };
-            }
-
-        }
-
-        public OperateResult GetAllCareerRecords(QueryParam param = null)
-        {
-            try
-            {
-                using (SystemDB db = new SystemDB())
-                {
-
-                    var elements = (from e in db.employeeCareerList.Include("employee")
-                                    select new
-                                    {
-                                        e.id,
-                                        e.type,
-                                        e.time,
-                                        e.employee.name,
-                                    }
-                                  ).ToList();
-
-                    return new OperateResult
-                    {
-                        status = OperateStatus.Success,
-                        data = elements,
-                    };
-
-                }
-
-
-            }
-            catch (Exception ex)
-            {
-                return new OperateResult
-                {
-                    content = Model.Utility.Utility.GetExceptionMsg(ex),
-                };
-            }
-        }
-
-
-        public OperateResult GetAllCareerRecordByPager(QueryParam param = null)
-        {
-            try
-            {
-                using (SystemDB db = new SystemDB())
-                {
-
-                    var elements = from e in db.employeeCareerList.Include("employee")
-                                   orderby e.time descending
+                    var elements = from e in db.employeeList.AsEnumerable()
                                    select new
                                    {
                                        e.id,
-                                       e.type,
-                                       e.time,
-                                       e.description,
-                                       e.employee.name,
-                                       e.employee.departmentId
+                                       e.sex,
+                                       e.departmentId,
+                                       e.postId,
+                                       e.state
                                    };
 
-                    // 先查询出部门及子部门，再过滤
+                    // 过滤
                     #region
                     if (param != null && param.filters != null)
                     {
+                        // 先查询出部门及子部门，再过滤
+                        #region
                         if (param.filters.Keys.Contains("departmentId"))
                         {
                             var p = param.filters["departmentId"];
@@ -1713,54 +2494,60 @@ namespace Apps.BLL
 
                             elements = elements.Where(t => departments.Contains(t.departmentId));
                         }
-                    }
-                    #endregion
-
-                    // 模糊过滤名字
-                    #region
-                    if (param != null && param.filters != null)
-                    {
-                        if (param.filters.Keys.Contains("employeeName"))
+                        #endregion
+                        // 过滤状态
+                        #region
+                        if (param.filters.Keys.Contains("state"))
                         {
-                            var p = param.filters["employeeName"];
-                            elements = elements.Where(t => t.name.Contains(p.value));
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.state));
                         }
+                        #endregion
+
                     }
                     #endregion
 
 
-                    int total = elements.Count();
-                    int pages = 0;
-                    Pager pager = param.pager;
-                    if (pager == null || pager.rows == 0)
+                    var results = elements.GroupBy(e => e.postId)
+                        .Select(e => new { e.Key, count = e.Count() });
+
+                    var category = new List<object>();
+                    var data = new List<object>();
+
+                    foreach (var e in results)
                     {
-                        pages = total > 0 ? 1 : 0;
-                    }
-                    else
-                    {
-                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
-                        pages = total % pager.rows == 0 ? pages : pages + 1;
-                        if (pager.page <= 1)
+                        //根据postid得到对应名称
+                        var post = (from p in db.postInfoList
+                            where p.id == e.Key
+                            select p).FirstOrDefault();
+                        if (post == null)
                         {
-                            elements = elements.Take(pager.rows);
+                            category.Add("无岗位");
+                            data.Add(new { value = e.count, name = "无岗位" });
                         }
                         else
                         {
-                            elements = elements.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                            category.Add(post.name);
+                            data.Add(new { value = e.count, name = post.name });
                         }
                     }
+                    var series = new List<object>();
+                    series.Add(new { name = "员工岗位", data });
+                    var legend = new List<object>();
+                    legend.Add("员工岗位");
 
-                    var data = new
+                    var resultData = new
                     {
-                        pages,
-                        total,
-                        rows = elements.ToList()
+                        title = "岗位分析",
+                        category,
+                        legend = legend,
+                        series = series,
                     };
 
                     return new OperateResult
                     {
                         status = OperateStatus.Success,
-                        data = data,
+                        data = resultData,
                     };
 
                 }
@@ -1775,7 +2562,6 @@ namespace Apps.BLL
                 };
             }
         }
-
 
     }
 }

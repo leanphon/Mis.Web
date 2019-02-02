@@ -866,12 +866,14 @@
     <Content Include="Views\User\ShowResetPasswd.cshtml" />
     <Content Include="Views\Assessment\ShowImport.cshtml" />
     <Content Include="Views\Predict\LeaveWarning.cshtml" />
-    <Content Include="Views\Predict\Edit.cshtml" />
-    <Content Include="Views\Predict\Index.cshtml" />
+    <Content Include="Views\Predict\EmployeeBirthday.cshtml" />
+    <Content Include="Views\Predict\EmployeeContract.cshtml" />
     <Content Include="Views\Employee\ShowDepartment.cshtml" />
     <Content Include="Views\Department\Strength.cshtml" />
     <Content Include="Views\Employee\ShowCareer.cshtml" />
     <Content Include="Views\User\ShowModifyPasswd.cshtml" />
+    <Content Include="Views\Employee\CareerIndex.cshtml" />
+    <Content Include="Views\Analyse\EmployeePost.cshtml" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>

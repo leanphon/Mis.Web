@@ -13,7 +13,7 @@ namespace Apps.BLL
 {
     public class SalaryRecordManager
     {
-        public OperateResult Add(SalaryRecord model)
+        public static OperateResult  Add(SalaryRecord model)
         {
             try
             {
@@ -62,7 +62,7 @@ namespace Apps.BLL
             }
 
         }
-        public OperateResult AddBatch(List<SalaryRecord> listModel)
+        public static OperateResult  AddBatch(List<SalaryRecord> listModel)
         {
             bool fail = false;
             OperateResult result = new OperateResult();
@@ -86,7 +86,7 @@ namespace Apps.BLL
             return result;
         }
 
-        public OperateResult RefreshSalary(SalaryRecord model)
+        public static OperateResult  RefreshSalary(SalaryRecord model)
         {
 
             var shouldTotal = model.levelSalary + model.fullAttendanceRewards + model.performanceRewards
@@ -107,7 +107,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult Remove(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -157,7 +157,44 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult Update(SalaryRecord model)
+
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.salaryRecordList.RemoveRange(db.salaryRecordList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有工资记录"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult  Update(SalaryRecord model)
         {
             try
             {
@@ -196,7 +233,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult UpdateStatusBatch(List<long> listModel, string status)
+        public static OperateResult  UpdateStatusBatch(List<long> listModel, string status)
         {
             bool fail = false;
             OperateResult result = new OperateResult();
@@ -220,9 +257,9 @@ namespace Apps.BLL
             return result;
         }
 
-        public OperateResult UpdateStatus(long id, string status)
+        public static OperateResult  UpdateStatus(long id, string status)
         {
-            if (status != "未审核" && status != "审核")
+            if (status != "未审核" && status != "已审核")
             {
                 return new OperateResult
                 {
@@ -275,7 +312,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -314,8 +351,43 @@ namespace Apps.BLL
             }
         }
 
+        /// <summary>
+        /// 通过给定的员工id，返回其入职以来的月平均实发工资
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public static OperateResult GetSalaryAveById(long id)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
 
-        public OperateResult GetAll(QueryParam param = null)
+                    var element = (from m in db.salaryRecordList
+                            where id == m.id
+                            select m.actualTotal
+                        ).Average();
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = element,
+                    };
+
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -362,7 +434,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {
@@ -372,6 +444,7 @@ namespace Apps.BLL
                     var elements = from e in db.salaryRecordList.Include("assessmentInfoList")
                                    join employee in db.employeeList.Include("department")
                                    on e.assessmentInfo.employeeId equals employee.id
+                                   where e.assessmentInfo.status == "已审核"
                                    orderby employee.number
                                    select new
                                    {
@@ -511,7 +584,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetAssessmentByPager(QueryParam param = null)
+        public static OperateResult  GetAssessmentByPager(QueryParam param = null)
         {
             try
             {
@@ -678,7 +751,144 @@ namespace Apps.BLL
             }
         }
 
-        private string GenerateBillSerial(string month, string employeeNumber)
+        public static OperateResult GetAssessmentAll(QueryParam param = null)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+
+                    if (param == null || param.filters == null || !param.filters.Keys.Contains("month"))
+                    {
+                        return new OperateResult
+                        {
+                            content = "需要月份查询条件",
+                        };
+                    }
+
+                    // 得到给定月份的已经存在考核数据的记录
+                    string month = param.filters["month"].value ?? "";
+                    var elements = from e in db.assessmentInfoList.Include("employee").AsEnumerable()
+                                   let salaryInfo = e.employee.salaryInfo
+
+                                   //join salaryInfo in db.salaryInfoList.Include("levelInfo").Include("performanceInfo").Include("benefitInfo")
+                                   //on e.employeeId equals salaryInfo.employeeId
+                                   join department in db.departmentList
+                                   on e.employee.departmentId equals department.id
+
+                                   let levelSalary = CalPostSalary(salaryInfo.levelInfo.levelSalary, e.shouldWorkTime, e.actualWorkTime)
+                                   let fullAttendanceRewards = CalFullAttendanceRewards(salaryInfo.levelInfo.fullAttendanceRewards, e.shouldWorkTime, e.actualWorkTime)
+                                   let performanceRewards = CalPerformanceRewards(salaryInfo.performanceInfo.performanceRewards, e.performanceScore ?? 0)
+                                   let benefitRewards = CalBenefitRewards(salaryInfo.benefitInfo.benefitRewards, e.benefitScore ?? 0)
+                                   let seniorityRewards = CalSeniorityRewards(salaryInfo.levelInfo.seniorityRewardsBase, month, e.employee.entryDate ?? DateTime.Now)
+                                   let normalOvertimeRewards = CalNormalOvertimeRewards(salaryInfo.levelInfo.levelSalary, e.normalOvertime ?? 0)
+                                   let holidayOvertimeRewards = CalHolidayOvertimeRewards(salaryInfo.levelInfo.levelSalary, e.holidayOvertime ?? 0)
+                                   let shouldTotal = Math.Round(levelSalary + fullAttendanceRewards + performanceRewards + benefitRewards + seniorityRewards + normalOvertimeRewards + holidayOvertimeRewards, 2)
+
+                                   where e.month == month && !(db.salaryRecordList.Any(c => c.assessmentInfoId == e.id))
+                                   select new
+                                   {
+                                       billSerial = GenerateBillSerial(month, e.employee.number),
+                                       assessmentInfoId = e.id,
+                                       employeeId = e.employeeId,
+                                       employeeName = e.employee.name,
+                                       employeeNumber = e.employee.number,
+                                       departmentId = e.employee.departmentId,
+                                       departmentName = department.name,
+                                       levelSalary = levelSalary,
+                                       shouldWorkTime = e.shouldWorkTime,
+                                       actualWorkTime = e.actualWorkTime,
+                                       isFullAttendance = isFullAttendanceRewards(e.shouldWorkTime, e.actualWorkTime) ? "是" : "否",
+                                       fullAttendanceRewards = fullAttendanceRewards,
+                                       performanceRewardsBase = salaryInfo.performanceInfo.performanceRewards,
+                                       performanceScore = e.performanceScore,
+                                       performanceRewards = performanceRewards,
+                                       benefitRewardsBase = salaryInfo.benefitInfo.benefitRewards,
+                                       benefitScore = e.benefitScore,
+                                       benefitRewards = benefitRewards,
+                                       seniorityRewardsBae = salaryInfo.levelInfo.seniorityRewardsBase,
+                                       seniorityRewards = seniorityRewards,
+                                       normalOvertimeRewards = normalOvertimeRewards,
+                                       holidayOvertimeRewards = holidayOvertimeRewards,
+                                       subsidy = 0,
+                                       reissue = 0,
+                                       socialSecurity = 0,
+                                       publicFund = 0,
+                                       tax = 0,
+                                       chargeback = 0,
+                                       shouldTotal = shouldTotal,
+                                       actualTotal = shouldTotal,
+                                   };
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                    }
+                    #endregion
+
+
+                    // 模糊过滤名字
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.employeeName.Contains(p.value));
+                        }
+                    }
+                    #endregion
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = elements.ToList(),
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        private static string GenerateBillSerial(string month, string employeeNumber)
         {
             DateTime dtMonth;
 
@@ -695,7 +905,7 @@ namespace Apps.BLL
         }
 
 
-        private double CalPostSalary(double rewardsBase, double shouldWorkTime, double actualWorkTime)
+        private static double CalPostSalary(double rewardsBase, double shouldWorkTime, double actualWorkTime)
         {
             if (shouldWorkTime < 0.000001) //视为等于0
             {
@@ -712,7 +922,7 @@ namespace Apps.BLL
             }
         }
 
-        private double CalSeniorityRewards(double rewardsBase, string month, DateTime entryDate)
+        private static double CalSeniorityRewards(double rewardsBase, string month, DateTime entryDate)
         {
             DateTime dtMonth = DateTime.Now;
             if (DateTime.TryParse(month, out dtMonth))
@@ -728,16 +938,16 @@ namespace Apps.BLL
             return 0.00;
         }
 
-        private double CalPerformanceRewards(double rewardsBase, double score)
+        private static double CalPerformanceRewards(double rewardsBase, double score)
         {
             return Math.Round(rewardsBase * score / 100, 2);
         }
 
-        private double CalBenefitRewards(double rewardsBase, double score)
+        private static double CalBenefitRewards(double rewardsBase, double score)
         {
             return Math.Round(rewardsBase * score / 100, 2);
         }
-        private double CalFullAttendanceRewards(double rewardsBase, double shouldWorkTime, double actualWorkTime)
+        private static double CalFullAttendanceRewards(double rewardsBase, double shouldWorkTime, double actualWorkTime)
         {
             if (Math.Abs(shouldWorkTime - actualWorkTime) < 0.00001)
             {
@@ -746,7 +956,7 @@ namespace Apps.BLL
             return 0.00;
         }
 
-        private bool isFullAttendanceRewards(double shouldWorkTime, double actualWorkTime)
+        private static bool isFullAttendanceRewards(double shouldWorkTime, double actualWorkTime)
         {
             if (Math.Abs(shouldWorkTime - actualWorkTime) < 0.00001)
             {
@@ -761,7 +971,7 @@ namespace Apps.BLL
         /// <param name="levelSalary"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        private double CalNormalOvertimeRewards(double levelSalary, double time)
+        private static double CalNormalOvertimeRewards(double levelSalary, double time)
         {
             return Math.Round(levelSalary / (30 * 8) * time, 2);
         }
@@ -772,13 +982,13 @@ namespace Apps.BLL
         /// <param name="levelSalary"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        private double CalHolidayOvertimeRewards(double levelSalary, double time)
+        private static double CalHolidayOvertimeRewards(double levelSalary, double time)
         {
             return 2 * CalNormalOvertimeRewards(levelSalary, time);
         }
 
 
-        public OperateResult ExportAll(QueryParam param = null)
+        public static OperateResult  ExportAll(QueryParam param = null)
         {
             try
             {
@@ -928,7 +1138,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult ExportBill(QueryParam param = null)
+        public static OperateResult  ExportBill(QueryParam param = null)
         {
             try
             {

@@ -22,8 +22,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            UserManager manager = new UserManager();
-            OperateResult or = manager.GetAll();
+            OperateResult or = UserManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -36,8 +35,7 @@ namespace MIS.Web.Controllers
         }
         public ActionResult GetEntities(Pager pager)
         {
-            UserManager manager = new UserManager();
-            OperateResult or = manager.GetByPager(new QueryParam { pager = pager });
+            OperateResult or = UserManager.GetByPager(new QueryParam { pager = pager });
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -65,9 +63,8 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            UserManager manager = new UserManager();
 
-            OperateResult or = manager.Add(model);
+            OperateResult or = UserManager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -86,9 +83,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            UserManager manager = new UserManager();
 
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = UserManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -106,9 +102,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            UserManager manager = new UserManager();
-
-            OperateResult or = manager.Update(model);
+            OperateResult or = UserManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -127,9 +121,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            UserManager manager = new UserManager();
 
-            OperateResult or = manager.Remove(id.Value);
+            OperateResult or = UserManager.Remove(id.Value);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -190,9 +183,8 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            UserManager manager = new UserManager();
 
-            OperateResult or = manager.ResetPasswd(id, passwd);
+            OperateResult or = UserManager.ResetPasswd(id, passwd);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -230,9 +222,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            UserManager manager = new UserManager();
-
-            OperateResult or = manager.ModifyPasswd(id, passwdOld, passwd);
+            OperateResult or = UserManager.ModifyPasswd(id, passwdOld, passwd);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -253,9 +243,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            UserManager manager = new UserManager();
-
-            OperateResult or = manager.Lock(id.Value);
+            OperateResult or = UserManager.Lock(id.Value);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

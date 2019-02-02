@@ -1,0 +1,27 @@
+﻿--use MisDbTest;
+--use master
+--GO
+--drop database MisDbTest
+
+DBCC CHECKIDENT (AssessmentInfos, RESEED, 0)
+
+DBCC CHECKIDENT (AssessmentInfos, RESEED, 0)
+DBCC CHECKIDENT (BenefitInfos, RESEED, 0)
+DBCC CHECKIDENT (CareerRecords, RESEED, 0)
+DBCC CHECKIDENT (CompanyRegisters, RESEED, 0)
+DBCC CHECKIDENT (Companys, RESEED, 0)
+DBCC CHECKIDENT (Departments, RESEED, 0)
+
+DBCC CHECKIDENT (Employees, RESEED, 0)
+DBCC CHECKIDENT (FunctionRights, RESEED, 0)
+DBCC CHECKIDENT (LevelInfos, RESEED, 0)
+DBCC CHECKIDENT (LogRecords, RESEED, 0)
+DBCC CHECKIDENT (Modules, RESEED, 0)
+DBCC CHECKIDENT (PerformanceInfos, RESEED, 0)
+
+DBCC CHECKIDENT (PostInfos, RESEED, 0)
+--DBCC CHECKIDENT (RoleRights, RESEED, 0)
+DBCC CHECKIDENT (Roles, RESEED, 0)
+DBCC CHECKIDENT (SalaryInfos, RESEED, 0)
+DBCC CHECKIDENT (SalaryRecords, RESEED, 0)
+DBCC CHECKIDENT (Users, RESEED, 0)
