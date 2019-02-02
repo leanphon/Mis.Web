@@ -17,8 +17,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            PostManager manager = new PostManager();
-            OperateResult or = manager.GetAll();
+            OperateResult or = PostManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -31,9 +30,7 @@ namespace MIS.Web.Controllers
         }
         public ActionResult GetEntities(Apps.Model.Pager pager)
         {
-
-            PostManager manager = new PostManager();
-            OperateResult or = manager.GetByPager(new QueryParam { pager = pager });
+            OperateResult or = PostManager.GetByPager(new QueryParam { pager = pager });
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -61,9 +58,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            PostManager manager = new PostManager();
-
-            OperateResult or = manager.Add(model);
+            OperateResult or = PostManager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -82,9 +77,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            PostManager manager = new PostManager();
 
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = PostManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -102,9 +96,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            PostManager manager = new PostManager();
-
-            OperateResult or = manager.Update(model);
+            OperateResult or = PostManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -123,9 +115,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            PostManager manager = new PostManager();
 
-            OperateResult or = manager.Remove(id.Value);
+            OperateResult or = PostManager.Remove(id.Value);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

@@ -25,8 +25,7 @@ namespace MIS.Web.Controllers
         }
         public ActionResult GetAllEntities()
         {
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.GetAll();
+            OperateResult or = SalaryRecordManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -51,8 +50,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.GetByPager(queryParam);
+            OperateResult or = SalaryRecordManager.GetByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -79,9 +77,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.GetAssessmentByPager(queryParam);
+            OperateResult or = SalaryRecordManager.GetAssessmentByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -92,27 +88,6 @@ namespace MIS.Web.Controllers
             return Json(or, JsonRequestBehavior.AllowGet);
         }
 
-
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return Json(
-                    new OperateResult
-                    {
-                        content = "访问错误",
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
-
-            }
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.GetById(id.Value);
-
-            return View(or.data);
-
-        }
 
         public ActionResult EditEntity()
         {
@@ -153,9 +128,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-
-            OperateResult or = manager.Update(model);
+            OperateResult or = SalaryRecordManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -189,8 +162,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.AddBatch(lstData);
+            OperateResult or = SalaryRecordManager.AddBatch(lstData);
 
             return Json(or, JsonRequestBehavior.AllowGet);
         }
@@ -234,8 +206,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.Add(model);
+            OperateResult or = SalaryRecordManager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
         }
@@ -269,34 +240,11 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.RefreshSalary(model);
+            OperateResult or = SalaryRecordManager.RefreshSalary(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
         }
 
-
-
-        public ActionResult Delete(int? id)
-        {
-            if (id == null)
-            {
-                return Json(
-                    new OperateResult
-                    {
-                        content = "访问错误",
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
-
-            }
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.Remove(id.Value);
-
-            return Json(or, JsonRequestBehavior.AllowGet);
-
-        }
 
         public ActionResult ExportAll()
         {
@@ -313,8 +261,7 @@ namespace MIS.Web.Controllers
             }
 
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.ExportAll(queryParam);
+            OperateResult or = SalaryRecordManager.ExportAll(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -337,9 +284,7 @@ namespace MIS.Web.Controllers
         public ActionResult LockStatus(long id, string status)
         {
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-
-            OperateResult or = manager.UpdateStatus(id, status);
+            OperateResult or = SalaryRecordManager.UpdateStatus(id, status);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -373,8 +318,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.UpdateStatusBatch(lstData, status);
+            OperateResult or = SalaryRecordManager.UpdateStatusBatch(lstData, status);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -382,9 +326,7 @@ namespace MIS.Web.Controllers
         public ActionResult UnlockStatus(long id, string status)
         {
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-
-            OperateResult or = manager.UpdateStatus(id, status);
+            OperateResult or = SalaryRecordManager.UpdateStatus(id, status);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -418,8 +360,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.UpdateStatusBatch(lstData, status);
+            OperateResult or = SalaryRecordManager.UpdateStatusBatch(lstData, status);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -439,8 +380,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            SalaryRecordManager manager = new SalaryRecordManager();
-            OperateResult or = manager.ExportBill(queryParam);
+            OperateResult or = SalaryRecordManager.ExportBill(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

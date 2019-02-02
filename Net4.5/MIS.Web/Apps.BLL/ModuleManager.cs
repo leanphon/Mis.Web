@@ -12,7 +12,7 @@ namespace Apps.BLL
 {
     public class ModuleManager
     {
-        public OperateResult Add(Module model)
+        public static OperateResult  Add(Module model)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult Remove(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -100,7 +100,44 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Update(Module model)
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.moduleList.RemoveRange(db.moduleList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有模块"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+
+        public static OperateResult  Update(Module model)
         {
             try
             {
@@ -152,7 +189,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -191,7 +228,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -229,7 +266,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {
@@ -296,7 +333,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetModuleTree(QueryParam param = null)
+        public static OperateResult  GetModuleTree(QueryParam param = null)
         {
             if (param == null || param.filters == null
                               || !param.filters.Keys.Contains("roleId"))
@@ -352,7 +389,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetModulesByRoleId(long roleId)
+        public static OperateResult  GetModulesByRoleId(long roleId)
         {
             if (roleId == -1) // root 用户
             {

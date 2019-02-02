@@ -10,7 +10,7 @@ namespace Apps.BLL
 {
     public class UserManager
     {
-        public OperateResult Add(User model)
+        public static OperateResult  Add(User model)
         {
             try
             {
@@ -56,7 +56,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult Remove(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -116,7 +116,43 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Update(User model)
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.userList.RemoveRange(db.userList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有用户"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult  Update(User model)
         {
             try
             {
@@ -171,7 +207,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -211,7 +247,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -246,7 +282,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {
@@ -310,7 +346,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Login(User model)
+        public static OperateResult  Login(User model)
         {
             try
             {
@@ -381,7 +417,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult RootLogin(User model)
+        public static OperateResult  RootLogin(User model)
         {
             if (model.name == "root" && model.passwd == "root")
             {
@@ -405,7 +441,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult ResetPasswd(long id, string pwd)
+        public static OperateResult  ResetPasswd(long id, string pwd)
         {
             try
             {
@@ -459,7 +495,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult ModifyPasswd(long id, string pwdOld, string pwd)
+        public static OperateResult  ModifyPasswd(long id, string pwdOld, string pwd)
         {
             try
             {
@@ -522,7 +558,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Lock(long id)
+        public static OperateResult  Lock(long id)
         {
             try
             {

@@ -3,12 +3,18 @@ using Apps.Model.Leave;
 using Apps.Model.Utility;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
+using Apps.BLL.Utility;
 
 namespace Apps.BLL
 {
 
+    /// <summary>
+    /// 分析维度
+    /// </summary>
     public class Dimension
     {
         public string dimension { get; set; }
@@ -18,257 +24,77 @@ namespace Apps.BLL
 
     }
 
+
     public class LeaveManager
     {
+        public static double LeaveLimitPercent = 0.6;
+
+        public delegate OperateResult CalItem(Employee e);
+        public delegate double AnalyzeItem(Employee e);
+
+        /// <summary>
+        /// 员工离职后，把该员工数据信息录入离职数据库
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static OperateResult Leave(Employee model)
         {
+            if (model == null)
+            {
+                return new OperateResult
+                {
+                    content = "离职员工数据为null"
+                };
+            }
             try
             {
                 using (DbHelperLeave db = new DbHelperLeave())
                 {
-                    ///// 离职记录基数表
-                    //#region 
-                    //if (model.address != null)
-                    //{
-                    //    LeaveRecord m = new LeaveRecord
-                    //    {
-                    //        employeeId = model.id,
-                    //    };
-                    //    db.leaveRecordList.Add(m);
-                    //}
-                    //#endregion
+                    EmployeeLeave employee = Model.Utility.Utility.AutoCopy<Employee, EmployeeLeave>(model);
 
-                    ///薪资
+                    // 岗位
+                    #region
+                    using (SystemDB dbBase = new SystemDB())
+                    {
+                        var postInfo = (from e in dbBase.postInfoList
+                                        where e.id == model.postId
+                                        select e
+                                ).FirstOrDefault();
+                        if (postInfo != null)
+                        {
+                            employee.postName = postInfo.name;
+                        }
+                    }
+                    #endregion
+
+                    //薪资
                     #region 
                     using (SystemDB dbBase = new SystemDB())
                     {
                         var salary = (from e in dbBase.salaryInfoList
                                       where e.id == model.salaryInfoId
                                       select e).FirstOrDefault();
-
-                        LeaveSalary m = new LeaveSalary
+                        if (salary != null)
                         {
-                            employeeId = model.id,
-                            salary = salary.GetSalaryTotal()
-                        };
-                        db.salaryList.Add(m);
+                            OperateResult or = SalaryRecordManager.GetSalaryAveById(model.id);
 
-                    }
-
-                    if (model.address != null)
-                    {
-                        LeaveAddress m = new LeaveAddress
-                        {
-                            employeeId = model.id,
-                            address = model.address,
-                        };
-
-                        CompanyManager manger = new CompanyManager();
-                        OperateResult or = manger.GetFirst();
-                        if (or.data != null)
-                        {
-                            Company c = or.data as Company;
-                            m.toCompanyDistance = MapHelper.GetTowPointDistance(model.address, c.address);
-
-                            db.addressList.Add(m);
-
+                            if (or.status == OperateStatus.Success)
+                            {
+                                employee.salary = salary.GetSalaryTotal();
+                                employee.salaryAverage = (double)or.data;
+                            }
                         }
-                    }
-                    #endregion
-
-
-                    ///居住地
-                    #region 
-                    if (model.address != null)
-                    {
-                        LeaveAddress m = new LeaveAddress
-                        {
-                            employeeId = model.id,
-                            address = model.address,
-                        };
-
-                        CompanyManager manger = new CompanyManager();
-                        OperateResult or = manger.GetFirst();
-                        if (or.data != null)
-                        {
-                            Company c = or.data as Company;
-                            m.toCompanyDistance = MapHelper.GetTowPointDistance(model.address, c.address);
-
-                            db.addressList.Add(m);
-
-                        }
-                    }
-                    #endregion
-
-                    ///年龄
-                    #region 
-                    if (model.birthday != null)
-                    {
-                        LeaveAge m = new LeaveAge
-                        {
-                            employeeId = model.id,
-                            age = Model.Utility.Utility.CalYears(model.birthday, DateTime.Now),
-                        };
-                        db.ageList.Add(m);
 
                     }
                     #endregion
 
-                    ///部门
-                    #region 
-                    LeaveDepartment department = new LeaveDepartment
-                    {
-                        employeeId = model.id,
-                        departmentId = model.departmentId,
-                    };
-                    db.departmentList.Add(department);
-                    #endregion
 
-                    ///学历
-                    #region 
-                    if (model.education != null)
-                    {
-                        LeaveEducation m = new LeaveEducation
-                        {
-                            employeeId = model.id,
-                            education = model.education,
-                        };
-                        db.educationList.Add(m);
-
-                    }
-                    #endregion
-
-                    ///学历
-                    #region 
-                    if (model.education != null)
-                    {
-                        LeaveEducation m = new LeaveEducation
-                        {
-                            employeeId = model.id,
-                            education = model.education,
-                        };
-                        db.educationList.Add(m);
-
-                    }
-                    #endregion
-
-                    ///工作年限
-                    #region 
-                    LeaveExperience experience = new LeaveExperience
-                    {
-                        employeeId = model.id,
-                        experience = model.experience != null ? model.experience.Value : 0
-                    };
-                    if (model.entryDate != null && model.leaveDate != null)
-                    {
-                        experience.experience += Model.Utility.Utility.CalYears(model.entryDate.Value, model.leaveDate.Value);
-                    }
-
-
-                    db.experienceList.Add(experience);
-
-                    #endregion
-
-                    ///婚姻状况
-                    #region 
-                    if (model.marriage != null)
-                    {
-                        LeaveMarriage m = new LeaveMarriage
-                        {
-                            employeeId = model.id,
-                            marriage = model.marriage,
-                        };
-                        db.marriageList.Add(m);
-
-                    }
-                    #endregion
-
-                    ///民族
-                    #region 
-                    if (model.nation != null)
-                    {
-                        LeaveNation m = new LeaveNation
-                        {
-                            employeeId = model.id,
-                            nation = model.nation,
-                        };
-                        db.nationList.Add(m);
-
-                    }
-                    #endregion
-
-                    ///籍贯
-                    #region 
-                    if (model.nativePlace != null)
-                    {
-                        LeaveNativePlace m = new LeaveNativePlace
-                        {
-                            employeeId = model.id,
-                            nativePlace = model.nativePlace,
-                        };
-                        db.nativePlaceList.Add(m);
-
-                    }
-                    #endregion
-
-                    ///政治面貌
-                    #region 
-                    if (model.political != null)
-                    {
-                        LeavePolitical m = new LeavePolitical
-                        {
-                            employeeId = model.id,
-                            political = model.political,
-                        };
-                        db.politicalList.Add(m);
-
-                    }
-                    #endregion
-
-                    ///性别
-                    #region 
-                    if (model.sex != null)
-                    {
-                        LeaveSex m = new LeaveSex
-                        {
-                            employeeId = model.id,
-                            sex = model.sex,
-                        };
-                        db.sexList.Add(m);
-
-                    }
-                    #endregion
-
-                    ///人才来源
-                    #region 
-                    if (model.source != null)
-                    {
-                        LeaveSource m = new LeaveSource
-                        {
-                            employeeId = model.id,
-                            source = model.source,
-                        };
-                        db.sourceList.Add(m);
-
-                    }
-                    #endregion
-
-                    ///司龄
-                    #region 
-                    if (model.entryDate != null && model.leaveDate != null)
-                    {
-                        LeaveWorkAge m = new LeaveWorkAge
-                        {
-                            employeeId = model.id,
-                            workAge = Model.Utility.Utility.CalYears(model.entryDate.Value, model.leaveDate.Value),
-                        };
-
-                        db.workAgeList.Add(m);
-
-                    }
-                    #endregion
-
+                    // 离职记录基数表
+                    #region
+                    db.EmployeeLeaveList.Add(employee);
                     db.SaveChanges();
+
+                    #endregion
 
                     return new OperateResult
                     {
@@ -287,109 +113,43 @@ namespace Apps.BLL
         }
 
 
-        /// <summary>
-        /// 以给定样本的[最小值,平均值]，[平均值,最大值]作为上下两个区间各划分50个刻度（50分）
-        /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
-        /// <param name="ave"></param>
-        /// <param name="val"></param>
-        /// <returns>分数</returns>
-        private static double CalAddressScore(double min, double max, double ave, double val)
+
+        public static OperateResult RemoveAll()
         {
-            if (max == ave) //单个样本，或者所有样本相同
+            try
             {
-                if (val > max)
+                using (DbHelperLeave db = new DbHelperLeave())
                 {
-                    return 100;
-                }
-                else
-                {
-                    return 0;
+                    db.EmployeeLeaveList.RemoveRange(db.EmployeeLeaveList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有离职员工"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
                 }
             }
-            else
+            catch (Exception ex)
             {
-                double score = 0;
-                if (val > ave)
+                return new OperateResult
                 {
-                    score = 50 + (val - ave) / (max - ave) * 50;
-                }
-                else
-                {
-                    score = (ave - val) / (ave - min) * 50;
-                }
-                if (score > 100)
-                {
-                    score = 100;
-                }
-                return score;
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
             }
+
         }
 
-        private static double CalAgeScore(long min, long max, double ave, int val)
-        {
-            if (max == ave) //单个样本，或者所有样本相同
-            {
-                if (val == max)
-                {
-                    return 100;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            else
-            {
-                double score = 0;
-                if (val > ave)
-                {
-                    score = 100 - (val - ave) / (max - ave) * 100;
-                }
-                else
-                {
-                    score = 100 - (ave - val) / (ave - min) * 50;
-                }
-                if (score > 100)
-                {
-                    score = 100;
-                }
-                return score;
-            }
-        }
-
-        private static double CalSalaryScore(double min, double max, double ave, double val)
-        {
-            if (max == ave) //单个样本，或者所有样本相同
-            {
-                if (val == max)
-                {
-                    return 100;
-                }
-                else
-                {
-                    return 0;
-                }
-            }
-            else
-            {
-                double score = 0;
-                if (val > ave)
-                {
-                    score = 50 - (val - ave) / (max - ave) * 50;
-                }
-                else
-                {
-                    score = 50 + (ave - val) / (ave - min) * 50;
-                }
-                if (score > 100)
-                {
-                    score = 100;
-                }
-                return score;
-            }
-        }
 
         public static OperateResult LeaveWarning(QueryParam param = null)
         {
@@ -398,138 +158,12 @@ namespace Apps.BLL
                 DbHelperLeave dbLeave = new DbHelperLeave();
                 SystemDB db = new SystemDB();
 
-                /// 计算历史库样本值
-                #region
-
-                // 到公司距离
-                #region
-                double min = 0;
-                double max = 0;
-                double ave = 0;
-                try
-                {
-                    min = (from e in dbLeave.addressList.AsEnumerable()
-                           let dis = e.toCompanyDistance
-                           select e.toCompanyDistance).Min();
-                    max = (from e in dbLeave.addressList
-                           select e.toCompanyDistance).Max();
-                    ave = (from e in dbLeave.addressList
-                           select e.toCompanyDistance).Average();
-
-                }
-                catch (Exception)
-                {
-                }
-
-
-                var addressSample = new
-                {
-                    min,
-                    max,
-                    ave
-                };
-
-                #endregion
-
-                // 年龄
-                #region
-                long ageMin = 0;
-                long ageMax = 0;
-                double ageAve = 0;
-
-                try
-                {
-                    ageMin = (from e in dbLeave.ageList
-                              select e.age).Min();
-                    ageMax = (from e in dbLeave.ageList
-                              select e.age).Max();
-                    ageAve = (from e in dbLeave.ageList
-                              select e.age).Average();
-
-                }
-                catch (Exception )
-                {
-                }
-
-
-                var ageSample = new
-                {
-                    min = ageMin,
-                    max = ageMax,
-                    ave = ageAve
-                };
-
-                #endregion
-
-
-                // 工资
-                #region
-
-                double salaryMin = 0;
-                double salaryMax = 0;
-                double salaryAve = 0;
-
-                try
-                {
-                    salaryMin = (from e in dbLeave.salaryList
-                                 select e.salary).Min();
-                    salaryMax = (from e in dbLeave.salaryList
-                                 select e.salary).Max();
-                    salaryAve = (from e in dbLeave.salaryList
-                                 select e.salary).Average();
-                }
-                catch (Exception )
-                {
-                }
-
-                var salarySample = new
-                {
-                    min = salaryMin,
-                    max = salaryMax,
-                    ave = salaryAve
-                };
-
-                #endregion
-
-
-
-                #endregion
-
-
-                /// 预警计算
-                #region
+                
                 var company = (from e in db.companyList
                                select e).FirstOrDefault();
 
-                var elements = from e in db.employeeList.Include("department").AsEnumerable()
-                               join s in db.salaryInfoList on e.salaryInfoId equals s.id
-                               let salary = s.GetSalaryTotal()
-                               let age = Model.Utility.Utility.CalYears(e.birthday, DateTime.Now)
-                               let distance = Model.Utility.MapHelper.GetTowPointDistance(company.address, e.address)
-                               let workAge = Model.Utility.Utility.CalYears(e.entryDate != null ? e.entryDate.Value : DateTime.Now, DateTime.Now)
-
-                               where e.state != "离职"
-                               select new
-                               {
-                                   e.id,
-                                   e.number,
-                                   e.name,
-                                   e.departmentId,
-                                   departmentName = e.department.name,
-
-                                   distance,
-                                   age,
-                                   e.education,
-                                   e.experience,
-                                   e.marriage,
-                                   e.nation,
-                                   e.nativePlace,
-                                   e.political,
-                                   salary,
-                                   e.sex,
-                                   e.source,
-                                   workAge
-                               };
+                var elements = db.employeeList.Include("department").Where(m => m.state != "离职")
+                    .Select(m => m );
 
                 // 先查询出部门及子部门，再过滤
                 #region
@@ -567,61 +201,33 @@ namespace Apps.BLL
                 }
                 #endregion
 
-                List<object> data = new List<object>();
 
-                foreach (var e in elements)
-                {
-                    List<Dimension> dimensions = new List<Dimension>();
+                /// 预警计算
+                #region
 
-                    var addressScore = CalAddressScore(addressSample.min, addressSample.max, addressSample.ave, e.distance);
-                    dimensions.Add(new Dimension
-                    {
-                        dimension = "居住地到公司距离",
-                        score = addressScore,
-                        value = e.distance,
-                        average = addressSample.ave
-                    });
-
-                    var ageScore = CalAgeScore(ageSample.min, ageSample.max, ageSample.ave, e.age);
-                    dimensions.Add(new Dimension
-                    {
-                        dimension = "年龄",
-                        score = ageScore,
-                        value = e.age,
-                        average = ageSample.ave
-                    });
-
-                    var salayScore = CalSalaryScore(salarySample.min, salarySample.min, salarySample.ave, e.salary);
-                    dimensions.Add(new Dimension
-                    {
-                        dimension = "薪资",
-                        score = salayScore,
-                        value = e.salary,
-                        average = salarySample.ave
-                    });
-                    var resultScore = (from d in dimensions
-                                       select d.score).Average();
-
-                    data.Add(new
+                var result = from e in elements.AsEnumerable()
+                    let age = Model.Utility.Utility.CalYears(e.birthday, DateTime.Now)
+                    let workAge = Model.Utility.Utility.CalMonths(e.entryDate ?? DateTime.Now, DateTime.Now)
+                    let resultScore = GetEmployeeLeaveDegree(e)
+                    select new
                     {
                         e.id,
-                        e.number,
                         e.name,
-                        e.departmentName,
-                        resultScore,
-                        dimensions
-                    });
+                        e.number,
+                        departmentName = e.department.name,
+                        postName = e.postInfo.name,
+                        age,
+                        workAge,
+                        resultScore
 
-                }
-
-
+                    };
                 #endregion
 
 
                 return new OperateResult
                 {
                     status = OperateStatus.Success,
-                    data = data,
+                    data = result.ToList(),
                 };
             }
             catch (Exception ex)
@@ -634,6 +240,1129 @@ namespace Apps.BLL
 
         }
 
+        public static double GetEmployeeLeaveDegree(Employee e)
+        {
+            Dictionary<AnalyzeItem, double> analyzeList = new Dictionary<AnalyzeItem, double>();
+            analyzeList.Add(AnalyzeByBigData, 0.3);
+            analyzeList.Add(AnalyzeBySalary, 0.3);
+            analyzeList.Add(AnalyzeByPostCrossAge, 0.15);
+            analyzeList.Add(AnalyzeByPostCrossWorkAge, 0.1);
+            analyzeList.Add(AnalyzeByAssessment, 0.15);
 
+            double percent = 0;
+
+            foreach (var fun in analyzeList)
+            {
+                double matchDegree = fun.Key(e);
+
+                percent += matchDegree * fun.Value;
+
+            }
+
+            if (percent < 0.3)
+            {
+                return 0.3;
+            }
+            else if (percent >= 0.3 && percent <= 0.4)
+            {
+                return 0.5;
+            }
+            else if (percent > 0.4 && percent <= 0.5)
+            {
+                return 0.55;
+            }
+            else if (percent > 0.5 && percent <= 0.6)
+            {
+                return 0.6;
+            }
+            else if (percent > 0.6 && percent <= 0.7)
+            {
+                return 0.7;
+            }
+            else if (percent > 0.7 && percent <= 0.8)
+            {
+                return 0.75;
+            }
+            else if (percent > 0.8)
+            {
+                return 0.8;
+            }
+
+            return 0.0;
+        }
+
+        #region 大数据计算
+
+        /// <summary>
+        /// 通过历史返回计算多条件的最终匹配度
+        /// </summary>
+        /// <param name="e"></param>
+        /// <returns></returns>
+        public static double AnalyzeByBigData(Employee e)
+        {
+            int condition = 0;
+            int count = 0;
+
+            List<CalItem> calFuns = new List<CalItem>();
+            calFuns.Add(CalPost);
+            calFuns.Add(CalAge);
+            calFuns.Add(CalEducation);
+            calFuns.Add(CalWorkAge);
+            calFuns.Add(CalSalaryActualTotal);
+
+            foreach (var fun in calFuns)
+            {
+                OperateResult or = fun(e);
+
+                if (or.status == OperateStatus.Success)
+                {
+                    condition++;
+                    bool fit = (bool)or.data;
+                    count = fit ? count + 1 : count;
+                }
+            }
+
+            if (count == 0 || condition == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return count / (double)condition;
+            }
+        }
+
+
+
+        /// <summary>
+        /// 岗位离职率占比相加达60%的岗位
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns>计算成功返回status返回success，如果成立则data返回true，否则返回false</returns>
+        private static OperateResult CalPost(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+
+                var total = dbLeave.EmployeeLeaveList.Count();
+                var count = 0;
+
+                var dimensionGroup = dbLeave.EmployeeLeaveList.GroupBy(g => g.postName)
+                    .Select(m => new {postName = m.Key, count = m.Count()})
+                    .OrderBy(m => m.count);
+
+                foreach (var item in dimensionGroup)
+                {
+                    count += item.count;
+                    if (item.postName == employee.postInfo.name)
+                    {
+                        double percent = count / (double)total;
+                        if (percent < LeaveLimitPercent)
+                        {
+                            return new OperateResult
+                            {
+                                status = OperateStatus.Success,
+                                data = true,
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+            return new OperateResult
+            {
+                status = OperateStatus.Success,
+                data = false,
+            };
+        }
+
+        /// <summary>
+        /// 年龄段离职率占比相加达60%的年龄段
+        /// 按照年为单元计算
+        /// </summary>
+        /// <param name="employee">未离职员工</param>
+        /// <returns>计算成功返回status返回success，如果成立则data返回true，否则返回false</returns>
+        private static OperateResult CalAge(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+
+                var total = dbLeave.EmployeeLeaveList.Count();
+                var count = 0;
+
+                int age = Model.Utility.Utility.CalYears(employee.birthday, DateTime.Now);
+
+                var dimensionGroup = dbLeave.EmployeeLeaveList.GroupBy(g => Model.Utility.Utility.CalYears(g.birthday, g.leaveDate.Value))
+                    .Select(m => new { age = m.Key, count = m.Count() })
+                    .OrderBy(m => m.count);
+
+                foreach (var item in dimensionGroup)
+                {
+                    count += item.count;
+                    if (item.age == age)
+                    {
+                        double percent = count / (double)total;
+                        if (percent < LeaveLimitPercent)
+                        {
+                            return new OperateResult
+                            {
+                                status = OperateStatus.Success,
+                                data = true,
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+            return new OperateResult
+            {
+                status = OperateStatus.Success,
+                data = false,
+            };
+        }
+
+
+        /// <summary>
+        /// 学历段离职率占比相加达60%的学历段
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns>计算成功返回status返回success，如果成立则data返回true，否则返回false</returns>
+        private static OperateResult CalEducation(Employee employee)
+        {
+            try 
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+
+                var total = dbLeave.EmployeeLeaveList.Count();
+                var count = 0;
+
+                var dimensionGroup = dbLeave.EmployeeLeaveList.GroupBy(g => g.education)
+                    .Select(m => new { education = m.Key, count = m.Count() })
+                    .OrderBy(m => m.count);
+
+                foreach (var item in dimensionGroup)
+                {
+                    count += item.count;
+                    if (item.education == employee.education)
+                    {
+                        double percent = count / (double)total;
+                        if (percent < LeaveLimitPercent)
+                        {
+                            return new OperateResult
+                            {
+                                status = OperateStatus.Success,
+                                data = true,
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+            return new OperateResult
+            {
+                status = OperateStatus.Success,
+                data = false,
+            };
+        }
+
+        /// <summary>
+        /// 司龄月数离职率占比相加达60%的司龄段
+        /// 按照月为单元计算
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns>计算成功返回status返回success，如果成立则data返回true，否则返回false</returns>
+        private static OperateResult CalWorkAge(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+
+                var total = dbLeave.EmployeeLeaveList.Count();
+                var count = 0;
+
+                //按照月计算
+                int workAge = Model.Utility.Utility.CalMonths(employee.entryDate.Value, DateTime.Now);
+
+                var dimensionGroup = dbLeave.EmployeeLeaveList.GroupBy(g => Model.Utility.Utility.CalMonths(g.entryDate.Value, g.leaveDate.Value))
+                    .Select(m => new { workAge = m.Key, count = m.Count() })
+                    .OrderBy(m => m.count);
+
+                foreach (var item in dimensionGroup)
+                {
+                    count += item.count;
+                    if (item.workAge == workAge)
+                    {
+                        double percent = count / (double)total;
+                        if (percent < LeaveLimitPercent)
+                        {
+                            return new OperateResult
+                            {
+                                status = OperateStatus.Success,
+                                data = true,
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+            return new OperateResult
+            {
+                status = OperateStatus.Success,
+                data = false,
+            };
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="employee">实发工资</param>
+        /// <returns>计算成功返回status返回success，如果成立则data返回true，否则返回false</returns>
+        private static OperateResult CalSalaryActualTotal(Employee employee)
+        { 
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                var total = dbLeave.EmployeeLeaveList.Count();
+                var count = 0;
+
+                var salaryInfo = db.salaryInfoList.Where(m => m.id == employee.salaryInfoId)
+                    .Select(m => m).FirstOrDefault();
+                if (salaryInfo == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "无薪酬信息",
+                    };
+                }
+
+                var actualTotal = salaryInfo.GetSalaryTotal();
+
+                var dimensionGroup = dbLeave.EmployeeLeaveList.GroupBy(g => g.salary)
+                    .Select(m => new { salary = m.Key, count = m.Count() })
+                    .OrderByDescending(m => m.count)
+                    .ThenBy(m => m.salary);
+
+                foreach (var item in dimensionGroup)
+                {
+                    count += item.count;
+                    if (item.salary == actualTotal)
+                    {
+                        double percent = count / (double)total;
+                        if (percent < LeaveLimitPercent)
+                        {
+                            return new OperateResult
+                            {
+                                status = OperateStatus.Success,
+                                data = true,
+                            };
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+            return new OperateResult
+            {
+                status = OperateStatus.Success,
+                data = false,
+            };
+        }
+
+        #endregion
+
+
+        #region 薪酬相关计算
+
+        public static double AnalyzeBySalary(Employee e)
+        {
+            int condition = 0;
+            int count = 0;
+
+            List<CalItem> calFuns = new List<CalItem>();
+            calFuns.Add(CalSalaryInDepInPost);
+            calFuns.Add(CalSalaryInDep);
+            calFuns.Add(CalSalaryInPost);
+            calFuns.Add(CalSalaryInHistoryPost);
+            calFuns.Add(CalSalaryPersonal);
+
+            foreach (var fun in calFuns)
+            {
+                OperateResult or = fun(e);
+
+                if (or.status == OperateStatus.Success)
+                {
+                    condition++;
+                    bool fit = (bool)or.data;
+                    count = fit ? count + 1 : count;
+                }
+            }
+
+            if (count == 0 || condition == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return count / (double)condition;
+            }
+        }
+
+        /// <summary>
+        /// 当月低于该部门该岗位平均实发工资
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalSalaryInDepInPost(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                //得到最近一次该员工的工资数据
+                var record = db.salaryRecordList.Where(m => m.assessmentInfo.employeeId == employee.id)
+                    .OrderByDescending(m => m.assessmentInfo.month)
+                    .Select(m=>m).FirstOrDefault();
+
+                if (record == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "还未存在工资数据，无法就行分析",
+                    };
+                }
+
+                //得到最近一月部门内该岗位平均工资
+                var ave = db.salaryRecordList.Where(m => m.assessmentInfo.month == record.assessmentInfo.month
+                                                         && m.assessmentInfo.employee.departmentId ==
+                                                         record.assessmentInfo.employee.departmentId
+                                                         && m.assessmentInfo.employee.postId ==
+                                                         record.assessmentInfo.employee.postId)
+                    .Average(m => m.actualTotal);
+
+                if (record.actualTotal < ave)
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = true
+                    };
+                }
+                else
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = false
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        /// <summary>
+        /// 当月低于该部门平均工资
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalSalaryInDep(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                //得到最近一次该员工的工资数据
+                var record = db.salaryRecordList.Where(m => m.assessmentInfo.employeeId == employee.id)
+                    .OrderByDescending(m => m.assessmentInfo.month)
+                    .Select(m => m).FirstOrDefault();
+
+                if (record == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "还未存在工资数据，无法就行分析",
+                    };
+                }
+
+                //得到最近一月部门内平均工资
+                var ave = db.salaryRecordList.Where(m => m.assessmentInfo.month == record.assessmentInfo.month
+                                                         && m.assessmentInfo.employee.departmentId ==
+                                                         record.assessmentInfo.employee.departmentId)
+                    .Average(m => m.actualTotal);
+
+                if (record.actualTotal < ave)
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = true
+                    };
+                }
+                else
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = false
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        /// <summary>
+        /// 当月低于该全体该岗位平均工资
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalSalaryInPost(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                //得到最近一次该员工的工资数据
+                var record = db.salaryRecordList.Where(m => m.assessmentInfo.employeeId == employee.id)
+                    .OrderByDescending(m => m.assessmentInfo.month)
+                    .Select(m => m).FirstOrDefault();
+
+                if (record == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "还未存在工资数据，无法就行分析",
+                    };
+                }
+
+                //得到最近一月部门内平均工资
+                var ave = db.salaryRecordList.Where(m => m.assessmentInfo.month == record.assessmentInfo.month
+                                                         && m.assessmentInfo.employee.postId ==
+                                                         record.assessmentInfo.employee.postId)
+                    .Average(m => m.actualTotal);
+
+                if (record.actualTotal < ave)
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = true
+                    };
+                }
+                else
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = false
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        /// <summary>
+        /// 当月实发工资小于或等于该岗位已离职员工平均工资
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalSalaryInHistoryPost(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                //得到最近一次该员工的工资数据
+                var record = db.salaryRecordList.Where(m => m.assessmentInfo.employeeId == employee.id)
+                    .OrderByDescending(m => m.assessmentInfo.month)
+                    .Select(m => m).FirstOrDefault();
+
+                if (record == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "还未存在工资数据，无法就行分析",
+                    };
+                }
+
+                var ave = (from s in db.salaryRecordList
+                    join e in dbLeave.EmployeeLeaveList on s.assessmentInfo.employeeId equals e.id
+                    where e.postId == employee.postId
+                    select s.actualTotal).Average();
+
+                if (record.actualTotal < ave)
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = true
+                    };
+                }
+                else
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = false
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+        /// <summary>
+        /// 当月低于其上三个月平均实发工资
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalSalaryPersonal(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                //得到最近一次该员工的工资数据
+                var record = db.salaryRecordList.Where(m => m.assessmentInfo.employeeId == employee.id)
+                    .OrderByDescending(m => m.assessmentInfo.month)
+                    .Select(m => m).FirstOrDefault();
+
+                if (record == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "还未存在工资数据，无法就行分析",
+                    };
+                }
+
+                //得到该员工平均工资
+                var ave = db.salaryRecordList.Where(m => m.assessmentInfo.employeeId == employee.id)
+                    .OrderByDescending(m => m.assessmentInfo.month)
+                    .Skip(1).Take(3)
+                    .Average(m => m.actualTotal);
+
+                if (record.actualTotal < ave)
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = true
+                    };
+                }
+                else
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = false
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+        #endregion
+
+        #region 交叉计算
+
+        public static double AnalyzeByPostCrossAge(Employee e)
+        {
+            int condition = 0;
+            int count = 0;
+
+            List<CalItem> calFuns = new List<CalItem>();
+            calFuns.Add(CalPostCrossAge);
+
+            foreach (var fun in calFuns)
+            {
+                OperateResult or = fun(e);
+
+                if (or.status == OperateStatus.Success)
+                {
+                    condition++;
+                    bool fit = (bool)or.data;
+                    count = fit ? count + 1 : count;
+                }
+            }
+
+            if (count == 0 || condition == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return count / (double)condition;
+            }
+        }
+
+        public static double AnalyzeByPostCrossWorkAge(Employee e)
+        {
+            int condition = 0;
+            int count = 0;
+
+            List<CalItem> calFuns = new List<CalItem>();
+            calFuns.Add(CalPostCrossWorkAge);
+
+            foreach (var fun in calFuns)
+            {
+                OperateResult or = fun(e);
+
+                if (or.status == OperateStatus.Success)
+                {
+                    condition++;
+                    bool fit = (bool)or.data;
+                    count = fit ? count + 1 : count;
+                }
+            }
+
+            if (count == 0 || condition == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return count / (double)condition;
+            }
+        }
+
+        private class StageItem
+        {
+            public int min { get; set; }
+            public int max { get; set; }
+            public int count { get; set; }
+        }
+
+        /// <summary>
+        /// 岗位与年龄交叉计算
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalPostCrossAge(Employee employee)
+        {
+            List<StageItem> liststageItems = new List<StageItem>();
+            liststageItems.Add(new StageItem { min = 0, max = 18 });
+            liststageItems.Add(new StageItem { min = 19, max = 22 });
+            liststageItems.Add(new StageItem { min = 23, max = 25 });
+            liststageItems.Add(new StageItem { min = 26, max = 29 });
+            liststageItems.Add(new StageItem { min = 29, max = 31 });
+            liststageItems.Add(new StageItem { min = 32, max = 35 });
+            liststageItems.Add(new StageItem { min = 36, max = 40 });
+            liststageItems.Add(new StageItem { min = 41, max = 45 });
+            liststageItems.Add(new StageItem { min = 46, max = 100 });
+
+            int employeeAge = Model.Utility.Utility.CalYears(employee.birthday, DateTime.Now);
+
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                foreach (var stageItem in liststageItems)
+                {
+                    var count = (from e in dbLeave.EmployeeLeaveList
+                        where e.postId == employee.id
+                        let age = Model.Utility.Utility.CalYears(e.birthday, e.leaveDate.Value)
+                        where age >= stageItem.min && age <= stageItem.max
+                        select e).Count();
+
+                    stageItem.count = count;
+                }
+
+                // 排序
+                var orderList = liststageItems.OrderByDescending(m => m.count);
+                double rate = 1 / orderList.Count();
+                double percent = 1.0;
+
+                foreach (var stageItem in orderList)
+                {
+                    if (employeeAge >= stageItem.min && employeeAge <= stageItem.max)
+                    {
+                        return new OperateResult
+                        {
+                            status = OperateStatus.Success,
+                            data = percent
+                        };
+                    }
+
+                    percent -= rate;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+            return new OperateResult
+            {
+                status = OperateStatus.Error,
+            };
+        }
+
+        /// <summary>
+        /// 岗位与司龄交叉计算
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalPostCrossWorkAge(Employee employee)
+        {
+            List<StageItem> liststageItems = new List<StageItem>();
+            liststageItems.Add(new StageItem { min = 0, max = 1 });
+            liststageItems.Add(new StageItem { min = 2, max = 2 });
+            liststageItems.Add(new StageItem { min = 3, max = 3 });
+            liststageItems.Add(new StageItem { min = 4, max = 4 });
+            liststageItems.Add(new StageItem { min = 5, max = 5 });
+            liststageItems.Add(new StageItem { min = 6, max = 6 });
+            liststageItems.Add(new StageItem { min = 7, max = 7 });
+            liststageItems.Add(new StageItem { min = 8, max = 8 });
+            liststageItems.Add(new StageItem { min = 9, max = 9 });
+            liststageItems.Add(new StageItem { min = 10, max = 10 });
+            liststageItems.Add(new StageItem { min = 11, max = 11 });
+            liststageItems.Add(new StageItem { min = 12, max = 23 });
+            liststageItems.Add(new StageItem { min = 24, max = 35 });
+            liststageItems.Add(new StageItem { min = 36, max = 47 });
+            liststageItems.Add(new StageItem { min = 48, max = 59 });
+            liststageItems.Add(new StageItem { min = 60, max = 1200 });
+
+            int employeeAge = Model.Utility.Utility.CalMonths(employee.entryDate.Value, DateTime.Now);
+
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                foreach (var stageItem in liststageItems)
+                {
+                    var count = (from e in dbLeave.EmployeeLeaveList
+                                 where e.postId == employee.id
+                                 let age = Model.Utility.Utility.CalMonths(e.entryDate.Value, e.leaveDate.Value)
+                                 where age >= stageItem.min && age <= stageItem.max
+                                 select e).Count();
+
+                    stageItem.count = count;
+                }
+
+                // 排序
+                var orderList = liststageItems.OrderByDescending(m => m.count);
+                double rate = 1 / orderList.Count();
+                double percent = 1.0;
+
+                foreach (var stageItem in orderList)
+                {
+                    if (employeeAge >= stageItem.min && employeeAge <= stageItem.max)
+                    {
+                        return new OperateResult
+                        {
+                            status = OperateStatus.Success,
+                            data = percent
+                        };
+                    }
+
+                    percent -= rate;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+            return new OperateResult
+            {
+                status = OperateStatus.Error,
+            };
+        }
+
+        #endregion
+
+
+
+        #region 考核相关计算
+
+        public static double AnalyzeByAssessment(Employee e)
+        {
+            int condition = 0;
+            int count = 0;
+
+            List<CalItem> calFuns = new List<CalItem>();
+            calFuns.Add(CalAssessmentInDep);
+            calFuns.Add(CalAssessmentInCompany);
+            calFuns.Add(CalAssessmentInHistory);
+
+            foreach (var fun in calFuns)
+            {
+                OperateResult or = fun(e);
+
+                if (or.status == OperateStatus.Success)
+                {
+                    condition++;
+                    bool fit = (bool)or.data;
+                    count = fit ? count + 1 : count;
+                }
+            }
+
+            if (count == 0 || condition == 0)
+            {
+                return 0;
+            }
+            else
+            {
+                return count / (double)condition;
+            }
+        }
+        /// <summary>
+        /// 当月低于该部门平均考核分
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalAssessmentInDep(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                //得到最近一次该员工的工资数据
+                var record = db.assessmentInfoList.Where(m => m.employeeId == employee.id)
+                    .OrderByDescending(m => m.month)
+                    .Select(m => m).FirstOrDefault();
+
+                if (record == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "还未存在考核数据，无法就行分析",
+                    };
+                }
+
+                //得到最近一次部门内考核得分
+                var ave = db.assessmentInfoList.Where(m => m.employee.departmentId == employee.departmentId
+                                                           && m.month == record.month)
+                        .Select(m => m)
+                        .Average(m => m.performanceScore);
+
+                if (record.performanceScore < ave)
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = true
+                    };
+                }
+                else
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = false
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        /// <summary>
+        /// 当月低于该公司平均考核分
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalAssessmentInCompany(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                //得到最近一次该员工的工资数据
+                var record = db.assessmentInfoList.Where(m => m.employeeId == employee.id)
+                    .OrderByDescending(m => m.month)
+                    .Select(m => m).FirstOrDefault();
+
+                if (record == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "还未存在考核数据，无法就行分析",
+                    };
+                }
+
+                //得到最近一次部门内考核得分
+                var ave = db.assessmentInfoList.Where(m => m.month == record.month)
+                    .Select(m => m)
+                    .Average(m => m.performanceScore);
+
+                if (record.performanceScore < ave)
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = true
+                    };
+                }
+                else
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = false
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        /// <summary>
+        /// 当月考核分低于其上三个月平均考核分
+        /// </summary>
+        /// <param name="employee"></param>
+        /// <returns></returns>
+        private static OperateResult CalAssessmentInHistory(Employee employee)
+        {
+            try
+            {
+                DbHelperLeave dbLeave = new DbHelperLeave();
+                var db = new SystemDB();
+
+                //得到最近一次该员工的工资数据
+                var record = db.assessmentInfoList.Where(m => m.employeeId == employee.id)
+                    .OrderByDescending(m => m.month)
+                    .Select(m => m).FirstOrDefault();
+
+                if (record == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "还未存在考核数据，无法就行分析",
+                    };
+                }
+
+                //得到上三次部门内考核得分
+                var ave = db.assessmentInfoList.Where(m => m.employeeId == employee.id)
+                    .OrderByDescending(m => m.month)
+                    .Skip(1).Take(3)
+                    .Select(m => m)
+                    .Average(m => m.performanceScore);
+
+                if (record.performanceScore < ave)
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = true
+                    };
+                }
+                else
+                {
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = false
+                    };
+                }
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+        #endregion
     }
 }

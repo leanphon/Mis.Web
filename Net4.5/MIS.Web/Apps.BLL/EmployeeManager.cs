@@ -19,7 +19,7 @@ namespace Apps.BLL
 
     public class EmployeeManager
     {
-        public OperateResult Add(Employee model)
+        public static OperateResult  Add(Employee model)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult Remove(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -121,18 +121,60 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Update(Employee model)
+
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.employeeCareerList.RemoveRange(db.employeeCareerList.ToList());
+
+                    db.employeeList.RemoveRange(db.employeeList.ToList());
+
+                    db.salaryInfoList.RemoveRange(db.salaryInfoList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有员工"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+
+        public static OperateResult  Update(Employee model)
         {
             try
             {
                 using (SystemDB db = new SystemDB())
                 {
 
-                    var elements = (from e in db.employeeList
+                    var element = (from e in db.employeeList
                                     where e.id != model.id && e.number == model.number
                                     select e
-                                    ).ToList();
-                    if (elements.Count() >= 1)
+                                    ).FirstOrDefault();
+                    if (element != null)
                     {
                         return new OperateResult
                         {
@@ -140,6 +182,20 @@ namespace Apps.BLL
                         };
                     }
 
+                    var employee = (from e in db.employeeList
+                            where e.id == model.id
+                            select e
+                        ).AsNoTracking().FirstOrDefault();
+                    if (employee == null)
+                    {
+                        return new OperateResult
+                        {
+                            content = "不存在的员工",
+                        };
+                    }
+
+                    model.postId = employee.postId;
+                    model.salaryInfoId = employee.salaryInfoId;
 
                     db.Entry(model).State = System.Data.Entity.EntityState.Modified;
 
@@ -171,7 +227,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetSalaryInfoById(long id)
+        public static OperateResult  GetSalaryInfoById(long id)
         {
             try
             {
@@ -211,7 +267,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult UpdatePost(long employeeId, long postId)
+        public static OperateResult  UpdatePost(long employeeId, long postId)
         {
             try
             {
@@ -258,7 +314,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult UpdateSalary(long employeeId, SalaryInfo model)
+        public static OperateResult  UpdateSalary(long employeeId, SalaryInfo model)
         {
             try
             {
@@ -282,8 +338,20 @@ namespace Apps.BLL
 
                     if (elements.Count() == 1)
                     {
-                        db.Entry(model).State = System.Data.Entity.EntityState.Modified;
-                        db.SaveChanges();
+                        if (model.levelId != null || model.performanceId != null
+                                                  || model.benefitId != null)
+                        {
+                            db.Entry(model).State = System.Data.Entity.EntityState.Modified;
+                            db.SaveChanges();
+
+                            LogManager.Add(new LogRecord
+                            {
+                                userId = SessionHelper.GetUserId(),
+                                time = DateTime.Now,
+                                type = "Info",
+                                content = "修改员工薪酬：" + employee.number
+                            });
+                        }
                     }
                     else
                     {
@@ -295,15 +363,15 @@ namespace Apps.BLL
                         employee.salaryInfoId = model.id;
                         db.Entry(employee).State = EntityState.Modified;
                         db.SaveChanges();
-                    }
 
-                    LogManager.Add(new LogRecord
-                    {
-                        userId = SessionHelper.GetUserId(),
-                        time = DateTime.Now,
-                        type = "Info",
-                        content = "修改员工薪酬：" + employee.number
-                    });
+                        LogManager.Add(new LogRecord
+                        {
+                            userId = SessionHelper.GetUserId(),
+                            time = DateTime.Now,
+                            type = "Info",
+                            content = "新建员工薪酬：" + employee.number
+                        });
+                    }
 
 
                     return new OperateResult
@@ -324,7 +392,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Formal(long id, string state, DateTime time)
+        public static OperateResult  Formal(long id, string state, DateTime time)
         {
             try
             {
@@ -376,7 +444,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult Leave(long id, string state, DateTime time)
+        public static OperateResult  Leave(long id, string state, DateTime time)
         {
             try
             {
@@ -431,7 +499,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult SelectDepartment(long id, long departmentId)
+        public static OperateResult  SelectDepartment(long id, long departmentId)
         {
             try
             {
@@ -483,7 +551,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -524,7 +592,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -584,7 +652,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {
@@ -672,10 +740,7 @@ namespace Apps.BLL
                         if (param.filters.Keys.Contains("employeeName"))
                         {
                             var p = param.filters["employeeName"];
-                            //elements = elements.Where(t => t.name.Contains(p.value));
-                            //elements = elements.Where(t => t.name==p.value);
                             elements = elements.Where(t => t.name.Contains(p.value));
-                            int nn = elements.Count();
                         }
                     }
                     #endregion
@@ -692,8 +757,6 @@ namespace Apps.BLL
                     }
                     #endregion
                             
-
-
                     int total = elements.Count();
                     int pages = 0;
                     Pager pager = param.pager;
@@ -741,7 +804,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetEmployeeContractByPager(QueryParam param = null)
+        public static OperateResult  GetEmployeeContractByPager(QueryParam param = null)
         {
             try
             {
@@ -883,7 +946,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetEmployeeBirthdayByPager(QueryParam param = null)
+        public static OperateResult  GetEmployeeBirthdayByPager(QueryParam param = null)
         {
             try
             {
@@ -1024,7 +1087,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult AddCareerRecordBatch(long employeeId, List<EmployeeCareerRecord> lstData)
+        public static OperateResult  AddCareerRecordBatch(long employeeId, List<EmployeeCareerRecord> lstData)
         {
             try
             {
@@ -1073,7 +1136,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult RemoveCareerRecord(long id)
+        public static OperateResult  RemoveCareerRecord(long id)
         {
             try
             {
@@ -1115,7 +1178,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult UpdateCareerRecord(EmployeeCareerRecord model)
+        public static OperateResult  UpdateCareerRecord(EmployeeCareerRecord model)
         {
             try
             {
@@ -1146,7 +1209,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetCareerRecordById(long id)
+        public static OperateResult  GetCareerRecordById(long id)
         {
             try
             {
@@ -1184,7 +1247,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetCareerRecordsById(long employeeId)
+        public static OperateResult  GetCareerRecordsById(long employeeId)
         {
             try
             {
@@ -1222,7 +1285,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetAllCareerRecords(QueryParam param = null)
+        public static OperateResult  GetAllCareerRecords(QueryParam param = null)
         {
             try
             {
@@ -1323,7 +1386,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult GetAllCareerRecordByPager(QueryParam param = null)
+        public static OperateResult  GetAllCareerRecordByPager(QueryParam param = null)
         {
             try
             {
@@ -1338,9 +1401,11 @@ namespace Apps.BLL
                                        e.type,
                                        e.time,
                                        e.description,
-                                       e.employee.name,
-                                       e.employee.state,
-                                       e.employee.departmentId
+                                       employeeName = e.employee.name,
+                                       employeeNumber = e.employee.number,
+                                       employeeState = e.employee.state,
+                                       e.employee.departmentId,
+                                       departmentName = e.employee.department.name
                                    };
 
 
@@ -1390,7 +1455,7 @@ namespace Apps.BLL
                         if (param.filters.Keys.Contains("employeeName"))
                         {
                             var p = param.filters["employeeName"];
-                            elements = elements.Where(t => t.name.Contains(p.value));
+                            elements = elements.Where(t => t.employeeName.Contains(p.value));
                         }
 
                         #endregion
@@ -1401,7 +1466,7 @@ namespace Apps.BLL
                         if (param.filters.Keys.Contains("state"))
                         {
                             var p = param.filters["state"];
-                            elements = elements.Where(t => p.value.Contains(t.state));
+                            elements = elements.Where(t => p.value.Contains(t.employeeState));
                         }
                         #endregion
                     }
@@ -1461,7 +1526,7 @@ namespace Apps.BLL
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        public OperateResult ExportAll(QueryParam param = null)
+        public static OperateResult  ExportAll(QueryParam param = null)
         {
             try
             {
@@ -1624,7 +1689,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult ImportExcel(string fileName)
+        public static OperateResult  ImportExcel(string fileName)
         {
             List<EmployeeExport> query = new List<EmployeeExport>();
             try
@@ -1759,7 +1824,144 @@ namespace Apps.BLL
             return result;
         }
 
-        public OperateResult AnalyseByAge(QueryParam param = null)
+
+
+        /// <summary>
+        /// 返回值中的data是DataTable
+        /// </summary>
+        /// <param name="queryParam"></param>
+        /// <returns></returns>
+        public static OperateResult  ExportCareerAll(QueryParam param = null)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    var elements = from e in db.employeeCareerList.Include("employee")
+                        orderby e.time descending
+                        select new
+                        {
+                            e.id,
+                            e.type,
+                            e.time,
+                            e.description,
+                            employeeName = e.employee.name,
+                            employeeNumber = e.employee.number,
+                            employeeState = e.employee.state,
+                            e.employee.departmentId,
+                            departmentName = e.employee.department.name
+                        };
+
+                    if (param != null && param.filters != null)
+                    {
+                        // 先查询出部门及子部门，再过滤
+
+                        #region
+
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+
+                        #endregion
+
+                        // 模糊过滤名字
+
+                        #region
+
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.employeeName.Contains(p.value));
+                        }
+
+                        #endregion
+
+                        // 过滤状态
+
+                        #region
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.employeeState));
+                        }
+                        #endregion
+                    }
+
+                    long rowIndex = 1;
+                    var results = from e in elements.AsEnumerable()
+                                  let index = rowIndex++
+                                  select new EmployeeCareerRecordExport
+                                  {
+                                      index = index,
+                                      employeeName = e.employeeName,
+                                      employeeNumber = e.employeeNumber,
+                                      departmentName = e.departmentName,
+                                      type = e.type,
+                                      time = e.time,
+                                      description = e.description
+                                  };
+
+
+                    DataTable dt = DataTableHelper.ToDataTable<EmployeeCareerRecordExport>(results.ToList());
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "导出员工信息："
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "导出成功",
+                        data = dt,
+                    };
+
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+
+
+        public static OperateResult  AnalyseByAge(QueryParam param = null)
         {
             try
             {
@@ -1869,7 +2071,7 @@ namespace Apps.BLL
         }
 
 
-        public OperateResult AnalyseByGender(QueryParam param = null)
+        public static OperateResult  AnalyseByGender(QueryParam param = null)
         {
             try
             {
@@ -1976,7 +2178,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult AnalyseByWorkAge(QueryParam param = null)
+        public static OperateResult  AnalyseByWorkAge(QueryParam param = null)
         {
             try
             {
@@ -2098,7 +2300,7 @@ namespace Apps.BLL
             public int count { get; set; }
 
         }
-        public OperateResult AnalyseBySalary(QueryParam param = null)
+        public static OperateResult  AnalyseBySalary(QueryParam param = null)
         {
             try
             {
@@ -2240,7 +2442,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult AnalyseByPost(QueryParam param = null)
+        public static OperateResult  AnalyseByPost(QueryParam param = null)
         {
             try
             {

@@ -56,6 +56,38 @@ namespace Apps.Model
 
     }
 
+    public class EmployeeCareerRecordExport
+    {
+        [Display(Name = "序号")]
+        public long index { get; set; }
+
+        [Display(Name = "姓名")]
+        [Required(ErrorMessage = "{0}必须输入")]
+        [StringLength(20, ErrorMessage = "{0}长度不得超过20")]
+        public string employeeName { get; set; }
+
+        [Display(Name = "工号")]
+        [Required(ErrorMessage = "{0}必须输入")]
+        [StringLength(10, ErrorMessage = "{0}长度不得超过10")]
+        public string employeeNumber { get; set; }
+
+        [Display(Name = "部门")]
+        public string departmentName { get; set; }
+
+        [Display(Name = "类别")]
+        //public CareerType type { get; set; }
+        public string type { get; set; }
+
+        [Display(Name = "日期")]
+        public DateTime time { get; set; }
+
+
+        [Display(Name = "说明")]
+        public string description { get; set; }
+
+
+    }
+
     public enum EmployeeState
     {
         [Description("试用期")]
@@ -95,6 +127,7 @@ namespace Apps.Model
         [ForeignKey("departmentId")]
         public virtual Department department { get; set; }
 
+        [Display(Name = "岗位")]
         public long? postId { get; set; }
         [ForeignKey("postId")]
         public virtual PostInfo postInfo { get; set; }

@@ -11,7 +11,7 @@ namespace Apps.BLL
     public class DbContextRoot : DbContext
     {
         public DbContextRoot() 
-            : base("name=Default")
+            : base("name=AppsDB")
         {
         }
 
@@ -47,19 +47,10 @@ namespace Apps.BLL
 
         }
 
-
-        public DbSet<PurchaseRecord> purchaseRecords { get; set; }
-
-        public DbSet<PaymentRecord> paymentRecords { get; set; }
-        public DbSet<PaymentProject> paymentProjects { get; set; }
-
-
         public DbSet<Module> moduleList { get; set; }
         public DbSet<FunctionRight> rightList { get; set; }
         public DbSet<Role> roleList { get; set; }
-        public DbSet<RoleRights> roleRightsList { get; set; }
         public DbSet<User> userList { get; set; }
-        public DbSet<RootUser> rootUserList { get; set; }
         public DbSet<LogRecord> logRecordList { get; set; }
 
 
@@ -69,9 +60,6 @@ namespace Apps.BLL
         public DbSet<Employee> employeeList { get; set; }
         public DbSet<EmployeeCareerRecord> employeeCareerList { get; set; }
         public DbSet<Department> departmentList { get; set; }
-        public DbSet<Category> categoryList { get; set; }
-        public DbSet<Product> productList { get; set; }
-
 
         public DbSet<PostInfo> postInfoList { get; set; }
         public DbSet<LevelInfo> levelInfoList { get; set; }
@@ -81,17 +69,12 @@ namespace Apps.BLL
         public DbSet<AssessmentInfo> assessmentInfoList { get; set; }
         public DbSet<SalaryRecord> salaryRecordList { get; set; }
 
-
-
-        ///// 后续拆到其他数据库
-        public DbSet<Customer> customerList { get; set; }
-        public DbSet<Baby> babyList { get; set; }
     }
 
     public class SystemDB : DbContextRoot
     {
         public SystemDB()
-            : base("name=Default")
+            : base("name=AppsDB")
         //: base(SessionHelper.GetDbName())
         {
         }

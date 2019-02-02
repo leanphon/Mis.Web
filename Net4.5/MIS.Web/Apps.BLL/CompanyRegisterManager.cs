@@ -4,12 +4,13 @@ using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Text;
+using Apps.BLL.Utility;
 
 namespace Apps.BLL
 {
     public class CompanyRegisterManager
     {
-        public OperateResult AddRegister(CompanyRegister model)
+        public static OperateResult  Add(CompanyRegister model)
         {
             try
             {
@@ -52,7 +53,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult RemoveRegister(long id)
+        public static OperateResult  Remove(long id)
         {
             try
             {
@@ -101,7 +102,44 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult UpdateRegister(CompanyRegister model)
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.companyRegisterList.RemoveRange(db.companyRegisterList.ToList());
+
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有公司注册信息"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+
+        public static OperateResult  Update(CompanyRegister model)
         {
             try
             {
@@ -142,7 +180,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetRegisterByCode(string code)
+        public static OperateResult  GetByCode(string code)
         {
             try
             {
@@ -180,7 +218,7 @@ namespace Apps.BLL
                 };
             }
         }
-        public OperateResult GetRegisterById(long id)
+        public static OperateResult  GetById(long id)
         {
             try
             {
@@ -219,7 +257,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetRegisterAll(QueryParam param = null)
+        public static OperateResult  GetAll(QueryParam param = null)
         {
             try
             {
@@ -248,7 +286,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetRegisterByPager(QueryParam param = null)
+        public static OperateResult  GetByPager(QueryParam param = null)
         {
             try
             {

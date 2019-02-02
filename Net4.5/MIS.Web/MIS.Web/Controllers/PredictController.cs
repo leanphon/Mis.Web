@@ -34,8 +34,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.GetEmployeeContractByPager(queryParam);
+            OperateResult or = EmployeeManager.GetEmployeeContractByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -64,8 +63,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.GetEmployeeBirthdayByPager(queryParam);
+            OperateResult or = EmployeeManager.GetEmployeeBirthdayByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

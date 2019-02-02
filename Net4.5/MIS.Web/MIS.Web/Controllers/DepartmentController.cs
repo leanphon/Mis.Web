@@ -20,8 +20,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            DepartmentManager manager = new DepartmentManager();
-            OperateResult or = manager.GetAll();
+            OperateResult or = DepartmentManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -35,8 +34,7 @@ namespace MIS.Web.Controllers
         public ActionResult GetEntities(Pager pager)
         {
 
-            DepartmentManager manager = new DepartmentManager();
-            OperateResult or = manager.GetByPager(new QueryParam {pager=pager });
+            OperateResult or = DepartmentManager.GetByPager(new QueryParam {pager=pager });
             
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -64,9 +62,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            DepartmentManager manager = new DepartmentManager();
-
-            OperateResult or = manager.Add(model);
+            OperateResult or = DepartmentManager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -85,9 +81,7 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            DepartmentManager manager = new DepartmentManager();
-
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = DepartmentManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -105,9 +99,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            DepartmentManager manager = new DepartmentManager();
-
-            OperateResult or = manager.Update(model);
+            OperateResult or = DepartmentManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -126,9 +118,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            DepartmentManager manager = new DepartmentManager();
 
-            OperateResult or = manager.Remove(id.Value);
+            OperateResult or = DepartmentManager.Remove(id.Value);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

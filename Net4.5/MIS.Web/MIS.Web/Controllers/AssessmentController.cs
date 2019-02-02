@@ -29,8 +29,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.GetAll();
+            OperateResult or = AssessmentManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -55,8 +54,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.GetByPager(queryParam);
+            OperateResult or = AssessmentManager.GetByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -82,8 +80,7 @@ namespace MIS.Web.Controllers
             }
 
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.GetEmployeesByPager(queryParam);
+            OperateResult or = AssessmentManager.GetEmployeesByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -133,8 +130,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.AddBatch(lstData, month);
+            OperateResult or = AssessmentManager.AddBatch(lstData, month);
 
             return Json(or, JsonRequestBehavior.AllowGet);
         }
@@ -180,8 +176,7 @@ namespace MIS.Web.Controllers
 
             model.month = month;
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.Add(model);
+            OperateResult or = AssessmentManager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
         }
@@ -214,8 +209,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.SaveBatch(lstData);
+            OperateResult or = AssessmentManager.SaveBatch(lstData);
 
             return Json(or, JsonRequestBehavior.AllowGet);
         }
@@ -248,32 +242,11 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.Update(model);
+            OperateResult or = AssessmentManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
         }
 
-        public ActionResult Edit(int? id)
-        {
-            if (id == null)
-            {
-                return Json(
-                    new OperateResult
-                    {
-                        content = "访问错误",
-                    },
-                    JsonRequestBehavior.AllowGet
-                );
-
-            }
-            EmployeeManager manager = new EmployeeManager();
-
-            OperateResult or = manager.GetById(id.Value);
-
-            return View(or.data);
-
-        }
         public ActionResult EditEntity()
         {
             string data = Request.Params["requestData"];
@@ -313,9 +286,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            AssessmentManager manager = new AssessmentManager();
-
-            OperateResult or = manager.Update(model);
+            OperateResult or = AssessmentManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -337,8 +308,7 @@ namespace MIS.Web.Controllers
             }
 
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.ExportAll(queryParam);
+            OperateResult or = AssessmentManager.ExportAll(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -360,10 +330,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult LockStatus(long id, string status)
         {
-
-            AssessmentManager manager = new AssessmentManager();
-
-            OperateResult or = manager.UpdateStatus(id, status);
+            OperateResult or = AssessmentManager.UpdateStatus(id, status);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -397,8 +364,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.UpdateStatusBatch(lstData, status);
+            OperateResult or = AssessmentManager.UpdateStatusBatch(lstData, status);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -406,10 +372,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult UnlockStatus(long id, string status)
         {
-
-            AssessmentManager manager = new AssessmentManager();
-
-            OperateResult or = manager.UpdateStatus(id, status);
+            OperateResult or = AssessmentManager.UpdateStatus(id, status);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -443,8 +406,7 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.UpdateStatusBatch(lstData, status);
+            OperateResult or = AssessmentManager.UpdateStatusBatch(lstData, status);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -510,8 +472,7 @@ namespace MIS.Web.Controllers
             string path = target + filename;//获取存储的目标地址
             file.SaveAs(path);
 
-            AssessmentManager manager = new AssessmentManager();
-            OperateResult or = manager.ImportExcel(path);
+            OperateResult or = AssessmentManager.ImportExcel(path);
 
 
             return Json(or, JsonRequestBehavior.AllowGet);

@@ -16,6 +16,10 @@ namespace Apps.Model.Utility
             }
             return years;
         }
+        public static int CalMonths(DateTime dtBegin, DateTime dtEnd)
+        {
+            return (dtEnd.Year - dtBegin.Year) * 12 + (dtEnd.Month - dtBegin.Month);
+        }
 
         public static string GetExceptionMsg(Exception ex)
         {
@@ -28,6 +32,23 @@ namespace Apps.Model.Utility
             }
 
             return msg;
+        }
+
+        public static TChild AutoCopy<TParent, TChild>(TParent parent) where TChild : TParent, new()
+        {
+            TChild child = new TChild();
+            var parentType = typeof(TParent);
+            var properties = parentType.GetProperties();
+            foreach (var p in properties)
+            {
+                //循环遍历属性
+                if (p.CanRead && p.CanWrite)
+                {
+                    //进行属性拷贝
+                    p.SetValue(child, p.GetValue(parent, null), null);
+                }
+            }
+            return child;
         }
     }
 }

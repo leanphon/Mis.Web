@@ -42,8 +42,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.AnalyseByAge(queryParam);
+            OperateResult or = EmployeeManager.AnalyseByAge(queryParam);
 
             if (or.status != OperateStatus.Success
                 && or.content != null)
@@ -74,8 +73,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.AnalyseByGender(queryParam);
+            OperateResult or = EmployeeManager.AnalyseByGender(queryParam);
 
             if (or.status != OperateStatus.Success
                 && or.content != null)
@@ -108,8 +106,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.AnalyseByWorkAge(queryParam);
+            OperateResult or = EmployeeManager.AnalyseByWorkAge(queryParam);
 
             if (or.status != OperateStatus.Success
                 && or.content != null)
@@ -142,8 +139,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.AnalyseBySalary(queryParam);
+            OperateResult or = EmployeeManager.AnalyseBySalary(queryParam);
 
             if (or.status != OperateStatus.Success
                 && or.content != null)
@@ -175,8 +171,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            EmployeeManager manager = new EmployeeManager();
-            OperateResult or = manager.AnalyseByPost(queryParam);
+            OperateResult or = EmployeeManager.AnalyseByPost(queryParam);
 
             if (or.status != OperateStatus.Success
                 && or.content != null)

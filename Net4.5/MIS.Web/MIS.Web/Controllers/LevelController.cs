@@ -17,8 +17,7 @@ namespace MIS.Web.Controllers
 
         public ActionResult GetAllEntities()
         {
-            LevelManager manager = new LevelManager();
-            OperateResult or = manager.GetAll();
+            OperateResult or = LevelManager.GetAll();
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -32,8 +31,7 @@ namespace MIS.Web.Controllers
         public ActionResult GetEntities(Apps.Model.Pager pager)
         {
 
-            LevelManager manager = new LevelManager();
-            OperateResult or = manager.GetByPager(new QueryParam { pager = pager });
+            OperateResult or = LevelManager.GetByPager(new QueryParam { pager = pager });
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -61,9 +59,8 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            LevelManager manager = new LevelManager();
 
-            OperateResult or = manager.Add(model);
+            OperateResult or = LevelManager.Add(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -82,9 +79,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            LevelManager manager = new LevelManager();
 
-            OperateResult or = manager.GetById(id.Value);
+            OperateResult or = LevelManager.GetById(id.Value);
 
             return View(or.data);
 
@@ -102,9 +98,8 @@ namespace MIS.Web.Controllers
                 );
             }
 
-            LevelManager manager = new LevelManager();
 
-            OperateResult or = manager.Update(model);
+            OperateResult or = LevelManager.Update(model);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 
@@ -123,9 +118,8 @@ namespace MIS.Web.Controllers
                 );
 
             }
-            LevelManager manager = new LevelManager();
 
-            OperateResult or = manager.Remove(id.Value);
+            OperateResult or = LevelManager.Remove(id.Value);
 
             return Json(or, JsonRequestBehavior.AllowGet);
 

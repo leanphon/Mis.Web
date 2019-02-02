@@ -39,6 +39,8 @@
         xAxis: [
             {
                 type: 'category',
+                interval:0,
+                rotate:40,
                 data: viewEntity.category,
                 axisLabel: {
                     formatter: '{value} ' + viewEntity.xAxisPostfix

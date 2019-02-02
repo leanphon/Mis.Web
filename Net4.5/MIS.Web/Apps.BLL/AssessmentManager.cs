@@ -15,7 +15,7 @@ namespace Apps.BLL
 {
     public class AssessmentManager
     {
-        public OperateResult Add(AssessmentInfo model)
+        public static OperateResult Add(AssessmentInfo model)
         {
             try
             {
@@ -76,7 +76,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult AddBatch(List<AssessmentInfo> listModel, string month)
+        public static OperateResult AddBatch(List<AssessmentInfo> listModel, string month)
         {
             bool fail = false;
             OperateResult result = new OperateResult();
@@ -101,7 +101,7 @@ namespace Apps.BLL
             return result;
         }
 
-        public OperateResult Remove(long id)
+        public static OperateResult Remove(long id)
         {
             try
             {
@@ -147,8 +147,43 @@ namespace Apps.BLL
             }
 
         }
+        public static OperateResult RemoveAll()
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    db.assessmentInfoList.RemoveRange(db.assessmentInfoList.ToList());
 
-        public OperateResult Update(AssessmentInfo model)
+                    db.SaveChanges();
+
+                    LogManager.Add(new LogRecord
+                    {
+                        userId = SessionHelper.GetUserId(),
+                        time = DateTime.Now,
+                        type = "Info",
+                        content = "删除所有考核"
+                    });
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        content = "删除成功"
+                    };
+
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+        public static OperateResult Update(AssessmentInfo model)
         {
             try
             {
@@ -183,7 +218,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult SaveBatch(List<AssessmentInfo> listModel)
+        public static OperateResult SaveBatch(List<AssessmentInfo> listModel)
         {
             bool fail = false;
             OperateResult result = new OperateResult();
@@ -195,8 +230,7 @@ namespace Apps.BLL
                 {
                     fail = true;
 
-                    EmployeeManager em = new EmployeeManager();
-                    OperateResult orEm = em.GetById(model.employeeId);
+                    OperateResult orEm = EmployeeManager.GetById(model.employeeId);
                     Employee e = orEm.data as Employee;
                     if (e != null)
                     {
@@ -213,7 +247,7 @@ namespace Apps.BLL
             return result;
         }
 
-        public OperateResult UpdateStatusBatch(List<long> listModel, string status)
+        public static OperateResult UpdateStatusBatch(List<long> listModel, string status)
         {
             bool fail = false;
             OperateResult result = new OperateResult();
@@ -237,7 +271,7 @@ namespace Apps.BLL
             return result;
         }
 
-        public OperateResult UpdateStatus(long id, string status)
+        public static OperateResult UpdateStatus(long id, string status)
         {
             if (status != "未审核" && status != "已审核")
             {
@@ -303,7 +337,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetById(long id)
+        public static OperateResult GetById(long id)
         {
             using (SystemDB db = new SystemDB())
             {
@@ -341,7 +375,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult GetAll(QueryParam param = null)
+        public static OperateResult GetAll(QueryParam param = null)
         {
             try
             {
@@ -372,7 +406,7 @@ namespace Apps.BLL
             }
         }
 
-        public OperateResult GetByPager(QueryParam param = null)
+        public static OperateResult GetByPager(QueryParam param = null)
         {
             try
             {
@@ -523,13 +557,123 @@ namespace Apps.BLL
         }
 
 
+        public static OperateResult GetEmployeesAll(QueryParam param = null)
+        {
+            try
+            {
+                using (SystemDB db = new SystemDB())
+                {
+                    if (param == null || param.filters == null || !param.filters.Keys.Contains("month"))
+                    {
+                        return new OperateResult
+                        {
+                            content = "需要月份查询条件",
+                        };
+                    }
+                    // 得到给定月份的已经存在考核数据的记录
+                    string month = param.filters["month"].value ?? "";
+                    var assessmnetList = from m in db.assessmentInfoList
+                                         where m.month == month
+                                         select m;
+                    var elements = from m in db.employeeList.Include("department").AsEnumerable()
+                                   where !(assessmnetList.Any(c => c.employeeId == m.id && c.month == month))
+                                   select new
+                                   {
+                                       billSerial = GenerateBillSerial(month, m.number),
+                                       employeeId = m.id,
+                                       employeeName = m.name,
+                                       employeeNumber = m.number,
+                                       employeeStatus = m.state,
+                                       departmentId = m.departmentId,
+                                       departmentName = m.department.name,
+                                   };
+
+
+                    // 先查询出部门及子部门，再过滤
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                    }
+                    #endregion
+
+                    // 模糊过滤名字
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.employeeName.Contains(p.value));
+                        }
+                    }
+                    #endregion
+
+                    // 过滤状态
+                    #region
+                    if (param != null && param.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("state"))
+                        {
+                            var p = param.filters["state"];
+                            elements = elements.Where(t => p.value.Contains(t.employeeStatus));
+                        }
+                    }
+                    #endregion
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = elements.ToList(),
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
+
         /// <summary>
         /// 1、如果员工有给定month的考核数据，则取出考核数据，否则返回默认考核数据
         /// 
         /// </summary>
         /// <param name="param"></param>
         /// <returns></returns>
-        public OperateResult GetEmployeesByPager(QueryParam param = null)
+        public static OperateResult GetEmployeesByPager(QueryParam param = null)
         {
             try
             {
@@ -665,7 +809,7 @@ namespace Apps.BLL
             }
 
         }
-        private string GenerateBillSerial(string month, string employeeNumber)
+        private static string GenerateBillSerial(string month, string employeeNumber)
         {
             DateTime dtMonth;
 
@@ -686,7 +830,7 @@ namespace Apps.BLL
         /// </summary>
         /// <param name="queryParam"></param>
         /// <returns></returns>
-        public OperateResult ExportAll(QueryParam param = null)
+        public static OperateResult ExportAll(QueryParam param = null)
         {
             try
             {
@@ -832,7 +976,7 @@ namespace Apps.BLL
 
         }
 
-        public OperateResult ImportExcel(string fileName)
+        public static OperateResult ImportExcel(string fileName)
         {
             try
             {

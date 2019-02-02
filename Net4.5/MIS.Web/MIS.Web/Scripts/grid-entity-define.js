@@ -307,7 +307,7 @@ function EmployeeGrid(gridId, toolbar) {
     this.toolbar = toolbar;
 }
 
-function EmployeeCareerGrid(gridId, toolbar) {
+function EmployeeCareerAddGrid(gridId, toolbar) {
     this.id = gridId;
 
     this.forzenCols = [[
@@ -376,6 +376,41 @@ function EmployeeCareerGrid(gridId, toolbar) {
 
     this.toolbar = toolbar;
 }
+
+function EmployeeCareerGrid(gridId, toolbar) {
+    this.id = gridId;
+
+    this.forzenCols = [[
+                { field: 'id', hidden: true },
+                { field: 'employeeId', hidden: true },
+                { field: 'status', hidden: true },
+    ]];
+
+    this.normalCols = [[
+        { field: 'employeeName', title: '姓名', width: 100 },
+        { field: 'employeeNumber', title: '工号', width: 100 },
+        { field: 'departmentName', title: '部门', width: 100 },
+        { field: 'type', title: '类型', width: 100 },
+        {
+            field: 'time', title: '时间', width: 150,
+            formatter: function (date) {
+                if (typeof date == "string") {
+                    if (date.indexOf("/Date") != -1) {
+                        return formatDate(date);
+                    } else {
+                        return date;
+                    }
+                }
+            },
+        },
+        { field: 'description', title: '说明', width: 300 },
+
+    ]];
+
+
+    this.toolbar = toolbar;
+}
+
 
 function EmployeeBirthdayGrid(gridId, toolbar) {
     this.id = gridId;
