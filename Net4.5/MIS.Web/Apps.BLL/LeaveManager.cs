@@ -1,5 +1,4 @@
 ﻿using Apps.Model;
-using Apps.Model.Leave;
 using Apps.Model.Utility;
 using System;
 using System.Collections.Generic;
@@ -48,43 +47,38 @@ namespace Apps.BLL
             }
             try
             {
-                using (DbHelperLeave db = new DbHelperLeave())
+                using (SystemDB db = new SystemDB())
                 {
                     EmployeeLeave employee = Model.Utility.Utility.AutoCopy<Employee, EmployeeLeave>(model);
 
+                    employee.employeeId = model.id;
+
                     // 岗位
                     #region
-                    using (SystemDB dbBase = new SystemDB())
+                    var postInfo = (from e in db.postInfoList
+                            where e.id == model.postId
+                            select e
+                        ).FirstOrDefault();
+                    if (postInfo != null)
                     {
-                        var postInfo = (from e in dbBase.postInfoList
-                                        where e.id == model.postId
-                                        select e
-                                ).FirstOrDefault();
-                        if (postInfo != null)
-                        {
-                            employee.postName = postInfo.name;
-                        }
+                        employee.postName = postInfo.name;
                     }
                     #endregion
 
                     //薪资
                     #region 
-                    using (SystemDB dbBase = new SystemDB())
+                    var salary = (from e in db.salaryInfoList
+                                  where e.id == model.salaryInfoId
+                                  select e).FirstOrDefault();
+                    if (salary != null)
                     {
-                        var salary = (from e in dbBase.salaryInfoList
-                                      where e.id == model.salaryInfoId
-                                      select e).FirstOrDefault();
-                        if (salary != null)
+                        OperateResult or = SalaryRecordManager.GetSalaryAveById(model.id);
+
+                        if (or.status == OperateStatus.Success)
                         {
-                            OperateResult or = SalaryRecordManager.GetSalaryAveById(model.id);
-
-                            if (or.status == OperateStatus.Success)
-                            {
-                                employee.salary = salary.GetSalaryTotal();
-                                employee.salaryAverage = (double)or.data;
-                            }
+                            employee.salary = salary.GetSalaryTotal();
+                            employee.salaryAverage = (double)or.data;
                         }
-
                     }
                     #endregion
 
@@ -118,7 +112,7 @@ namespace Apps.BLL
         {
             try
             {
-                using (DbHelperLeave db = new DbHelperLeave())
+                using (SystemDB db = new SystemDB())
                 {
                     db.EmployeeLeaveList.RemoveRange(db.EmployeeLeaveList.ToList());
 
@@ -151,22 +145,19 @@ namespace Apps.BLL
         }
 
 
-        public static OperateResult LeaveWarning(QueryParam param = null)
+        public static OperateResult LeaveWarningByPager(QueryParam param = null)
         {
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 SystemDB db = new SystemDB();
 
-                
-                var company = (from e in db.companyList
-                               select e).FirstOrDefault();
-
                 var elements = db.employeeList.Include("department").Where(m => m.state != "离职")
-                    .Select(m => m );
+                    .Select(m => m);
 
                 // 先查询出部门及子部门，再过滤
+
                 #region
+
                 if (param != null && param.filters != null)
                 {
                     if (param.filters.Keys.Contains("departmentId"))
@@ -178,57 +169,88 @@ namespace Apps.BLL
                         Func<long, IQueryable<long>> GetSonFun = null;
                         GetSonFun = id =>
                         {
-                        // 查找属于给定部门的员工
-                        var sons = from e in db.departmentList
-                                       where e.parentId == id
-                                       select e.id;
+                            // 查找属于给定部门的员工
+                            var sons = from e in db.departmentList
+                                where e.parentId == id
+                                select e.id;
                             IQueryable<long> many = sons;
-                        // 查找属于给定部门子部门的员工
-                        foreach (var it in sons)
+                            // 查找属于给定部门子部门的员工
+                            foreach (var it in sons)
                             {
                                 many = many.Concat(GetSonFun(it));
                             }
+
                             return many;
                         };
 
                         // 所有部门
                         var departments = (from e in db.departmentList
-                                           where e.id == departmentId
-                                           select e.id).Concat(GetSonFun(departmentId));
+                            where e.id == departmentId
+                            select e.id).Concat(GetSonFun(departmentId));
 
                         elements = elements.Where(t => departments.Contains(t.departmentId));
                     }
                 }
+
                 #endregion
 
 
-                /// 预警计算
+                // 预警计算
+
                 #region
 
                 var result = from e in elements.AsEnumerable()
                     let age = Model.Utility.Utility.CalYears(e.birthday, DateTime.Now)
                     let workAge = Model.Utility.Utility.CalMonths(e.entryDate ?? DateTime.Now, DateTime.Now)
                     let resultScore = GetEmployeeLeaveDegree(e)
+                                     orderby resultScore descending 
                     select new
                     {
                         e.id,
                         e.name,
                         e.number,
-                        departmentName = e.department.name,
-                        postName = e.postInfo.name,
+                        departmentName = "",
+                        postName = "",
                         age,
                         workAge,
-                        resultScore
+                        resultScore = resultScore * 100 + "%"
 
                     };
-                #endregion
 
+                #endregion
+                int total = result.Count();
+                int pages = 0;
+                Pager pager = param.pager;
+                if (pager == null || pager.rows == 0)
+                {
+                    pages = total > 0 ? 1 : 0;
+                }
+                else
+                {
+                    pages = total / (pager.rows == 0 ? 20 : pager.rows);
+                    pages = total % pager.rows == 0 ? pages : pages + 1;
+                    if (pager.page <= 1)
+                    {
+                        result = result.Take(pager.rows);
+                    }
+                    else
+                    {
+                        result = result.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                    }
+                }
+                var data = new
+                {
+                    pages,
+                    total,
+                    rows = result.ToList()
+                };
 
                 return new OperateResult
                 {
                     status = OperateStatus.Success,
-                    data = result.ToList(),
+                    data = data,
                 };
+
             }
             catch (Exception ex)
             {
@@ -341,9 +363,17 @@ namespace Apps.BLL
         /// <returns>计算成功返回status返回success，如果成立则data返回true，否则返回false</returns>
         private static OperateResult CalPost(Employee employee)
         {
+            if (employee.postInfo == null)
+            {
+                return new OperateResult
+                {
+                    content = "无岗位信息",
+                };
+            }
+
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
+                SystemDB dbLeave = new SystemDB();
 
                 var total = dbLeave.EmployeeLeaveList.Count();
                 var count = 0;
@@ -393,14 +423,14 @@ namespace Apps.BLL
         {
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
+                SystemDB dbLeave = new SystemDB();
 
                 var total = dbLeave.EmployeeLeaveList.Count();
                 var count = 0;
 
                 int age = Model.Utility.Utility.CalYears(employee.birthday, DateTime.Now);
 
-                var dimensionGroup = dbLeave.EmployeeLeaveList.GroupBy(g => Model.Utility.Utility.CalYears(g.birthday, g.leaveDate.Value))
+                var dimensionGroup = dbLeave.EmployeeLeaveList.AsEnumerable().GroupBy(g => Model.Utility.Utility.CalYears(g.birthday, g.leaveDate.Value))
                     .Select(m => new { age = m.Key, count = m.Count() })
                     .OrderBy(m => m.count);
 
@@ -443,9 +473,17 @@ namespace Apps.BLL
         /// <returns>计算成功返回status返回success，如果成立则data返回true，否则返回false</returns>
         private static OperateResult CalEducation(Employee employee)
         {
+            if (employee.education == null)
+            {
+                return new OperateResult
+                {
+                    content = "无学历信息",
+                };
+            }
+
             try 
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
+                SystemDB dbLeave = new SystemDB();
 
                 var total = dbLeave.EmployeeLeaveList.Count();
                 var count = 0;
@@ -493,9 +531,16 @@ namespace Apps.BLL
         /// <returns>计算成功返回status返回success，如果成立则data返回true，否则返回false</returns>
         private static OperateResult CalWorkAge(Employee employee)
         {
+            if (employee.entryDate == null)
+            {
+                return new OperateResult()
+                {
+                    content = "入职日期有误"
+                };
+            }
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
+                SystemDB dbLeave = new SystemDB();
 
                 var total = dbLeave.EmployeeLeaveList.Count();
                 var count = 0;
@@ -503,7 +548,7 @@ namespace Apps.BLL
                 //按照月计算
                 int workAge = Model.Utility.Utility.CalMonths(employee.entryDate.Value, DateTime.Now);
 
-                var dimensionGroup = dbLeave.EmployeeLeaveList.GroupBy(g => Model.Utility.Utility.CalMonths(g.entryDate.Value, g.leaveDate.Value))
+                var dimensionGroup = dbLeave.EmployeeLeaveList.AsEnumerable().GroupBy(g => Model.Utility.Utility.CalMonths(g.entryDate.Value, g.leaveDate.Value))
                     .Select(m => new { workAge = m.Key, count = m.Count() })
                     .OrderBy(m => m.count);
 
@@ -547,10 +592,9 @@ namespace Apps.BLL
         { 
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
-                var total = dbLeave.EmployeeLeaveList.Count();
+                var total = db.EmployeeLeaveList.Count();
                 var count = 0;
 
                 var salaryInfo = db.salaryInfoList.Where(m => m.id == employee.salaryInfoId)
@@ -565,7 +609,7 @@ namespace Apps.BLL
 
                 var actualTotal = salaryInfo.GetSalaryTotal();
 
-                var dimensionGroup = dbLeave.EmployeeLeaveList.GroupBy(g => g.salary)
+                var dimensionGroup = db.EmployeeLeaveList.GroupBy(g => g.salary)
                     .Select(m => new { salary = m.Key, count = m.Count() })
                     .OrderByDescending(m => m.count)
                     .ThenBy(m => m.salary);
@@ -573,7 +617,7 @@ namespace Apps.BLL
                 foreach (var item in dimensionGroup)
                 {
                     count += item.count;
-                    if (item.salary == actualTotal)
+                    if (Math.Abs(item.salary - actualTotal) < 0.01)
                     {
                         double percent = count / (double)total;
                         if (percent < LeaveLimitPercent)
@@ -647,9 +691,16 @@ namespace Apps.BLL
         /// <returns></returns>
         private static OperateResult CalSalaryInDepInPost(Employee employee)
         {
+            if (employee.postInfo == null)
+            {
+                return new OperateResult
+                {
+                    content = "无岗位信息",
+                };
+            }
+
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 //得到最近一次该员工的工资数据
@@ -709,7 +760,6 @@ namespace Apps.BLL
         {
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 //得到最近一次该员工的工资数据
@@ -765,9 +815,16 @@ namespace Apps.BLL
         /// <returns></returns>
         private static OperateResult CalSalaryInPost(Employee employee)
         {
+            if (employee.postInfo == null)
+            {
+                return new OperateResult
+                {
+                    content = "无岗位信息",
+                };
+            }
+
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 //得到最近一次该员工的工资数据
@@ -823,9 +880,16 @@ namespace Apps.BLL
         /// <returns></returns>
         private static OperateResult CalSalaryInHistoryPost(Employee employee)
         {
+            if (employee.postInfo == null)
+            {
+                return new OperateResult
+                {
+                    content = "无岗位信息",
+                };
+            }
+
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 //得到最近一次该员工的工资数据
@@ -842,7 +906,7 @@ namespace Apps.BLL
                 }
 
                 var ave = (from s in db.salaryRecordList
-                    join e in dbLeave.EmployeeLeaveList on s.assessmentInfo.employeeId equals e.id
+                    join e in db.EmployeeLeaveList on s.assessmentInfo.employeeId equals e.employeeId
                     where e.postId == employee.postId
                     select s.actualTotal).Average();
 
@@ -883,7 +947,6 @@ namespace Apps.BLL
         {
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 //得到最近一次该员工的工资数据
@@ -1011,6 +1074,14 @@ namespace Apps.BLL
         /// <returns></returns>
         private static OperateResult CalPostCrossAge(Employee employee)
         {
+            if (employee.postInfo == null)
+            {
+                return new OperateResult
+                {
+                    content = "无岗位信息",
+                };
+            }
+
             List<StageItem> liststageItems = new List<StageItem>();
             liststageItems.Add(new StageItem { min = 0, max = 18 });
             liststageItems.Add(new StageItem { min = 19, max = 22 });
@@ -1026,12 +1097,11 @@ namespace Apps.BLL
 
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 foreach (var stageItem in liststageItems)
                 {
-                    var count = (from e in dbLeave.EmployeeLeaveList
+                    var count = (from e in db.EmployeeLeaveList
                         where e.postId == employee.id
                         let age = Model.Utility.Utility.CalYears(e.birthday, e.leaveDate.Value)
                         where age >= stageItem.min && age <= stageItem.max
@@ -1081,6 +1151,14 @@ namespace Apps.BLL
         /// <returns></returns>
         private static OperateResult CalPostCrossWorkAge(Employee employee)
         {
+            if (employee.postInfo == null)
+            {
+                return new OperateResult
+                {
+                    content = "无岗位信息",
+                };
+            }
+
             List<StageItem> liststageItems = new List<StageItem>();
             liststageItems.Add(new StageItem { min = 0, max = 1 });
             liststageItems.Add(new StageItem { min = 2, max = 2 });
@@ -1103,12 +1181,11 @@ namespace Apps.BLL
 
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 foreach (var stageItem in liststageItems)
                 {
-                    var count = (from e in dbLeave.EmployeeLeaveList
+                    var count = (from e in db.EmployeeLeaveList.AsEnumerable()
                                  where e.postId == employee.id
                                  let age = Model.Utility.Utility.CalMonths(e.entryDate.Value, e.leaveDate.Value)
                                  where age >= stageItem.min && age <= stageItem.max
@@ -1197,7 +1274,6 @@ namespace Apps.BLL
         {
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 //得到最近一次该员工的工资数据
@@ -1255,7 +1331,6 @@ namespace Apps.BLL
         {
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 //得到最近一次该员工的工资数据
@@ -1312,7 +1387,6 @@ namespace Apps.BLL
         {
             try
             {
-                DbHelperLeave dbLeave = new DbHelperLeave();
                 var db = new SystemDB();
 
                 //得到最近一次该员工的工资数据

@@ -34,6 +34,7 @@ namespace Apps.BLL
             //modelBuilder.Entity<RoleRights>().ToTable("RoleRights");
             modelBuilder.Entity<Company>().ToTable("Companys");
             modelBuilder.Entity<EmployeeCareerRecord>().ToTable("CareerRecords");
+            //modelBuilder.Entity<EmployeeLeave>().ToTable("EmployeeLeave");
 
             modelBuilder.Entity<Role>()
             .HasMany(t => t.rightList)
@@ -68,6 +69,11 @@ namespace Apps.BLL
         public DbSet<SalaryInfo> salaryInfoList { get; set; }
         public DbSet<AssessmentInfo> assessmentInfoList { get; set; }
         public DbSet<SalaryRecord> salaryRecordList { get; set; }
+
+        /// <summary>
+        /// ¿Î÷∞¡–±Ì
+        /// </summary>
+        public DbSet<EmployeeLeave> EmployeeLeaveList { get; set; }
 
     }
 

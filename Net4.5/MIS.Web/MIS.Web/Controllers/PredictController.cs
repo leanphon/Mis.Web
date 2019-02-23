@@ -16,6 +16,32 @@ namespace MIS.Web.Controllers
             return View();
         }
 
+        public ActionResult GetLeaveWarningByPager(Apps.Model.Pager pager)
+        {
+            QueryParam queryParam = new QueryParam { pager = pager };
+
+            var extendParams = Request.Params["extendParams"];
+            if (extendParams != null)
+            {
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                List<FilterModel> filters = js.Deserialize<List<FilterModel>>(extendParams);
+                Dictionary<string, FilterModel> filterSet = filters.ToDictionary(key => key.key, model => model);
+
+                queryParam.filters = filterSet;
+            }
+
+            OperateResult or = LeaveManager.LeaveWarningByPager(queryParam);
+
+            if (or.status == OperateStatus.Success
+                && or.data != null)
+            {
+                return Json(or.data, JsonRequestBehavior.AllowGet);
+            }
+
+            return Json(or, JsonRequestBehavior.AllowGet);
+        }
+
+
         public ActionResult EmployeeContract()
         {
             return View();

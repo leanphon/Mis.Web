@@ -88,7 +88,6 @@
     <Compile Include="BenefitManager.cs" />
     <Compile Include="CompanyManager.cs" />
     <Compile Include="CompanyRegisterManager.cs" />
-    <Compile Include="DBHelperLeave.cs" />
     <Compile Include="DepartmentManager.cs" />
     <Compile Include="EmployeeManager.cs" />
     <Compile Include="FunctionRightManager.cs" />
