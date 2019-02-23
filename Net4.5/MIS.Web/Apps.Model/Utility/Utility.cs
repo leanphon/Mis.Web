@@ -34,18 +34,24 @@ namespace Apps.Model.Utility
             return msg;
         }
 
-        public static TChild AutoCopy<TParent, TChild>(TParent parent) where TChild : TParent, new()
+        public static TDst AutoCopy<TSrc, TDst>(TSrc parent) where TDst: new()
         {
-            TChild child = new TChild();
-            var parentType = typeof(TParent);
-            var properties = parentType.GetProperties();
-            foreach (var p in properties)
+            TDst child = new TDst();
+            var srcType = typeof(TSrc);
+            var dstType = typeof(TDst);
+            var dstProperties = dstType.GetProperties();
+
+            foreach (var pd in dstProperties)
             {
                 //循环遍历属性
-                if (p.CanRead && p.CanWrite)
+                if (pd.CanRead && pd.CanWrite)
                 {
-                    //进行属性拷贝
-                    p.SetValue(child, p.GetValue(parent, null), null);
+                    var ps = srcType.GetProperty(pd.Name);
+                    if (ps != null)
+                    {
+                        //进行属性拷贝
+                        pd.SetValue(child, ps.GetValue(parent, null), null);
+                    }
                 }
             }
             return child;

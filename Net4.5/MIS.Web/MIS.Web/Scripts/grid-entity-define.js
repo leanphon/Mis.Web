@@ -741,9 +741,10 @@ function LeaveWarningGrid(gridId, toolbar) {
     ]];
 
     this.normalCols = [[
-                { field: 'grade', title: '预警等级', width: 150, formatter: formatGrade },
-                { field: 'resultScore', title: '综合分数', width: 150, formatter: formatScore },
-                { field: 'dimensions', hidden: true },
+                { field: 'postName', title: '岗位名称', width: 150 },
+                { field: 'age', title: '年龄', width: 150 },
+                { field: 'workAge', title: '工龄', width: 150 },
+                { field: 'resultScore', title: '离职可能性', width: 150 },
 
     ]];
 

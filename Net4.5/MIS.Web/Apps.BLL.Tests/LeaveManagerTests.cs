@@ -46,7 +46,10 @@ namespace Apps.BLL.Tests
                 OperateResult or = DepartmentManager.Add(e);
                 if (or.status == OperateStatus.Error)
                 {
-                    Trace.WriteLine("App Trace >>> " + or.content);
+                    StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
                     return false;
                 }
             }
@@ -64,7 +67,10 @@ namespace Apps.BLL.Tests
                 OperateResult or = PostManager.Add(e);
                 if (or.status == OperateStatus.Error)
                 {
-                    Trace.WriteLine("App Trace >>> " + or.content);
+                    StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
                     return false;
                 }
             }
@@ -87,7 +93,10 @@ namespace Apps.BLL.Tests
                 OperateResult or = LevelManager.Add(e);
                 if (or.status == OperateStatus.Error)
                 {
-                    Trace.WriteLine("App Trace >>> " + or.content);
+                    StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
                     return false;
                 }
             }
@@ -106,7 +115,10 @@ namespace Apps.BLL.Tests
                 OperateResult or = PerformanceManager.Add(e);
                 if (or.status == OperateStatus.Error)
                 {
-                    Trace.WriteLine("App Trace >>> " + or.content);
+                    StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
                     return false;
                 }
             }
@@ -125,7 +137,10 @@ namespace Apps.BLL.Tests
                 OperateResult or = BenefitManager.Add(e);
                 if (or.status == OperateStatus.Error)
                 {
-                    Trace.WriteLine("App Trace >>> " + or.content);
+					StackTrace st = new StackTrace(new StackFrame(true)); 
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
                     return false;
                 }
             }
@@ -175,57 +190,673 @@ namespace Apps.BLL.Tests
             return new DateTime(year, month, day);
         }
 
+        //public bool EmployeeEntryStub()
+        //{
+        //    Random random = new Random();
+
+        //    for (var i = 0; i < EmployeeStubSize; i++)
+        //    {
+        //        Employee e = new Employee();
+
+        //        e.name = "Employee-" + i;
+        //        e.departmentId = random.Next(1, DepartmentStubSize + 1);
+        //        e.number = "ENO-" + i;
+        //        e.postId = random.Next(1, PostStubSize + 1);
+        //        e.idCard = "45010719880202131" + random.Next(1, 10);
+        //        e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+        //        e.education = GetEducationFromRandom();
+        //        e.state = "试用期";
+        //        e.phone = "1397710543" + i;
+        //        e.experience = i / 10;
+
+        //        e.salaryInfo = new SalaryInfo()
+        //        {
+        //            levelId = random.Next(1, LevelStubSize + 1),
+        //            performanceId = random.Next(1, PerformanceStubSize + 1),
+        //            benefitId = random.Next(1, BenefitStubSize + 1),
+        //        };
+
+        //        e.birthday = GetTimeFromRandom(new DateTime(1970, 1 ,1));
+        //        e.entryDate = GetTimeFromRandom(new DateTime(2005, 1, 1));
+        //        e.formalDate = GetTimeFromRandom(e.entryDate.Value.AddMonths(3));
+        //        e.contractBegin = GetTimeFromRandom(new DateTime(2017, 1, 1));
+        //        e.contractEnd = GetTimeFromRandom(e.contractBegin.Value.AddMonths(12));
+
+        //        OperateResult or = EmployeeManager.Add(e);
+        //        if (or.status == OperateStatus.Error)
+        //        {
+        //            StackTrace st = new StackTrace(new StackFrame(true));
+        //        string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+        //                     $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+        //        Trace.WriteLine(msg);
+        //            return false;
+        //        }
+        //    }
+
+        //    return true;
+        //}
+
         public bool EmployeeEntryStub()
         {
             Random random = new Random();
-            
-            for (var i = 0; i < EmployeeStubSize; i++)
+
+            int i = 1;
+            int departmentId = 1;
+            int postId = 1;
+
+            #region 添加员工入职，部门1、岗位1，层级1
+
+            Employee e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
             {
-                Employee e = new Employee();
+                levelId = 1,
+                performanceId = 1,
+                benefitId = 1,
+            };
 
-                e.name = "Employee-" + i;
-                e.departmentId = random.Next(1, DepartmentStubSize + 1);
-                e.number = "Employee-" + i;
-                e.postId = random.Next(1, PostStubSize + 1);
-                e.idCard = "45010719880202131" + random.Next(1, 10);
-                e.sex = random.Next(1, 3) == 1 ? "男" : "女";
-                e.education = GetEducationFromRandom();
-                e.state = "试用期";
-                e.phone = "1397710543" + i;
-                e.experience = i / 10;
+            e.birthday = new DateTime(1970, 1, 1);
+            e.entryDate = new DateTime(2005, 1, 1);
+            e.formalDate = new DateTime(2005, 4, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
 
-                e.salaryInfo = new SalaryInfo()
-                {
-                    levelId = random.Next(1, LevelStubSize + 1),
-                    performanceId = random.Next(1, PerformanceStubSize + 1),
-                    benefitId = random.Next(1, BenefitStubSize + 1),
-                };
-
-                e.birthday = GetTimeFromRandom(new DateTime(1970, 1 ,1));
-                e.entryDate = GetTimeFromRandom(new DateTime(2005, 1, 1));
-                e.formalDate = GetTimeFromRandom(e.entryDate.Value.AddMonths(3));
-                e.contractBegin = GetTimeFromRandom(new DateTime(2017, 1, 1));
-                e.contractEnd = GetTimeFromRandom(e.contractBegin.Value.AddMonths(12));
-
-                OperateResult or = EmployeeManager.Add(e);
-                if (or.status == OperateStatus.Error)
-                {
-                    Trace.WriteLine("App Trace >>> " + or.content);
-                    return false;
-                }
+            OperateResult or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
             }
+
+            #endregion
+
+            #region 添加员工入职，部门1、岗位1，层级2
+
+            i = 2;
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 2,
+                performanceId = 2,
+                benefitId = 2,
+            };
+
+            e.birthday = new DateTime(1970, 1, 1);
+            e.entryDate = new DateTime(2005, 1, 1);
+            e.formalDate = new DateTime(2005, 4, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+            #region 添加员工入职，部门1、岗位1，层级3
+
+            i = 3;
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 3,
+                performanceId = 3,
+                benefitId = 3,
+            };
+
+            e.birthday = new DateTime(1970, 1, 1);
+            e.entryDate = new DateTime(2005, 1, 1);
+            e.formalDate = new DateTime(2005, 4, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+
+            #region 添加员工入职，部门2、岗位1，层级1
+
+            i = 4;
+            departmentId = 2;
+            postId = 1;
+
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 1,
+                performanceId = 1,
+                benefitId = 1,
+            };
+
+            e.birthday = new DateTime(1970, 1, 1);
+            e.entryDate = new DateTime(2014, 4, 1);
+            e.formalDate = new DateTime(2014, 7, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+            #region 添加员工入职，部门2、岗位1，层级2
+
+            i = 5;
+            departmentId = 2;
+            postId = 1;
+
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 2,
+                performanceId = 2,
+                benefitId = 2,
+            };
+
+            e.birthday = new DateTime(1970, 1, 1);
+            e.entryDate = new DateTime(2014, 4, 1);
+            e.formalDate = new DateTime(2014, 7, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+            #region 添加员工入职，部门2、岗位1，层级3
+
+            i = 6;
+            departmentId = 2;
+            postId = 1;
+
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 3,
+                performanceId = 3,
+                benefitId = 3,
+            };
+
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2014, 4, 1);
+            e.formalDate = new DateTime(2014, 7, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+
+            #region 添加员工入职，部门1、岗位2，层级1
+
+            i = 7;
+            departmentId = 1;
+            postId = 2;
+
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 1,
+                performanceId = 1,
+                benefitId = 1,
+            };
+
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2015, 6, 1);
+            e.formalDate = new DateTime(2015, 9, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+            #region 添加员工入职，部门1、岗位2，层级2
+
+            i = 8;
+            departmentId = 1;
+            postId = 2;
+
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 2,
+                performanceId = 2,
+                benefitId = 2,
+            };
+
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2015, 6, 1);
+            e.formalDate = new DateTime(2015, 9, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+            #region 添加员工入职，部门1、岗位2，层级3
+
+            i = 9;
+            departmentId = 1;
+            postId = 2;
+
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 3,
+                performanceId = 3,
+                benefitId = 3,
+            };
+
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2015, 6, 1);
+            e.formalDate = new DateTime(2015, 9, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+
+            #region 添加员工入职，部门2、岗位2，层级1
+
+            i = 10;
+            departmentId = 2;
+            postId = 2;
+
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 1,
+                performanceId = 1,
+                benefitId = 1,
+            };
+
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2013, 10, 1);
+            e.formalDate = new DateTime(2013, 12, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+            #region 添加员工入职，部门2、岗位2，层级2
+
+            i = 11;
+            departmentId = 2;
+            postId = 2;
+
+            e = new Employee();
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 2,
+                performanceId = 2,
+                benefitId = 2,
+            };
+
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2013, 10, 1);
+            e.formalDate = new DateTime(2013, 12, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+            #region 添加员工入职，部门2、岗位2，层级3
+
+            i = 12;
+            departmentId = 2;
+            postId = 2;
+
+            e = new Employee();
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 3,
+                performanceId = 3,
+                benefitId = 3,
+            };
+
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2013, 10, 1);
+            e.formalDate = new DateTime(2013, 12, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+
+
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+            
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+
+            #region 添加员工入职，部门1、岗位1，层级3
+
+            i = 13;
+            departmentId = 1;
+            postId = 1;
+
+            e = new Employee();
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 3,
+                performanceId = 3,
+                benefitId = 3,
+            };
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2013, 10, 1);
+            e.formalDate = new DateTime(2013, 12, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
+            #region 添加员工入职，部门2、岗位2，层级3
+
+            i = 14;
+            departmentId = 2;
+            postId = 2;
+
+            e = new Employee();
+
+            e.salaryInfo = new SalaryInfo()
+            {
+                levelId = 3,
+                performanceId = 3,
+                benefitId = 3,
+            };
+            e.birthday = new DateTime(1988, 1, 1);
+            e.entryDate = new DateTime(2013, 10, 1);
+            e.formalDate = new DateTime(2013, 12, 1);
+            e.contractBegin = new DateTime(2017, 1, 1);
+            e.contractEnd = new DateTime(2019, 12, 1);
+
+            e.name = "Employee-" + i;
+            e.departmentId = departmentId;
+            e.number = "ENO-" + i;
+            e.postId = postId;
+            e.idCard = "45010719880202131" + random.Next(1, 100);
+            e.sex = random.Next(1, 3) == 1 ? "男" : "女";
+            e.education = "高中";
+            e.state = "试用期";
+            e.phone = "1397710543" + i;
+            e.experience = i / 10;
+
+
+            or = EmployeeManager.Add(e);
+            if (or.status == OperateStatus.Error)
+            {
+                StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
+                return false;
+            }
+
+            #endregion
+
 
             return true;
         }
-        public bool EmployeeLeaveStub(int employeeId)
+
+        public bool EmployeeLeaveStub(int employeeId, DateTime time)
         {
             var or = EmployeeManager.GetById(employeeId);
             if (or.status == OperateStatus.Error  || or.data==null)
             {
                 return false;
             }
-
-            var time = GetTimeFromRandom(new DateTime(2018, 1, 1));
 
             or = EmployeeManager.Leave(employeeId, "离职", time);
             if (or.status == OperateStatus.Error )
@@ -285,7 +916,10 @@ namespace Apps.BLL.Tests
                 or = AssessmentManager.Add(e);
                 if (or.status == OperateStatus.Error)
                 {
-                    Trace.WriteLine("App Trace >>> " + or.content);
+                    StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
                     return false;
                 }
             }
@@ -347,7 +981,10 @@ namespace Apps.BLL.Tests
                 or = SalaryRecordManager.Add(e);
                 if (or.status == OperateStatus.Error)
                 {
-                    Trace.WriteLine("App Trace >>> " + or.content);
+                    StackTrace st = new StackTrace(new StackFrame(true));
+                string msg = $"App Trace >>> in file: {st.GetFrame(0).GetFileName()} " +
+                             $"line {st.GetFrame(0).GetFileLineNumber()} message： {or.content}";
+                Trace.WriteLine(msg);
                     return false;
                 }
             }
@@ -355,8 +992,8 @@ namespace Apps.BLL.Tests
             return true;
         }
 
-        [TestMethod()]
-        public void LeaveWarningTest()
+
+        public void LeaveWarningStub()
         {
             //打桩：基础数据
             Assert.AreEqual(true, DepartmentAddStub());
@@ -366,11 +1003,13 @@ namespace Apps.BLL.Tests
             Assert.AreEqual(true, BenefitAddStub());
 
 
-            //打桩：在职员工，离职员工、考核数据
+            //打桩：入职
             Assert.AreEqual(true, EmployeeEntryStub());
-            Assert.AreEqual(true, EmployeeAssessmentStub("2018-7")) ;
+
+            //打桩：考核数据
+            Assert.AreEqual(true, EmployeeAssessmentStub("2018-7"));
             Assert.AreEqual(true, EmployeeSalaryInputStub("2018-7"));
-            Assert.AreEqual(true, EmployeeAssessmentStub("2018-8")) ;
+            Assert.AreEqual(true, EmployeeAssessmentStub("2018-8"));
             Assert.AreEqual(true, EmployeeSalaryInputStub("2018-8"));
             Assert.AreEqual(true, EmployeeAssessmentStub("2018-9"));
             Assert.AreEqual(true, EmployeeSalaryInputStub("2018-9"));
@@ -381,10 +1020,64 @@ namespace Apps.BLL.Tests
             Assert.AreEqual(true, EmployeeAssessmentStub("2018-12"));
             Assert.AreEqual(true, EmployeeSalaryInputStub("2018-12"));
 
-            // 先离职
-            Assert.AreEqual(EmployeeLeaveStub(1), true);
 
         }
+
+        public void OutputResult(OperateResult or)
+        {
+            dynamic listLeaveWarning = or.data;
+            foreach (var item in listLeaveWarning)
+            {
+                SalaryRecord e = new SalaryRecord();
+
+                PropertyInfo[] pArray = item.GetType().GetProperties();
+                Type t = item.GetType();
+
+                long id = t.GetProperty("id").GetValue(item);
+                string name = t.GetProperty("name").GetValue(item);
+                string number = t.GetProperty("number").GetValue(item);
+                string departmentName = t.GetProperty("departmentName").GetValue(item);
+                string postName = t.GetProperty("postName").GetValue(item);
+                int age = t.GetProperty("age").GetValue(item);
+                int workAge = t.GetProperty("workAge").GetValue(item);
+                string resultScore = t.GetProperty("resultScore").GetValue(item);
+
+
+                var content =
+                    $"id: {id}, name:{name}, number:{number}, departmentName:{departmentName}, postName:{postName}, age:{age}, workAge:{workAge}, resultScore:{resultScore}";
+
+                Trace.WriteLine("App Trace Case Result >>> " + content);
+
+            }
+        }
+
+        [TestMethod()]
+        public void LeaveWarningTest1()
+        {
+            //打桩
+            LeaveWarningStub();
+            // 打桩：先离职
+            Assert.AreEqual(EmployeeLeaveStub(1, new DateTime(2010, 5, 1)), true);
+            Assert.AreEqual(EmployeeLeaveStub(2, new DateTime(2010, 5, 10)), true);
+            Assert.AreEqual(EmployeeLeaveStub(3, new DateTime(2010, 5, 12)), true);
+
+            var or = LeaveManager.LeaveWarning();
+            Assert.AreEqual(or.status, OperateStatus.Success);
+
+            OutputResult(or);
+
+            Assert.AreEqual(EmployeeLeaveStub(4, new DateTime(2018, 9, 1)), true);
+            Assert.AreEqual(EmployeeLeaveStub(5, new DateTime(2018, 9, 1)), true);
+            Assert.AreEqual(EmployeeLeaveStub(6, new DateTime(2018, 9, 1)), true);
+
+
+            or = LeaveManager.LeaveWarning();
+            Assert.AreEqual(or.status, OperateStatus.Success);
+
+            OutputResult(or);
+
+        }
+
 
         public void Dispose()
         {

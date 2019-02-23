@@ -1,15 +1,139 @@
-﻿@model Apps.Model.LevelInfo
-@{
-    Layout = null;
+﻿@{
+    ViewBag.Title = "离职预警";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 
     string controllerName = ViewContext.RouteData.Values["controller"].ToString();
-    string divDialog = controllerName + "_divDialog";
     string divContent = controllerName + "_divContent";
-    string formEntity = controllerName + "_formEntity";
     string tabEntityList = controllerName + "_tabEntityList";
 }
 
-<div >
-    数据不完整，暂无法预测
+
+<div class="easyui-layout" fit="true" border="false">
+    <div>
+        @*<div data-options="region:'center',split:false,title:'@(tableTitle)'">*@
+        <div style="padding-bottom:15px; height:auto; background: #F4F4F4;">
+            <form id="searchForm">
+                <table>
+                    <tr>
+                        <th>部门：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="departmentIdFilter" name="departmentIdFilter" />
+                        </td>
+                        <th>员工姓名：</th>
+                        <td>
+                            <input class="parm_control" type="text" id="employeeNameFilter" name="employeeNameFilter" />
+                        </td>
+
+                    </tr>
+                </table>
+            </form>
+        </div>
+        <table class="tab_center" id="@(tabEntityList)"></table>
+    </div>
 </div>
+<div id="@(divContent)"></div>
+
+<div id="@(tabEntityList)Menu" class="easyui-menu" style="width: 50px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+    <div data-options="iconCls:'icon-money'" onclick="onShowWarningDetail()">预警详情</div>
+</div>
+
+
+<div id="@(tabEntityList)ContextMenu" class="easyui-menu" style="height: 250px; display: none;">
+    <!--放置一个隐藏的菜单Div-->
+</div>
+
+
+<script>
+	$(function () {
+	    initPage();
+
+		//初始加载，表格宽度自适应
+		$(document).ready(function(){
+			onDatagridAdjust();
+		});
+	　　//浏览器窗口大小变化后，表格宽度自适应
+		$(window).resize(function(){
+			onDatagridAdjust();
+		});
+    })
+
+	function initPage() {
+	    $('#departmentIdFilter').combobox({
+	        width: '100%',
+	        //editable: false,
+	        url: '/Department/GetAllEntities',
+	        mode: 'remote',
+	        valueField: 'id',
+	        textField: 'name',
+	    });
+
+	    var url = '/@(controllerName)/GetLeaveWarningByPager';
+	    var callbackFuns = [
+            { "name": "onBeforeLoad", "fun": onBeforeLoad },
+            //{ "name": "onDblClickRow", "fun": onShowWarningDetail },
+            //{ "name": "onRowContextMenu", "fun": onDatagridRowContextMenu }
+	    ];
+
+	    toolbar = [
+            //{ text: '导出全部', iconCls: 'icon-export', handler: onExportAll },
+	    ];
+
+	    var gridObj = new LeaveWarningGrid('@(tabEntityList)', toolbar);
+
+	    initDatagrid(gridObj, url, callbackFuns);
+
+	}
+
+
+    function formatScore(score) {
+        var num = Number(score)
+        num = num.toFixed(2);
+
+        return num;
+    }
+
+    function getParamsJson() {
+        var filterList = new Array;
+        if ($('#departmentIdFilter').val().trim() != '') {
+            var p = {
+                "key": "departmentId",
+                "action": "==",
+                "value": $('#departmentIdFilter').val().trim()
+            };
+            filterList.push(p)
+        }
+        if ($('#employeeNameFilter').val().trim() != '') {
+            var p = {
+                "key": "employeeName",
+                "action": "==",
+                "value": $('#employeeNameFilter').val().trim()
+            };
+            filterList.push(p)
+        }
+
+        return JSON.stringify(filterList);
+    }
+
+
+    function onBeforeLoad(param) {
+
+        param.extendParams = getParamsJson();
+
+        return true;
+    }
+
+    function filter() {
+        var queryParams = $('#@(tabEntityList)').datagrid('options').queryParams;
+
+        queryParams.extendParams = getParamsJson();
+
+        $('#@(tabEntityList)').datagrid('options').queryParams = queryParams;
+        $('#@(tabEntityList)').datagrid('load');
+    }
+
+
+</script>
+
+
 
