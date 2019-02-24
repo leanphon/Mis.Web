@@ -205,7 +205,9 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            OperateResult or = LeaveManager.LeaveWarningByPager(queryParam);
+            LeaveManager manager = new LeaveManager();
+
+            OperateResult or = manager.LeaveWarningByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)

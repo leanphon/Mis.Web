@@ -6,7 +6,6 @@ namespace Apps.BLL
     using Apps.Model.Finance;
     using Apps.Model;
     using Model.Privilege;
-    using Utility;
 
     public class DbContextRoot : DbContext
     {

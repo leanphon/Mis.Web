@@ -1,5 +1,4 @@
-﻿using Apps.BLL.Utility;
-using Apps.Model;
+﻿using Apps.Model;
 using Apps.Model.Utility;
 using LinqToExcel;
 using System;

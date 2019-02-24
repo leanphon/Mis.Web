@@ -6,7 +6,7 @@ using System.Text;
 using System.Web;
 using System.Web.SessionState;
 
-namespace Apps.BLL.Utility
+namespace Apps.BLL
 {
     public class SessionHelper
     {
