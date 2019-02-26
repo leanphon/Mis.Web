@@ -139,4 +139,14 @@ namespace Apps.Model{
         public double salaryAverage { get; set; }
 
     }
+
+    /// <summary>
+    /// 定时更新到数据库的员工离职可能性
+    /// </summary>
+    public class EmployeeLeaveRate
+    {
+        public long Id { get; set; }
+        public long EmployeeId { get; set; }
+        public double Rate { get; set; }
+    }
 }

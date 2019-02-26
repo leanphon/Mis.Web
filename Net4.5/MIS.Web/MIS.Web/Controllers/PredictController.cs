@@ -3,6 +3,7 @@ using Apps.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Script.Serialization;
@@ -16,7 +17,7 @@ namespace MIS.Web.Controllers
             return View();
         }
 
-        public ActionResult GetLeaveWarningByPager(Apps.Model.Pager pager)
+        public ActionResult GetLeaveWarningByPager(Pager pager)
         {
             QueryParam queryParam = new QueryParam { pager = pager };
 
@@ -30,9 +31,7 @@ namespace MIS.Web.Controllers
                 queryParam.filters = filterSet;
             }
 
-            LeaveManager manager = new LeaveManager();
-
-            OperateResult or = manager.LeaveWarningByPager(queryParam);
+            OperateResult or = LeaveManager.LeaveWarningByPager(queryParam);
 
             if (or.status == OperateStatus.Success
                 && or.data != null)
@@ -41,6 +40,22 @@ namespace MIS.Web.Controllers
             }
 
             return Json(or, JsonRequestBehavior.AllowGet);
+        }
+
+        public ActionResult ShowManualAnalyze()
+        {
+            return View();
+        }
+
+        [NoAsyncTimeout]
+        public async Task<ActionResult> ManualAnalyze()
+        {
+            LeaveManager manager = new LeaveManager();
+
+            var task = await manager.AnalyzeOneTimeAsync();
+
+            return Json(task, JsonRequestBehavior.AllowGet);
+
         }
 
 

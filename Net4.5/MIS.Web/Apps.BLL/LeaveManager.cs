@@ -2,9 +2,12 @@
 using Apps.Model.Utility;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Apps.BLL
 {
@@ -466,8 +469,6 @@ namespace Apps.BLL
             }
         }
 
-
-
         public static OperateResult RemoveAll()
         {
             try
@@ -504,6 +505,166 @@ namespace Apps.BLL
 
         }
 
+        public static object HandlePageData(object listData, Pager pager)
+        {
+            dynamic listObj = listData;
+            if (listObj == null)
+            {
+                return null;
+            }
+            int total = listObj.Count();
+            int pages = 0;
+            IEnumerable<object> pageData = new List<object>();
+
+            if (pager == null || pager.rows == 0)
+            {
+                pages = total > 0 ? 1 : 0;
+            }
+            else
+            {
+                pages = total / (pager.rows == 0 ? 20 : pager.rows);
+                pages = total % pager.rows == 0 ? pages : pages + 1;
+                if (pager.page <= 1)
+                {
+                    pageData = listObj.Take(pager.rows);
+                }
+                else
+                {
+                    pageData = listObj.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                }
+            }
+            var pagerData = new
+            {
+                pages,
+                total,
+                rows = pageData.ToList()
+            };
+
+            return pagerData;
+        }
+
+        public static OperateResult LeaveWarningByPager(QueryParam param = null)
+        {
+            try
+            {
+                using (var db = new SystemDB())
+                {
+                    var elements = db.employeeList.Include("department").Where(m => m.state != "离职")
+                    .Select(m => m);
+
+                    #region 先查询出部门及子部门，再过滤
+
+                    if (param?.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("departmentId"))
+                        {
+                            var p = param.filters["departmentId"];
+                            long departmentId = Convert.ToInt64(p.value ?? "0");
+
+
+                            Func<long, IQueryable<long>> GetSonFun = null;
+                            GetSonFun = id =>
+                            {
+                                // 查找属于给定部门的员工
+                                var sons = from e in db.departmentList
+                                           where e.parentId == id
+                                           select e.id;
+                                IQueryable<long> many = sons;
+                                // 查找属于给定部门子部门的员工
+                                foreach (var it in sons)
+                                {
+                                    many = many.Concat(GetSonFun(it));
+                                }
+
+                                return many;
+                            };
+
+                            // 所有部门
+                            var departments = (from e in db.departmentList
+                                               where e.id == departmentId
+                                               select e.id).Concat(GetSonFun(departmentId));
+
+                            elements = elements.Where(t => departments.Contains(t.departmentId));
+                        }
+                    }
+
+                    #endregion
+
+                    #region 模糊过滤名字
+                    if (param?.filters != null)
+                    {
+                        if (param.filters.Keys.Contains("employeeName"))
+                        {
+                            var p = param.filters["employeeName"];
+                            elements = elements.Where(t => t.name.Contains(p.value));
+                        }
+                    }
+                    #endregion
+
+
+                    var result = from e in elements.Include("department").Include("postInfo").AsEnumerable()
+                                 join rate in db.EmployeeLeaveRateList on e.id equals rate.EmployeeId
+                                 let age = Utility.CalYears(e.birthday, DateTime.Now)
+                                 let workAge = Utility.CalMonths(e.entryDate ?? DateTime.Now, DateTime.Now)
+                                 orderby rate.Rate descending, workAge
+                                 select new
+                                 {
+                                     e.id,
+                                     e.name,
+                                     e.number,
+                                     departmentName = e.department.name,
+                                     postName = e.postInfo?.name ?? "",
+                                     age,
+                                     workAge = Utility.FormatWorkAge(workAge),
+                                     resultScore = rate.Rate * 100 + "%"
+
+                                 };
+
+                    int total = result.Count();
+                    int pages = 0;
+                    Pager pager = param.pager;
+                    if (pager == null || pager.rows == 0)
+                    {
+                        pages = total > 0 ? 1 : 0;
+                    }
+                    else
+                    {
+                        pages = total / (pager.rows == 0 ? 20 : pager.rows);
+                        pages = total % pager.rows == 0 ? pages : pages + 1;
+                        if (pager.page <= 1)
+                        {
+                            result = result.Take(pager.rows);
+                        }
+                        else
+                        {
+                            result = result.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
+                        }
+                    }
+
+                    var pageData = new
+                    {
+                        pages,
+                        total,
+                        rows = result.ToList()
+                    };
+
+                    return new OperateResult
+                    {
+                        status = OperateStatus.Success,
+                        data = pageData,
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+
+        }
+
         #region 预统计分析
 
         OperateResult BeforeAnalyze()
@@ -513,6 +674,41 @@ namespace Apps.BLL
                 DbCache = new SystemDB();
                 EmployeeLeaveList = DbCache.EmployeeLeaveList.ToList();
 
+                #region 全体
+
+                PreCalRelateCompanyAge();
+                PreCalRelateCompanyPost();
+                PreCalRelateCompanyWorkAge();
+                PreCalRelateCompanyEducation();
+                PreCalRelateCompanySalary();
+
+                #endregion
+
+                #region 薪酬
+
+                PreCalSalaryRelateDep();
+                PreCalSalaryRelateDepPost();
+                PreCalSalaryRelatePost();
+                PreCalSalaryRelatePostLeave();
+
+                #endregion
+
+                #region 岗位
+
+                PreCalPostRelateAge();
+                PreCalPostRelateWorkAge();
+
+
+                #endregion
+
+                #region 考核
+
+                PreCalAssessmentRelateCompany();
+                PreCalAssessmentRelateLeave();
+                PreCalAssessmentRelateDep();
+
+                #endregion
+                /*
                 #region 全体
 
                 OperateResult or = PreCalRelateCompanyAge();
@@ -604,10 +800,9 @@ namespace Apps.BLL
                     return or;
                 }
 
-
-
                 #endregion
 
+                */
                 return new OperateResult
                 {
                     status = OperateStatus.Success,
@@ -623,11 +818,127 @@ namespace Apps.BLL
 
 
         }
-        void AfterAnalyze()
+
+        OperateResult SaveLeaveRateToDb(List<EmployeeLeaveRate> listRate)
         {
-            DbCache = null;
-            EmployeeLeaveList = null;
+            try
+            {
+                DbCache.EmployeeLeaveRateList.RemoveRange(DbCache.EmployeeLeaveRateList);
+
+                DbCache.SaveChanges();
+
+                DbCache.EmployeeLeaveRateList.AddRange(listRate);
+
+                DbCache.SaveChanges();
+
+                return new OperateResult
+                {
+                    status = OperateStatus.Success,
+                };
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
         }
+
+        public OperateResult AnalyzeOneTime()
+        {
+            OperateResult or = BeforeAnalyze();
+            if (or.status == OperateStatus.Error)
+            {
+                return or;
+            }
+
+            try
+            {
+                var result = from e in DbCache.employeeList.AsEnumerable()
+                    where e.state != "离职"
+                    let age = Utility.CalYears(e.birthday, DateTime.Now)
+                    let workAge = Utility.CalMonths(e.entryDate ?? DateTime.Now, DateTime.Now)
+                    let resultScore = GetEmployeeLeaveDegree(e)
+                    orderby resultScore descending
+                    select new EmployeeLeaveRate()
+                    {
+                        EmployeeId = e.id,
+                        Rate = resultScore
+                    };
+
+                or =  SaveLeaveRateToDb(result.ToList());
+
+                Trace.WriteLine("<<< Exception Trace >>> Analyze One Time Finish");
+
+                
+                return or;
+            }
+            catch (Exception ex)
+            {
+                return new OperateResult
+                {
+                    content = Model.Utility.Utility.GetExceptionMsg(ex),
+                };
+            }
+        }
+
+        public async Task<OperateResult> AnalyzeOneTimeAsync()
+        {
+            return await Task.Run(() => AnalyzeOneTime());
+        }
+
+        public double GetEmployeeLeaveDegree(Employee e)
+        {
+            Dictionary<AnalyzeItem, double> analyzeList = new Dictionary<AnalyzeItem, double>();
+            analyzeList.Add(AnalyzeByBigData, 0.3);
+            analyzeList.Add(AnalyzeBySalary, 0.3);
+            analyzeList.Add(AnalyzeByPostCrossAge, 0.15);
+            analyzeList.Add(AnalyzeByPostCrossWorkAge, 0.1);
+            analyzeList.Add(AnalyzeByAssessment, 0.15);
+
+            double percent = 0;
+
+            foreach (var fun in analyzeList)
+            {
+                double matchDegree = fun.Key(e);
+
+                percent += matchDegree * fun.Value;
+
+            }
+
+            if (percent < 0.3)
+            {
+                return 0.3;
+            }
+            else if (percent >= 0.3 && percent <= 0.4)
+            {
+                return 0.5;
+            }
+            else if (percent > 0.4 && percent <= 0.5)
+            {
+                return 0.55;
+            }
+            else if (percent > 0.5 && percent <= 0.6)
+            {
+                return 0.6;
+            }
+            else if (percent > 0.6 && percent <= 0.7)
+            {
+                return 0.7;
+            }
+            else if (percent > 0.7 && percent <= 0.8)
+            {
+                return 0.75;
+            }
+            else if (percent > 0.8)
+            {
+                return 0.8;
+            }
+
+            return 0.0;
+        }
+
 
         #region 大数据预统计分析
 
@@ -1046,6 +1357,8 @@ namespace Apps.BLL
                 var posts = (from e in EmployeeLeaveList
                     select e.postId).Distinct();
 
+                MapPostRelateAge = new Dictionary<long, List<DimensionPostRelateAge>>();
+
                 foreach (var postId in posts)
                 {
                     List<DimensionPostRelateAge> list = new List<DimensionPostRelateAge>();
@@ -1101,6 +1414,8 @@ namespace Apps.BLL
             {
                 var posts = (from e in EmployeeLeaveList
                     select e.postId).Distinct();
+
+                MapPostRelateWorkAge = new Dictionary<long, List<DimensionPostRelateWorkAge>>();
 
                 foreach (var postId in posts)
                 {
@@ -1196,6 +1511,14 @@ namespace Apps.BLL
                 var month = DbCache.assessmentInfoList
                     .OrderByDescending(m => m.month)
                     .Select(m => m.month).FirstOrDefault();
+                if (month == null)
+                {
+                    return new OperateResult
+                    {
+                        content = "无考核数据"
+                    };
+                }
+
 
                 var ave = DbCache.assessmentInfoList
                     .Where(m => m.month == month)
@@ -1263,180 +1586,6 @@ namespace Apps.BLL
 
 
         #endregion
-
-
-        public OperateResult LeaveWarningByPager(QueryParam param = null)
-        {
-            OperateResult or = BeforeAnalyze();
-            if (or.status == OperateStatus.Error)
-            {
-                return or;
-            }
-
-            try
-            {
-                var db = DbCache;
-                var elements = db.employeeList.Include("department").Where(m => m.state != "离职")
-                    .Select(m => m);
-
-                // 先查询出部门及子部门，再过滤
-
-                #region
-
-                if (param != null && param.filters != null)
-                {
-                    if (param.filters.Keys.Contains("departmentId"))
-                    {
-                        var p = param.filters["departmentId"];
-                        long departmentId = Convert.ToInt64(p.value ?? "0");
-
-
-                        Func<long, IQueryable<long>> GetSonFun = null;
-                        GetSonFun = id =>
-                        {
-                            // 查找属于给定部门的员工
-                            var sons = from e in db.departmentList
-                                where e.parentId == id
-                                select e.id;
-                            IQueryable<long> many = sons;
-                            // 查找属于给定部门子部门的员工
-                            foreach (var it in sons)
-                            {
-                                many = many.Concat(GetSonFun(it));
-                            }
-
-                            return many;
-                        };
-
-                        // 所有部门
-                        var departments = (from e in db.departmentList
-                            where e.id == departmentId
-                            select e.id).Concat(GetSonFun(departmentId));
-
-                        elements = elements.Where(t => departments.Contains(t.departmentId));
-                    }
-                }
-
-                #endregion
-
-
-                // 预警计算
-
-                #region
-
-                var result = from e in elements.AsEnumerable()
-                    let age = Utility.CalYears(e.birthday, DateTime.Now)
-                    let workAge = Utility.CalMonths(e.entryDate ?? DateTime.Now, DateTime.Now)
-                    let resultScore = GetEmployeeLeaveDegree(e)
-                                     orderby resultScore descending 
-                    select new
-                    {
-                        e.id,
-                        e.name,
-                        e.number,
-                        departmentName = "",
-                        postName = "",
-                        age,
-                        workAge,
-                        resultScore = resultScore * 100 + "%"
-
-                    };
-
-                #endregion
-                int total = result.Count();
-                int pages = 0;
-                Pager pager = param.pager;
-                if (pager == null || pager.rows == 0)
-                {
-                    pages = total > 0 ? 1 : 0;
-                }
-                else
-                {
-                    pages = total / (pager.rows == 0 ? 20 : pager.rows);
-                    pages = total % pager.rows == 0 ? pages : pages + 1;
-                    if (pager.page <= 1)
-                    {
-                        result = result.Take(pager.rows);
-                    }
-                    else
-                    {
-                        result = result.Skip((pager.page - 1) * pager.rows).Take(pager.rows);
-                    }
-                }
-                var data = new
-                {
-                    pages,
-                    total,
-                    rows = result.ToList()
-                };
-
-                return new OperateResult
-                {
-                    status = OperateStatus.Success,
-                    data = data,
-                };
-
-            }
-            catch (Exception ex)
-            {
-                return new OperateResult
-                {
-                    content = Model.Utility.Utility.GetExceptionMsg(ex),
-                };
-            }
-
-        }
-
-        public  double GetEmployeeLeaveDegree(Employee e)
-        {
-            Dictionary<AnalyzeItem, double> analyzeList = new Dictionary<AnalyzeItem, double>();
-            analyzeList.Add(AnalyzeByBigData, 0.3);
-            analyzeList.Add(AnalyzeBySalary, 0.3);
-            analyzeList.Add(AnalyzeByPostCrossAge, 0.15);
-            analyzeList.Add(AnalyzeByPostCrossWorkAge, 0.1);
-            analyzeList.Add(AnalyzeByAssessment, 0.15);
-
-            double percent = 0;
-
-            foreach (var fun in analyzeList)
-            {
-                double matchDegree = fun.Key(e);
-
-                percent += matchDegree * fun.Value;
-
-            }
-
-            if (percent < 0.3)
-            {
-                return 0.3;
-            }
-            else if (percent >= 0.3 && percent <= 0.4)
-            {
-                return 0.5;
-            }
-            else if (percent > 0.4 && percent <= 0.5)
-            {
-                return 0.55;
-            }
-            else if (percent > 0.5 && percent <= 0.6)
-            {
-                return 0.6;
-            }
-            else if (percent > 0.6 && percent <= 0.7)
-            {
-                return 0.7;
-            }
-            else if (percent > 0.7 && percent <= 0.8)
-            {
-                return 0.75;
-            }
-            else if (percent > 0.8)
-            {
-                return 0.8;
-            }
-
-            return 0.0;
-        }
 
         #region 大数据计算
 
@@ -2044,69 +2193,28 @@ namespace Apps.BLL
 
         public  double AnalyzeByPostCrossAge(Employee e)
         {
-            int condition = 0;
-            int count = 0;
-
-            List<CalItem> calFuns = new List<CalItem>();
-            calFuns.Add(CalPostCrossAge);
-
-            foreach (var fun in calFuns)
+            OperateResult or = CalPostCrossAge(e);
+            if (or.status == OperateStatus.Success)
             {
-                OperateResult or = fun(e);
+                double rate = (double)or.data;
 
-                if (or.status == OperateStatus.Success)
-                {
-                    condition++;
-                    bool fit = (bool)or.data;
-                    count = fit ? count + 1 : count;
-                }
+                return rate;
             }
+            return 0;
 
-            if (count == 0 || condition == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return count / (double)condition;
-            }
         }
 
         public  double AnalyzeByPostCrossWorkAge(Employee e)
         {
-            int condition = 0;
-            int count = 0;
-
-            List<CalItem> calFuns = new List<CalItem>();
-            calFuns.Add(CalPostCrossWorkAge);
-
-            foreach (var fun in calFuns)
+            OperateResult or = CalPostCrossWorkAge(e);
+            if (or.status == OperateStatus.Success)
             {
-                OperateResult or = fun(e);
+                double rate = (double)or.data;
 
-                if (or.status == OperateStatus.Success)
-                {
-                    condition++;
-                    bool fit = (bool)or.data;
-                    count = fit ? count + 1 : count;
-                }
+                return rate;
             }
+            return 0;
 
-            if (count == 0 || condition == 0)
-            {
-                return 0;
-            }
-            else
-            {
-                return count / (double)condition;
-            }
-        }
-
-        private class StageItem
-        {
-            public int min { get; set; }
-            public int max { get; set; }
-            public int count { get; set; }
         }
 
         /// <summary>
@@ -2598,7 +2706,7 @@ namespace Apps.BLL
 
                 #region
 
-                if (param != null && param.filters != null)
+                if (param?.filters != null)
                 {
                     if (param.filters.Keys.Contains("departmentId"))
                     {

@@ -28,8 +28,6 @@ namespace Apps.BLL.Tests
         {
             SystemDB db = new SystemDB();
 
-            db.Database.CreateIfNotExists();
-
             Dispose();
 
         }
@@ -1020,19 +1018,23 @@ namespace Apps.BLL.Tests
             Assert.AreEqual(true, EmployeeAssessmentStub("2018-12"));
             Assert.AreEqual(true, EmployeeSalaryInputStub("2018-12"));
 
-
-        }
+            }
 
         public void OutputResult(OperateResult or)
         {
-            dynamic listLeaveWarning = or.data;
+            dynamic pager = or.data;
+            Type tp = pager.GetType();
+            PropertyInfo[] ps = tp.GetType().GetProperties();
+
+            dynamic listLeaveWarning = tp.GetProperty("rows").GetValue(pager);
+
             foreach (var item in listLeaveWarning)
             {
                 SalaryRecord e = new SalaryRecord();
 
-                PropertyInfo[] pArray = item.GetType().GetProperties();
                 Type t = item.GetType();
-
+                PropertyInfo[] pArray = t.GetProperties();
+                
                 long id = t.GetProperty("id").GetValue(item);
                 string name = t.GetProperty("name").GetValue(item);
                 string number = t.GetProperty("number").GetValue(item);
@@ -1061,7 +1063,8 @@ namespace Apps.BLL.Tests
             Assert.AreEqual(EmployeeLeaveStub(2, new DateTime(2010, 5, 10)), true);
             Assert.AreEqual(EmployeeLeaveStub(3, new DateTime(2010, 5, 12)), true);
 
-            var or = LeaveManager.LeaveWarning();
+
+            var or = LeaveManager.LeaveWarningByPager(new QueryParam());
             Assert.AreEqual(or.status, OperateStatus.Success);
 
             OutputResult(or);
@@ -1071,7 +1074,7 @@ namespace Apps.BLL.Tests
             Assert.AreEqual(EmployeeLeaveStub(6, new DateTime(2018, 9, 1)), true);
 
 
-            or = LeaveManager.LeaveWarning();
+            or = LeaveManager.LeaveWarningByPager(new QueryParam());
             Assert.AreEqual(or.status, OperateStatus.Success);
 
             OutputResult(or);

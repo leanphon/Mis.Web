@@ -230,7 +230,7 @@ namespace Apps.BLL
                                    };
 
                     #region 查询过滤
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
 
                         // 过滤显示
@@ -288,7 +288,7 @@ namespace Apps.BLL
                                    };
 
                     #region 查询过滤
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
 
                         // 过滤显示

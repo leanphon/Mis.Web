@@ -222,7 +222,7 @@ namespace Apps.BLL
 
                     // 过滤时间
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("timeBegin"))
                         {
@@ -310,7 +310,7 @@ namespace Apps.BLL
 
                     // 过滤时间
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("timeBegin"))
                         {

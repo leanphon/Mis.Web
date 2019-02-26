@@ -441,7 +441,7 @@ namespace Apps.BLL
                                    };
 
                     #region 查询过滤
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         // 先查询出部门及子部门，再过滤
                         #region 过滤部门
@@ -496,7 +496,7 @@ namespace Apps.BLL
 
                         // 精确过滤状态
                         #region 过滤状态
-                        if (param != null && param.filters != null)
+                        if (param?.filters != null)
                         {
                             if (param.filters.Keys.Contains("status"))
                             {
@@ -590,7 +590,7 @@ namespace Apps.BLL
 
                     // 先查询出部门及子部门，再过滤
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("departmentId"))
                         {
@@ -626,7 +626,7 @@ namespace Apps.BLL
 
                     // 模糊过滤名字
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("employeeName"))
                         {
@@ -638,7 +638,7 @@ namespace Apps.BLL
 
                     // 过滤状态
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("state"))
                         {
@@ -706,7 +706,7 @@ namespace Apps.BLL
 
                     // 先查询出部门及子部门，再过滤
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("departmentId"))
                         {
@@ -742,7 +742,7 @@ namespace Apps.BLL
 
                     // 模糊过滤名字
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("employeeName"))
                         {
@@ -754,7 +754,7 @@ namespace Apps.BLL
 
                     // 过滤状态
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("state"))
                         {
@@ -862,7 +862,7 @@ namespace Apps.BLL
 
                     // 先查询出部门及子部门，再过滤
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("departmentId"))
                         {
@@ -898,7 +898,7 @@ namespace Apps.BLL
 
                     // 过滤月份
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("month"))
                         {
@@ -910,7 +910,7 @@ namespace Apps.BLL
 
                     // 模糊过滤名字
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("employeeName"))
                         {

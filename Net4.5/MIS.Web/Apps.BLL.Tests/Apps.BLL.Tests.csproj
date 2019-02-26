@@ -69,9 +69,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="AppsDB.cs" />
     <Compile Include="LeaveManagerTests.cs" />
+    <Compile Include="Migrations\Configuration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TestDb.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Apps.BLL\Apps.BLL.csproj">

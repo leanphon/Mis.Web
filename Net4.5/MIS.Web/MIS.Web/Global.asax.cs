@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MIS.Web.Models;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,6 +14,9 @@ namespace MIS.Web
     {
         protected void Application_Start()
         {
+            //注册,
+            TaskHelper t = new TaskHelper();
+
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
             RouteConfig.RegisterRoutes(RouteTable.Routes);
@@ -21,6 +25,7 @@ namespace MIS.Web
             //log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo(Server.MapPath("~/Web.config")));
             //log4net.Config.XmlConfigurator.Configure(new System.IO.FileInfo(Server.MapPath("~/log4net.config")));
             //log4net.Config.XmlConfigurator.Configure("log4net.config");
+
         }
     }
 }

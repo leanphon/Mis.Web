@@ -73,6 +73,7 @@ namespace Apps.BLL
         /// ¿Î÷∞¡–±Ì
         /// </summary>
         public DbSet<EmployeeLeave> EmployeeLeaveList { get; set; }
+        public DbSet<EmployeeLeaveRate> EmployeeLeaveRateList { get; set; }
 
     }
 

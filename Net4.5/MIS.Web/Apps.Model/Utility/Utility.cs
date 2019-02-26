@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -21,6 +22,15 @@ namespace Apps.Model.Utility
             return (dtEnd.Year - dtBegin.Year) * 12 + (dtEnd.Month - dtBegin.Month);
         }
 
+        public static string FormatWorkAge(int months)
+        {
+            if (months < 12)
+            {
+                return months + "月";
+            }
+            return (months / 12) + "年";
+        }
+
         public static string GetExceptionMsg(Exception ex)
         {
             string msg = ex.Message;
@@ -31,8 +41,10 @@ namespace Apps.Model.Utility
                 inner = inner.InnerException;
             }
 
-            return msg;
-        }
+            var trace = $"<<< Exception Trace >>>, msg{msg}, stack:{ex.StackTrace}";
+            Trace.WriteLine(trace);
+
+            return msg;}
 
         public static TDst AutoCopy<TSrc, TDst>(TSrc parent) where TDst: new()
         {

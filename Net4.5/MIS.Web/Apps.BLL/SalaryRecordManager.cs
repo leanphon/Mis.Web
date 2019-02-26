@@ -477,7 +477,7 @@ namespace Apps.BLL
 
                     // 先查询出部门及子部门，再过滤
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("departmentId"))
                         {
@@ -513,7 +513,7 @@ namespace Apps.BLL
 
                     // 过滤月份
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("month"))
                         {
@@ -525,7 +525,7 @@ namespace Apps.BLL
 
                     // 模糊过滤名字
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("employeeName"))
                         {
@@ -655,7 +655,7 @@ namespace Apps.BLL
 
                     // 先查询出部门及子部门，再过滤
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("departmentId"))
                         {
@@ -692,7 +692,7 @@ namespace Apps.BLL
 
                     // 模糊过滤名字
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("employeeName"))
                         {
@@ -822,7 +822,7 @@ namespace Apps.BLL
 
                     // 先查询出部门及子部门，再过滤
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("departmentId"))
                         {
@@ -859,7 +859,7 @@ namespace Apps.BLL
 
                     // 模糊过滤名字
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("employeeName"))
                         {
@@ -1027,7 +1027,7 @@ namespace Apps.BLL
 
                     // 先查询出部门及子部门，再过滤
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("departmentId"))
                         {
@@ -1063,7 +1063,7 @@ namespace Apps.BLL
 
                     // 过滤月份
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("month"))
                         {
@@ -1075,7 +1075,7 @@ namespace Apps.BLL
 
                     // 模糊过滤名字
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("employeeName"))
                         {
@@ -1177,7 +1177,7 @@ namespace Apps.BLL
 
                     // 先查询出部门及子部门，再过滤
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("departmentId"))
                         {
@@ -1213,7 +1213,7 @@ namespace Apps.BLL
 
                     // 过滤月份
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("month"))
                         {
@@ -1225,7 +1225,7 @@ namespace Apps.BLL
 
                     // 模糊过滤名字
                     #region
-                    if (param != null && param.filters != null)
+                    if (param?.filters != null)
                     {
                         if (param.filters.Keys.Contains("employeeName"))
                         {

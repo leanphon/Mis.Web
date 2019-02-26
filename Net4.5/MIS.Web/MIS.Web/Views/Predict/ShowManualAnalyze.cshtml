@@ -1,0 +1,27 @@
+﻿
+@{
+    ViewBag.Title = "ShowManualAnalyze";
+    string controllerName = ViewContext.RouteData.Values["controller"].ToString();
+
+}
+<script>
+    function action() {
+        $.ajax({
+            url: '/@(controllerName)/ManualAnalyze',
+            type: 'GET',
+            async: false,
+            success: function (data) {
+                if (data.indexOf("无权访问") >= 0) {
+                    showAlert(data);
+                    return;
+                }
+            }
+        });
+    }
+
+</script>
+<div>
+    <a href="#" onclick="action()">手动启动计算离职率</a>
+</div>
+
+
